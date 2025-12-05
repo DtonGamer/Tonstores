@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#F3F4F6"/>
+  <path d="M100 70C89.5066 70 81 78.5066 81 89C81 99.4934 89.5066 108 100 108C110.493 108 119 99.4934 119 89C119 78.5066 110.493 70 100 70Z" fill="#D1D5DB"/>
+  <path d="M64 130.748C64 117.416 79.0133 110 100 110C120.987 110 136 117.416 136 130.748V140H64V130.748Z" fill="#D1D5DB"/>
+  <text x="100" y="160" font-family="sans-serif" font-size="12" fill="#6B7280" text-anchor="middle">No Image Available</text>
+</svg> 

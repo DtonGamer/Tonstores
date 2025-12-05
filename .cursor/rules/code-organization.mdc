@@ -1,0 +1,34 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Code Organization Guidelines
+
+## Directory Structure
+- `src/lib/`: Core utilities and configuration
+  - [src/lib/config.ts](mdc:src/lib/config.ts): Central configuration management
+- `src/integrations/`: External service integrations
+  - `src/integrations/supabase/`: Supabase-specific code
+- `src/contexts/`: React context providers
+- `src/services/`: Business logic and data access
+- `src/components/`: React components
+
+## Configuration Management
+- Environment variables are managed through [src/lib/config.ts](mdc:src/lib/config.ts)
+- Use the `getEnv()` helper for accessing environment variables
+- Configuration is organized by feature (payment, Supabase, etc.)
+
+## Integration Patterns
+- Keep external service integrations isolated in `src/integrations/`
+- Use typed clients and interfaces
+- Handle errors consistently
+- Implement proper error boundaries
+
+## Best Practices
+- Follow DRY (Don't Repeat Yourself) principles
+- Use TypeScript for type safety
+- Keep components focused and single-responsibility
+- Implement proper error handling and logging
+- Use environment-specific configuration
+

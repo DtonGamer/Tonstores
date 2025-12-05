@@ -1,0 +1,30 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Single Responsibility Principle
+
+## Core Guidelines
+- One purpose per file/module
+- Maximum 300 lines per component/service
+- Split components when handling multiple domains or mixing UI and business logic
+
+## File Organization
+- Components: One component per file
+- Services: One service domain per file
+- Hooks: One primary function per hook
+- Utils: Group related utilities only
+
+## When to Split
+1. Component handles multiple unrelated states
+2. File mixes UI and business logic
+3. Service handles multiple domains
+4. File exceeds 300 lines
+5. Function has multiple responsibilities
+
+## Examples
+- Auth Context: [src/contexts/AuthContext.tsx](mdc:src/contexts/AuthContext.tsx)
+- Config Management: [src/lib/config.ts](mdc:src/lib/config.ts)
+- Supabase Client: [src/integrations/supabase/client.ts](mdc:src/integrations/supabase/client.ts)
+

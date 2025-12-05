@@ -1,0 +1,39 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Session Abstraction Rule
+
+## Core Requirements
+- Single session wrapper for all auth logic
+- Isolate session access to one service
+- No raw session checks in components
+
+## Implementation
+- Primary Auth Context: [src/contexts/AuthContext.tsx](mdc:src/contexts/AuthContext.tsx)
+- Supabase Client: [src/integrations/supabase/client.ts](mdc:src/integrations/supabase/client.ts)
+- Session Refresh: [src/utils/reconnectHandler.ts](mdc:src/utils/reconnectHandler.ts)
+
+## Session Management Guidelines
+1. Use AuthContext for session state
+2. Handle token refresh automatically
+3. Implement proper session cleanup
+4. Manage session persistence
+
+## Security Rules
+- Never store sensitive session data in localStorage
+- Implement proper session timeout
+- Handle session expiry gracefully
+- Use secure session cookies
+- Implement proper CSRF protection
+
+## Usage Examples
+```typescript
+// Correct usage
+const { session, user } = useAuth();
+
+// Incorrect - don't access session directly
+const session = supabase.auth.session();
+```
+

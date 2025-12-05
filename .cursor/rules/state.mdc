@@ -1,0 +1,31 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# State Management Principle
+
+## Core Rules
+- One store per data domain
+- No duplicate state across contexts/hooks
+- Prefer atomic updates over spread operations
+
+## State Management Guidelines
+1. Use React Context for global state
+2. Implement hooks for local state
+3. Avoid prop drilling
+4. Keep state as close as possible to where it's used
+
+## Implementation Examples
+- Auth State: [src/contexts/AuthContext.tsx](mdc:src/contexts/AuthContext.tsx)
+- Profile Management: [src/hooks/useProfile.ts](mdc:src/hooks/useProfile.ts)
+- Configuration State: [src/lib/config.ts](mdc:src/lib/config.ts)
+
+## Best Practices
+- Document state shape and purpose
+- Use TypeScript for state definitions
+- Implement proper state initialization
+- Handle loading and error states
+- Clear state on component unmount
+- Use proper cleanup in useEffect
+

@@ -1,0 +1,32 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Type Safety Mandate
+
+## Core Requirements
+- Zero `any` types allowed
+- Define interfaces for all API payloads and DB records
+- Validate runtime data with Zod or similar validation libraries
+
+## Type Definitions
+- Database Types: [src/integrations/supabase/types.ts](mdc:src/integrations/supabase/types.ts)
+- Environment Types: [src/types/environment.d.ts](mdc:src/types/environment.d.ts)
+
+## Type Safety Rules
+1. Use TypeScript strict mode
+2. Define explicit return types for functions
+3. Avoid type assertions unless absolutely necessary
+4. Use generics for reusable components/functions
+5. Define proper types for async operations
+
+## Runtime Validation
+- Validate all API responses
+- Type check all external data
+- Ensure proper error handling for type mismatches
+
+## Examples
+- Supabase Client: [src/integrations/supabase/client.ts](mdc:src/integrations/supabase/client.ts)
+- Config Types: [src/lib/config.ts](mdc:src/lib/config.ts)
+

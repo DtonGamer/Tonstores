@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+description: Eliminate code duplication
+alwaysApply: true
+
+Extract repeated logic into shared utilities/services
+Limit similar patterns to 2 instances before refactoring
+
+Reuse over rewrite - check existing utilities first

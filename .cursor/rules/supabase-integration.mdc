@@ -1,0 +1,36 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Supabase Integration Guidelines
+
+## Client Configuration
+The application uses two Supabase clients:
+
+1. Regular Client ([src/integrations/supabase/client.ts](mdc:src/integrations/supabase/client.ts)):
+   - Uses anon key for public operations
+   - Handles user authentication
+   - Used for regular database operations
+
+2. Admin Client ([src/integrations/supabase/admin.ts](mdc:src/integrations/supabase/admin.ts)):
+   - Uses service role key for privileged operations
+   - Required for admin-only functionality
+   - Must be used server-side or in protected admin routes only
+
+## Database Types
+- Database types are defined in [src/integrations/supabase/types.ts](mdc:src/integrations/supabase/types.ts)
+- Always use these types when interacting with Supabase
+- Update types when database schema changes
+
+## Authentication
+- Authentication state is managed through [src/contexts/AuthContext.tsx](mdc:src/contexts/AuthContext.tsx)
+- Admin role checks are performed using the profile's role field
+- Session management includes automatic token refresh
+
+## Best Practices
+- Never use admin client for regular user operations
+- Always handle Supabase errors appropriately
+- Use RLS policies for data access control
+- Keep service role key secure and never expose it client-side
+
