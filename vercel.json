@@ -12,16 +12,14 @@
   ],
   "routes": [
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
   ],
   "env": {
     "NODE_VERSION": "24.x"
-  },
-  "git": {
-    "deploymentEnabled": {
-      "main": true
-    }
   }
 }
