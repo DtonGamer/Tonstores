@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "framework": "vite",
   "builds": [
     {
       "src": "package.json",
@@ -9,10 +10,18 @@
       }
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
-  ]
+  ],
+  "env": {
+    "NODE_VERSION": "24.x"
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  }
 }

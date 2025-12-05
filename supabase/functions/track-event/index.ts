@@ -8,7 +8,7 @@ const jsonResponse = (statusCode: number, body: any) => {
     headers: {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
       "Pragma": "no-cache",
@@ -29,7 +29,7 @@ interface TrackEventPayload {
 // Define CORS headers
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma, expires",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
   "Pragma": "no-cache",
@@ -47,6 +47,14 @@ serve(async (req) => {
   }
 
   try {
+    // Verify the request has a valid apikey (checking anon key for public functions)
+    const apikey = req.headers.get("apikey");
+    const expectedAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    
+    if (!apikey || apikey !== expectedAnonKey) {
+      return jsonResponse(401, { error: "Invalid API key" });
+    }
+
     // Only allow POST
     if (req.method !== "POST") {
       return jsonResponse(405, { error: "Method Not Allowed" });
