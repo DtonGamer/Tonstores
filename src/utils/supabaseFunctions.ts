@@ -33,6 +33,14 @@ export const callSupabaseFunction = async (
     headers['apikey'] = import.meta.env.VITE_SUPABASE_ANON_KEY;
   }
 
+  // Add guest ID header if available (for tracking and session management)
+  if (typeof window !== 'undefined') {
+    const guestId = localStorage.getItem('tonstores-guest-id');
+    if (guestId) {
+      headers['X-Guest-ID'] = guestId;
+    }
+  }
+
   // Only add cache control headers if not already present, and avoid headers that cause CORS issues
   if (!headers['Cache-Control']) {
     headers['Cache-Control'] = 'no-cache';

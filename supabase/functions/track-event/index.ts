@@ -47,12 +47,20 @@ serve(async (req) => {
   }
 
   try {
-    // Verify the request has a valid apikey (checking anon key for public functions)
-    const apikey = req.headers.get("apikey");
+    // Check multiple possible header sources for authentication
+    // 1. Check for Authorization header (Bearer token format)
+    const authHeader = req.headers.get("Authorization");
+    // 2. Check for apikey header (anonymous key format)
+    const apiKeyHeader = req.headers.get("apikey");
+
     const expectedAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
-    
-    if (!apikey || apikey !== expectedAnonKey) {
-      return jsonResponse(401, { error: "Invalid API key" });
+
+    // Allow access if either the Authorization header is present (for users with tokens)
+    // OR if the apikey matches the expected anon key (for public access)
+    const hasValidAuth = authHeader || (apiKeyHeader && apiKeyHeader === expectedAnonKey);
+
+    if (!hasValidAuth) {
+      return jsonResponse(401, { error: "Missing authorization header" });
     }
 
     // Only allow POST
