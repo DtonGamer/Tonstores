@@ -10,7 +10,7 @@
     "dev": "vite",
     "prebuild": "npm install -g typescript",
     "build": "tsc --skipLibCheck && vite build",
-    "build:dev": "vite build --mode development",
+    "build:dev": "vite build --mode production",
     "lint": "eslint .",
     "preview": "vite preview",
     "process-payouts": "node scripts/process-payouts.js",

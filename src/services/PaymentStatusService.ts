@@ -1,7 +1,5 @@
-import { supabaseAdmin } from "@/integrations/supabase/admin";
 import { supabase } from "@/integrations/supabase/client";
 import { withSessionParams, setGuestSessionParam, getGuestUserId } from "@/utils/sessionParams";
-import { LedgerService } from "@/lib/ledger";
 import { StockService } from "./StockService";
 
 type OrderStatus = 'paid' | 'failed' | 'cancelled' | 'pending';
@@ -37,9 +35,10 @@ export const PaymentStatusService = {
     reference,
     isAdminOperation = false
   }: UpdateOrderStatusParams) {
-    // Choose the appropriate Supabase client based on whether this is an admin operation
-    const dbClient = isAdminOperation ? supabaseAdmin : supabase;
-    
+    // Only use regular supabase client for client-side operations
+    // Admin operations should be handled server-side to prevent exposing admin credentials
+    const dbClient = supabase;
+
     try {
       // Get order details first - use maybeSingle instead of single to avoid 406 errors
       const { data: orderData, error: findError } = await dbClient
@@ -94,30 +93,10 @@ export const PaymentStatusService = {
         }
       }
 
-      // If paid, create a ledger entry
+      // Ledger entries should be created server-side only to prevent security issues
+      // Client-side code should not attempt to create ledger entries directly
       if (paymentStatus === 'paid' && isAdminOperation) {
-        try {
-          // Get the seller's subaccount code
-          const { data: profileData } = await dbClient
-            .from('profiles')
-            .select('paystack_subaccount_code')
-            .eq('id', orderData.user_id)
-            .single();
-          
-          if (profileData?.paystack_subaccount_code) {
-            await LedgerService.createLedgerEntry({
-              subaccount_code: profileData.paystack_subaccount_code,
-              type: 'credit',
-              amount: orderData.total_amount,
-              reference: reference || orderData.transaction_reference || orderId,
-              description: `Payment received for order: ${orderId}`,
-              seller_id: orderData.user_id
-            });
-          }
-        } catch (ledgerError) {
-          console.error('Error creating ledger entry:', ledgerError);
-          // Continue even if ledger entry creation fails
-        }
+        console.warn('Client-side ledger entries are not supported. This should be handled server-side.');
       }
 
       return { success: true };
@@ -218,9 +197,10 @@ export const PaymentStatusService = {
     reference,
     isAdminOperation = false
   }: UpdatePayoutStatusParams) {
-    // Choose the appropriate Supabase client based on whether this is an admin operation
-    const dbClient = isAdminOperation ? supabaseAdmin : supabase;
-    
+    // Only use regular supabase client for client-side operations
+    // Admin operations should be handled server-side to prevent exposing admin credentials
+    const dbClient = supabase;
+
     try {
       // Get payout details first
       const { data: payoutData, error: findError } = await dbClient
@@ -237,9 +217,9 @@ export const PaymentStatusService = {
       // Update payout status
       const { error: updateError } = await dbClient
         .from('payouts')
-        .update({ 
-          status: payoutStatus, 
-          updated_at: new Date().toISOString() 
+        .update({
+          status: payoutStatus,
+          updated_at: new Date().toISOString()
         })
         .eq('id', payoutData.id);
 
@@ -247,31 +227,11 @@ export const PaymentStatusService = {
         console.error('Error updating payout record:', updateError);
         return { success: false, error: 'Failed to update payout record' };
       }
-      
-      // If completed, create a ledger entry
+
+      // Ledger entries should be created server-side only to prevent security issues
+      // Client-side code should not attempt to create ledger entries directly
       if (payoutStatus === 'completed' && isAdminOperation) {
-        try {
-          // Get the seller's subaccount code
-          const { data: profileData } = await dbClient
-            .from('profiles')
-            .select('paystack_subaccount_code')
-            .eq('id', payoutData.user_id)
-            .single();
-          
-          if (profileData?.paystack_subaccount_code) {
-            await LedgerService.createLedgerEntry({
-              subaccount_code: profileData.paystack_subaccount_code,
-              type: 'debit',
-              amount: payoutData.amount,
-              reference: reference,
-              description: `Payout processed: ${reference}`,
-              seller_id: payoutData.user_id
-            });
-          }
-        } catch (ledgerError) {
-          console.error('Error creating ledger entry:', ledgerError);
-          // Continue even if ledger entry creation fails
-        }
+        console.warn('Client-side ledger entries are not supported. This should be handled server-side.');
       }
 
       return { success: true };

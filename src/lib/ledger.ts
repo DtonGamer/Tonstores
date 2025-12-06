@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/integrations/supabase/admin';
+import { callSupabaseFunction } from '@/utils/supabaseFunctions';
 
 interface CreateLedgerEntryParams {
   subaccount_code: string;
@@ -15,23 +15,23 @@ interface CreateLedgerEntryParams {
 export const LedgerService = {
   /**
    * Creates a ledger entry for tracking financial transactions
-   * 
+   *
    * @param params Ledger entry parameters
    * @returns Success status and any error information
    */
   async createLedgerEntry(params: CreateLedgerEntryParams) {
-    const { error } = await supabaseAdmin
-      .from('ledger_entries')
-      .insert({
-        ...params,
-        created_at: new Date().toISOString()
-      });
-    
-    if (error) {
-      console.error('Error creating ledger entry:', error);
-      return { success: false, error };
+    try {
+      const response = await callSupabaseFunction('monnify-create-ledger-entry', { params });
+
+      if (!response.success) {
+        console.error('Error creating ledger entry:', response.error);
+        return { success: false, error: response.error };
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Unexpected error creating ledger entry:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
-    
-    return { success: true };
   }
-}; 
+};
