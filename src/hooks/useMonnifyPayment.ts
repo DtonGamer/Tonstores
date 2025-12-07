@@ -106,7 +106,7 @@ export const useMonnifyPayment = () => {
   };
 
   // Helper function to update order status
-  const updateOrderStatus = async (orderId: string, status: 'paid' | 'cancelled' | 'failed', paymentStatus: 'paid' | 'failed' | 'cancelled') => {
+  const updateOrderStatus = async (orderId: string, status: 'paid' | 'cancelled' | 'failed', paymentStatus: 'paid' | 'failed' | 'cancelled', escrowStatus?: 'held' | 'released' | 'refunded') => {
     if (!orderId) {
       console.error("Cannot update order: Missing order ID");
       return false;
@@ -124,7 +124,9 @@ export const useMonnifyPayment = () => {
       return await PaymentStatusService.updateOrderStatusClient(
         orderId,
         status,
-        paymentStatus
+        paymentStatus,
+        undefined, // reference
+        escrowStatus
       );
     } catch (updateError) {
       console.error(`Error updating order status to ${status}:`, updateError);
@@ -258,11 +260,12 @@ export const useMonnifyPayment = () => {
                 await setGuestSessionParam(guestId);
               }
 
-              // Update order status
+              // Update order status - set payment as paid but escrow as held
               const success = await updateOrderStatus(
                 order.id,
                 'paid',
-                'paid'
+                'paid',
+                'held' // Set escrow status to 'held' after successful payment
               );
 
               if (success) {
@@ -302,21 +305,33 @@ export const useMonnifyPayment = () => {
         },
       };
 
-      // Add income split configuration if subaccount is available
+      // Add original income split configuration to store for later release
+      // In escrow, 100% of funds initially go to the platform account
+      // The original split configuration will be applied during fund release
       const isDevelopment = process.env.NODE_ENV === 'development';
 
       if (subaccountCode && !isDevelopment) {
-        console.log("Adding income split configuration with subaccount:", subaccountCode);
+        console.log("Storing original income split configuration with subaccount:", subaccountCode);
+        // Store the original split configuration for later use when releasing funds from escrow
         paymentConfig.incomeSplitConfig = [
           {
             subAccountCode: subaccountCode,
             feePercentage: 2, // 2% fee
-            splitPercentage: 98, // 98% goes to the seller
+            splitPercentage: 98, // 98% goes to the seller (when funds are released)
             feeBearer: true
           }
         ];
       } else if (isDevelopment) {
-        console.log("Skipping subaccount in development mode");
+        console.log("Setting up split config in development mode");
+        // For dev, still store the configuration that would be used
+        paymentConfig.incomeSplitConfig = [
+          {
+            subAccountCode: subaccountCode || "DEV_SELLER_ACCT",
+            feePercentage: 2,
+            splitPercentage: 98,
+            feeBearer: true
+          }
+        ];
       }
 
       // Prepare Monnify transaction data
@@ -333,15 +348,16 @@ export const useMonnifyPayment = () => {
         metadata: paymentConfig.metadata
       };
 
-      // Call the API to initialize the Monnify transaction
-      const response = await fetch('/api/monnify-initialize-transaction', {
+      // Call the API to initialize the Monnify escrow transaction
+      const response = await fetch('/api/monnify-initialize-escrow-transaction', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...monnifyTransactionData,
-          userId: order.user_id
+          userId: order.user_id,
+          orderId: order.id  // Include order ID for escrow tracking
         }),
       });
 
@@ -386,7 +402,7 @@ export const useMonnifyPayment = () => {
   const handleCancelConfirm = async () => {
     if (currentOrderId) {
       try {
-        const success = await updateOrderStatus(currentOrderId, 'cancelled', 'cancelled');
+        const success = await updateOrderStatus(currentOrderId, 'cancelled', 'cancelled', 'refunded');
         if (!success) {
           console.error("Failed to update order status to cancelled");
         }

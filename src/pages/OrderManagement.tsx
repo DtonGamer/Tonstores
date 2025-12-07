@@ -25,6 +25,7 @@ import {
 import { Order } from "@/hooks/useOrders";
 import OrderDetails from "@/components/orders/OrderDetails";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { PaymentStatusService } from "@/services/PaymentStatusService";
 
 const OrderManagement = () => {
   const { user } = useAuth();
@@ -38,6 +39,7 @@ const OrderManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
+  const [escrowStatusFilter, setEscrowStatusFilter] = useState("all");
   const [socialMediaFilter, setSocialMediaFilter] = useState("all");
   
   useEffect(() => {
@@ -76,6 +78,8 @@ const OrderManagement = () => {
             total_amount,
             status,
             payment_status,
+            escrow_status,
+            release_date,
             created_at,
             payment_reference,
             catalog_id,
@@ -110,19 +114,24 @@ const OrderManagement = () => {
   }, [user]);
   
   useEffect(() => {
-    // Apply filters when searchQuery, statusFilter, or paymentStatusFilter changes
+    // Apply filters when searchQuery, statusFilter, paymentStatusFilter, or escrowStatusFilter changes
     let result = orders;
-    
-    // Apply status filter
+
+    // Apply status filter for order status (excluding escrow statuses)
     if (statusFilter !== "all") {
       result = result.filter(order => order.status === statusFilter);
     }
-    
+
     // Apply payment status filter
     if (paymentStatusFilter !== "all") {
       result = result.filter(order => order.payment_status === paymentStatusFilter);
     }
-    
+
+    // Apply escrow status filter
+    if (escrowStatusFilter !== "all") {
+      result = result.filter(order => order.escrow_status === escrowStatusFilter);
+    }
+
     // Apply social media filter
     if (socialMediaFilter !== "all") {
       if (socialMediaFilter === "none") {
@@ -131,19 +140,19 @@ const OrderManagement = () => {
         result = result.filter(order => order.social_media_source === socialMediaFilter);
       }
     }
-    
+
     // Apply search filter (case insensitive)
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(order => 
+      result = result.filter(order =>
         order.customer_name.toLowerCase().includes(query) ||
         order.customer_email.toLowerCase().includes(query) ||
         order.id.toLowerCase().includes(query)
       );
     }
-    
+
     setFilteredOrders(result);
-  }, [orders, searchQuery, statusFilter, paymentStatusFilter, socialMediaFilter]);
+  }, [orders, searchQuery, statusFilter, paymentStatusFilter, escrowStatusFilter, socialMediaFilter]);
   
   const handleViewOrder = (order: Order) => {
     setSelectedOrder(order);
@@ -153,33 +162,34 @@ const OrderManagement = () => {
     setSelectedOrder(null);
   };
   
-  const handleStatusUpdate = async (orderId: string, status: string, paymentStatus?: string) => {
+  const handleStatusUpdate = async (orderId: string, status: string, paymentStatus?: string, escrowStatus?: string) => {
     try {
-      // First update the order status
-      const updateData: { status: string, payment_status?: string } = { status };
-      if (paymentStatus) {
-        updateData.payment_status = paymentStatus;
+      // First update the order status using PaymentStatusService
+      const success = await PaymentStatusService.updateOrderStatusClient(
+        orderId,
+        status as any, // Type assertion as we're dealing with string values
+        paymentStatus as any, // Type assertion
+        undefined, // reference
+        escrowStatus as any // Type assertion
+      );
+
+      if (!success) {
+        throw new Error("Failed to update order status");
       }
-      
-      const { error } = await supabase
-        .from("orders")
-        .update(updateData)
-        .eq("id", orderId);
-      
-      if (error) throw error;
-      
+
       // Update the local state
       const updatedOrders = orders.map(order => {
         if (order.id === orderId) {
-          return { 
-            ...order, 
+          return {
+            ...order,
             status,
-            ...(paymentStatus ? { payment_status: paymentStatus } : {})
+            ...(paymentStatus ? { payment_status: paymentStatus } : {}),
+            ...(escrowStatus ? { escrow_status: escrowStatus } : {})
           };
         }
         return order;
       });
-      
+
       setOrders(updatedOrders);
     } catch (error: any) {
       console.error("Error updating order status:", error);
@@ -203,6 +213,12 @@ const OrderManagement = () => {
       case "paid":
         return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
       case "failed":
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
+      case "held":
+        return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300";
+      case "released":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
+      case "refunded":
         return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
@@ -312,8 +328,8 @@ const OrderManagement = () => {
                     </div>
                     
           <div className="w-full sm:w-auto">
-                      <Select 
-                        value={paymentStatusFilter} 
+                      <Select
+                        value={paymentStatusFilter}
                         onValueChange={setPaymentStatusFilter}
                       >
               <SelectTrigger className="w-full">
@@ -329,7 +345,24 @@ const OrderManagement = () => {
               </SelectContent>
             </Select>
           </div>
-          
+
+          <div className="w-full sm:w-auto">
+            <Select
+              value={escrowStatusFilter}
+              onValueChange={setEscrowStatusFilter}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Escrow Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Escrow</SelectItem>
+                <SelectItem value="held">Held</SelectItem>
+                <SelectItem value="released">Released</SelectItem>
+                <SelectItem value="refunded">Refunded</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="w-full sm:w-auto">
             <Select
               value={socialMediaFilter}
@@ -400,6 +433,11 @@ const OrderManagement = () => {
                           {order.payment_status && (
                             <Badge className={getStatusColor(order.payment_status)}>
                               Payment: {order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)}
+                            </Badge>
+                          )}
+                          {order.escrow_status && (
+                            <Badge className={getStatusColor(order.escrow_status)}>
+                              Escrow: {order.escrow_status.charAt(0).toUpperCase() + order.escrow_status.slice(1)}
                             </Badge>
                           )}
                         </div>

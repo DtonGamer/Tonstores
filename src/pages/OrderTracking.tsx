@@ -8,6 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { getStorageUrl, imageDefaults } from "@/utils/imageHelpers";
+import { EscrowService } from "@/services/EscrowService";
+import { toast } from "@/components/ui/use-toast";
 
 const OrderStatus = ({ status, type = "order" }: { status: string, type?: "order" | "payment" }) => {
   const getStatusColor = () => {
@@ -26,8 +28,12 @@ const OrderStatus = ({ status, type = "order" }: { status: string, type?: "order
         return "bg-red-100 text-red-800 border-red-200";
       case 'failed':
         return "bg-red-100 text-red-800 border-red-200";
-      case 'refunded':
+      case 'held':
         return "bg-orange-100 text-orange-800 border-orange-200";
+      case 'released':
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case 'refunded':
+        return "bg-red-100 text-red-800 border-red-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -158,7 +164,51 @@ const OrderTracking = () => {
       mounted = false;
     };
   }, [id, getOrderDetails]);
-  
+
+  // Function to confirm delivery and release funds from escrow
+  const handleConfirmDelivery = async () => {
+    if (!order?.id) {
+      toast({
+        title: "Error",
+        description: "Order ID is missing",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Confirm delivery and release funds from escrow
+      const result = await EscrowService.confirmDeliveryAndReleaseFunds({
+        orderId: order.id
+      });
+
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: result.message || "Delivery confirmed and funds released successfully",
+        });
+
+        // Refresh the order data
+        const { order: updatedOrder, items } = await getOrderDetails(order.id);
+        setOrder(updatedOrder);
+        setOrderItems(items);
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to confirm delivery",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error confirming delivery:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to confirm delivery",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -233,7 +283,22 @@ const OrderTracking = () => {
             </div>
             
             <OrderProgress status={order.status} />
-            
+
+            {/* Show delivery confirmation button if order is shipped and escrow is held */}
+            {order.status === 'shipped' && order.escrow_status === 'held' && (
+              <div className="mt-6">
+                <Button
+                  onClick={handleConfirmDelivery}
+                  className="bg-green-600 hover:bg-green-700 w-full md:w-auto"
+                >
+                  Confirm Delivery & Release Payment
+                </Button>
+                <p className="text-sm text-gray-500 mt-2 dark:text-gray-400">
+                  Click this button when you have received your order to release payment to the seller
+                </p>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
               <div>
                 <h3 className="font-semibold mb-2 dark:text-white">Customer</h3>

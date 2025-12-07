@@ -29,9 +29,12 @@ export type Order = {
   total_amount: number;
   status: string;
   payment_status?: string;
+  escrow_status?: string;
+  release_date?: string;
   catalog_id: string;
   user_id: string;
   created_at: string;
+  updated_at: string;
   payment_provider?: string | null;
   payment_reference?: string | null;
   social_media_source?: string | null;
@@ -108,6 +111,7 @@ export const useOrders = () => {
         total_amount: totalAmount,
         status: "pending",
         payment_status: "pending",
+        escrow_status: "held", // Initialize escrow status as 'held' by default
         catalog_id: catalogId,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -358,62 +362,64 @@ export const useOrders = () => {
   
   /**
    * Updates the status of an order with security checks
-   * 
+   *
    * @param orderId - The ID of the order to update
    * @param status - The new order status
    * @param paymentStatus - Optional new payment status
+   * @param escrowStatus - Optional new escrow status
    * @param currentUserId - Optional user ID to validate permissions (if provided, checks if user has permission to update the order)
    * @returns A promise that resolves to true if the update was successful
    * @throws Error if the order is a guest order or if the user doesn't have permission to update it
    */
-  const updateOrderStatus = async (orderId: string, status: string, paymentStatus?: string, currentUserId?: string) => {
+  const updateOrderStatus = async (orderId: string, status: string, paymentStatus?: string, currentUserId?: string, escrowStatus?: string) => {
     try {
       setIsLoading(true);
-      
+
       // First check if this is a guest order and who owns it
       const { data: orderData, error: fetchError } = await supabase
         .from("orders")
         .select("user_id, catalog_id, is_guest_order, guest_id")
         .eq("id", orderId)
         .single();
-        
+
       if (fetchError) throw fetchError;
-      
+
       // Get the current guest ID - will always be valid now
       const guestId = getGuestUserId();
-      
+
       // Check if this is a guest order with matching guest ID
       const isGuestOrder = orderData.is_guest_order === true;
       const isCurrentGuestOrder = isGuestOrder && orderData.guest_id === guestId;
-      
+
       // For guest orders, ensure guest session params are set
       if (isGuestOrder) {
         await setGuestSessionParam(guestId);
       }
-      
+
       // Validate permissions
       if (currentUserId) {
         // If a user ID is provided, check if they have permission to update this order
         const isOwner = orderData.user_id === currentUserId;
         const isSeller = orderData.catalog_id && await isSellerOfCatalog(currentUserId, orderData.catalog_id);
-        
+
         if (!isOwner && !isSeller && !isCurrentGuestOrder) {
           throw new Error('You do not have permission to update this order');
         }
       }
-      
+
       // Update the order status
       const { error: updateError } = await supabase
         .from("orders")
         .update({
           status,
           ...(paymentStatus && { payment_status: paymentStatus }),
+          ...(escrowStatus && { escrow_status: escrowStatus }),
           updated_at: new Date().toISOString()
         })
         .eq("id", orderId);
-        
+
       if (updateError) throw updateError;
-      
+
       return true;
     } catch (error: any) {
       toast({

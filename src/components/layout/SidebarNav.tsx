@@ -34,12 +34,6 @@ type NavItem = {
   icon: React.ReactNode;
 };
 
-type NavItem = {
-  name: string;
-  href: string;
-  icon: React.ReactNode;
-};
-
 export default function SidebarNav() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const { user, signOut, authInitialized } = useAuth();

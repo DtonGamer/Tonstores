@@ -1,3 +1,486 @@
+Integration Guide for Monnify BVN Verification
+The purpose of this document is to provide a comprehensive and clear set of instructions for developers or businesses integrating Monnify services in accordance with the Central Bank of Nigeria's circular on virtual accounts. This guide will specifically cover BVN verification endpoints, account creation, and updating existing accounts.
+
+
+alert image
+Monnify Update
+This feature is only available Live Mode
+Table of Content
+Introduction
+About BVN
+About NIN
+Capturing BVN or NIN for new customers
+Capturing BVN or NIN for old customers
+Fees
+
+
+Introduction
+The Central Bank of Nigeria, released a circular recently, regarding virtual accounts issued to customers, as follows:
+
+Every virtual account must be linked with either a Bank Verification Number (BVN) or National Identification Number (NIN).
+
+For accounts that wish to enjoy the maximum transaction limit, both BVN and NIN must be linked to the Account Number.
+
+
+Following this update, we would be sharing with you below how to;
+
+
+
+Verify BVN using Monnify BVN Verification endpoints
+How to add BVN during Account Creation / when reserving an Account
+How to Update Existing Account with BVN/NIN
+A Sample Flow / Implementation
+
+
+About BVN
+
+What is BVN
+The Bank Verification Number (BVN) is a unique 11-digit identification number that uniquely identifies an account holder across all banks in Nigeria.
+
+
+How to get BVN
+An account holder can enrol for BVN by visiting any commercial bank branch in Nigeria. For customers who need to remember their BVN info, they can dial the USSD Code 5650# on your number registered with BVN. There is a N20 service charge for checking BVN with USSD
+
+
+Verification process for BVN
+The objective of this step is to verify that the BVN supplied by a customer is correct and that the customer owns this BVN. This process often entails capturing the customer’s BVN and other bank account information, then sharing with a service which confirms the accuracy of this information. There are several services available for this and you can check out Monnify’s BVN verification API
+
+here
+
+
+
+About NIN
+
+What is NIN
+The National Identification Number (NIN) is your unique 11-digit identifier issued by the National Identification Management Commision (NIMC).
+
+
+How to get BVN
+To get a NIN Number you would be required to provide Original Birth Certificate and Valid Proof of Identity. You can find list of NIMC registration centers and designated enrollment agents on the NIMC website
+
+https://nimc.gov.ng/nimc-enrolment-centres
+
+
+Verification process for BVN
+The objective of this step is to verify that the customer owns this NIN. This step entails capturing the customer’s NIN and other important information and sharing with a service which confirms the accuracy of this information. There are several services available for this and you can check out Monnify’s NIN verification in the Documentation section
+
+
+
+Capturing BVN or NIN for new customers
+
+On your onboarding flow, implement a section to capture BVN or NIN from customers.
+
+Verify the BVN or NIN information provided using your preferred verification service (as indicated in the description sections above)
+
+Once this information is verified, complete the user sign up process on your application.
+
+Send request to Monnify for account creation via this
+
+here
+
+, supplying the BVN and/or NIN captured.
+
+Monnify would verify the information provided and generate virtual accounts as applicable
+
+Save the accounts generated on your system and display them to the customer.
+
+
+
+Capturing BVN or NIN for existing customers
+
+On a visible screen within your website or app, implement a notification bar to prompt users to update their KYC information.
+
+On click of this notification bar, display a screen to capture BVN and/or NIN information for the user.
+
+Verify the BVN or NIN information provided using your preferred verification service (as indicated in the description sections above)Once this information is verified by you, send a request to Monnify for account details update via this
+
+https://teamapt.atlassian.net/wiki/spaces/MON/pages/289046549/Reserve+An+Account+V2
+
+, supplying the BVN and/or NIN captured.
+
+Monnify would verify the information provided and save this information with the customer’s information.
+
+On successful response from Monnify, display a message to the user accordingly.
+
+
+
+Applicable Fees
+
+Monnify would NOT charge merchants for creating accounts or updating account details with BVN or NIN. Those actions are completely free of charge as usual.
+
+
+
+However, to verify BVN / or NIN on a merchant's application, the verification method of choice may attract fees depending on the service being used. This is solely at the discretion of the merchant and not imposed nor charged by Monnify.
+
+
+
+
+
+Rate this page
+How would you rate your experience?
+
+★
+★
+★
+★
+★
+On this page
+Integration Guide for Monnify BVN Verification
+Table of Content
+Introduction
+About BVN
+What is BVN
+How to get BVN
+Verification process for BVN
+About NIN
+What is NIN
+How to get BVN
+Verification process for BVN
+Capturing BVN or NIN for new customers
+Capturing BVN or NIN for existing customers
+Applicable Fees
+Rate this page
+On this page
+Got Questions
+Monnify Tutorial Videos
+Join Our Slack Community
+
+get info
+Got Questions
+Reach out to us at support@monnify.com if you have any questions as regards integrating with the Monnify API.
+youtube
+Monnify Tutorial Videos
+Check out Our Youtube channel for tutorials on how to integrate the Monnify API.
+slack
+Join Our Slack Community
+Click here to join the Monnify Slack community.
+Copyright © 2025 Monnify
+
+Home
+Customer Verification
+Verifying your Customers
+Verifying your Customers
+Name Enquiry
+This Monnify Account Inquiry Service allows you to confirm the accuracy of your customer’s account details on your payment platform before performing any form of financial transaction. For more information, see Validate Bank Account API for more details.
+
+
+
+
+BVN and Account Name Validation Service
+This service allows you to verify that the BVN information supplied by your customers matches what has been configured on their BVN. For more information, see BVN and Account Name Match API for more details.
+
+
+
+
+BVN Information Verification Service
+This service allows you to verify that the Bank Verification Number (BVN) and the account number provided by your customers match the BVN and account number linked to the account. For more information, see BVN Details Match API for more details. The service cost to use this service is N10 for each successful request.
+
+
+
+NIN Verification Service
+This service allows you to verify the National Identification Number (NIN) that was supplied by your customers. For more information, see NIN Verification API for more details. The service charge to use this API is N60 for each successful request.
+
+
+
+Rate this page
+How would you rate your experience?
+
+★
+★
+★
+★
+★
+On this page
+How to get BVN
+Verification process for BVN
+Verifying your Customers
+Name Enquiry
+BVN and Account Name Validation Service
+BVN Information Verification Service
+NIN Verification Service
+Rate this page
+On this page
+Got Questions
+Monnify Tutorial Videos
+Join Our Slack Community
+
+get info
+Got Questions
+Reach out to us at support@monnify.com if you have any questions as regards integrating with the Monnify API.
+youtube
+Monnify Tutorial Videos
+Check out Our Youtube channel for tutorials on how to integrate the Monnify API.
+slack
+Join Our Slack Community
+Click here to join the Monnify Slack community.
+Copyright © 2025 Monnify
+
+
+
+Transaction Splitting / Sub Accounts
+Transaction splitting is a feature on Monnify that allows you to create subaccounts so payments could be split across different accounts. This simply means that for a single transaction, Monnify can help you share the amount paid between up to five different accounts.
+
+This means you can specify what percentage of incoming payments should go into your default settlement account and what percentage of payments should also go into the sub-account you’ve created. You can create sub-accounts by integrating with the Monnify Create Sub-Account Endpoint
+
+
+You can do the following to a sub-account once it has been created:
+
+Delete a Sub-Account Endpoint you no longer need
+Get the Sub-Accounts created
+Update the details of a Sub-Account
+
+Attaching Subaccounts to other payment API
+To attach a subaccount to a payment request, simply append the subAccountCodeincomeSplitConfig object to the request parameter as shown below;
+
+Copy
+"incomeSplitConfig": [
+  	{
+  		"subAccountCode": {{SubaccountCode}},
+  		"feePercentage": {{fee in percent}},
+  		"splitPercentage": {{split in percent}},
+  		"feeBearer": {{true or false}}
+  	}
+  ]
+You can see sample usage example on the Reserved Account API section.
+
+Creating a Sub Account on Monnify UI
+Please send an email to integration-support@monnify.comto have the Sub Account UI enabled for you. Once enabled, you will see the Sub Account Tab under your Collections menu.
+
+
+
+To Create a Sub Account, click on Create New and fill in the necessary details
+
+
+Rate this page
+How would you rate your experience?
+
+★
+★
+★
+★
+★
+
+
+
+Transaction Refunds
+This feature allows you to return a payment to a customer. An example of a transaction refund scenario is when an Amazon customer picks five items and makes a payment for the five of them. On arrival of the products, the customer could decide to only keep three of the items and return the rest. Upon return, the customer would have to be refunded for the two refunded products by Amazon.
+
+See Transaction Refund API for more information on implementing it on your platform.
+
+
+Types of Refunds
+Partial Refund: A part of the total transaction amount is to be refunded. The customer will be refunded a part of the initial full payment.
+
+Full Refund: The total transaction amount is to be refunded.
+
+
+Charges
+For payments made via transfers, you will be charged a refund fee of N10 and this will be deducted from your wallet. You are required to have your wallet funded before refunds can be processed.
+
+
+
+Refund From Monnify Dashboard
+To initiate a refund on a particular transaction, click on the transaction to view its details as shown below;
+
+
+
+Transaction Refunds
+Clicking on the “Refund” button takes you to the refund page;
+
+Transaction Refunds on Monnify Dashboard
+Finally populate the necessary fields and click on the refund button to perform a refund on such transaction.
+
+
+
+Sample Error Messages
+Error Message	Meaning	Action
+99
+
+Error occurred while processing your request.
+
+Engage the Monnify support
+R1
+
+Transaction with specified reference does not exist.
+
+Recheck if there’s a transaction with such reference.
+
+R2
+
+Refund not permitted for specified transaction.
+
+Refund is currently only possible for payments via Account_Transfer. Recheck if the transaction is an Account_Transfer payment.
+R3
+
+Specified refund amount is above transaction amount.
+
+Recheck the transaction amount and retry accordingly.
+R4
+
+Specified refund amount is below minimum refundable amount.
+
+The minimum refundable amount is N100
+R5
+
+Merchant does not have sufficient funds to process refund.
+
+Merchant should topup his Monnify wallet and retry.
+R6
+
+Customer account details are invalid
+
+Merchant should request valid account details from the customer or try again later.
+R7
+
+No refund was initiated with the supplied refund reference.
+
+Kindly recheck if a refund with the refund reference was successfully initiated.
+R8
+
+Supplied value has exceeded the maximum allowed number of characters.
+
+The refundReason should not be more than 64 characters and the customerNote should not be more than 16 characters.
+R9
+
+Supplied refund reference already exists for the merchant.
+
+Kindly use a new and distinct refund reference.
+R10
+
+Merchant account balance could not be retrieved.
+
+Contact Monnify’s support.
+R11
+
+Name inquiry network error.
+
+Kindly retry later or Contact Monnify’s support.
+R12
+
+The total amount of all refunds done on a particular transaction has exceeded the transaction amount.
+
+No refunds can be done for the particular transaction as the total amount of partial refunds have summed up to the transaction amount.
+M01
+
+System error. Contact support.
+
+Contact Monnify’s support.
+M02
+
+System error. Contact support
+
+Contact Monnify’s support.
+Rate this page
+How would you rate your experience?
+
+★
+★
+★
+★
+★
+On this page
+Transaction Refunds
+Types of Refunds
+Charges
+Refund From Monnify Dashboard
+Sample Error Messages
+Rate this page
+On this page
+Got Questions
+Monnify Tutorial Videos
+Join Our Slack Community
+
+get info
+Got Questions
+Reach out to us at support@monnify.com if you have any questions as regards integrating with the Monnify API.
+youtube
+Monnify Tutorial Videos
+Check out Our Youtube channel for tutorials on how to integrate the Monnify API.
+slack
+Join Our Slack Community
+Click here to join the Monnify Slack community.
+Copyright © 2025 Monnify
+instagram
+facebook
+icon
+
+
+Home
+Monnify Collections
+Settlements
+Settlements
+Settlement is the process of Monnify crediting your wallet or bank account for payments received on your behalf (payments made by your customers). At settlement time, all payments received from your customers are made available to you by crediting your wallet on Monnify and optionally moving the funds to your external bank account.
+
+Settlement Time and How It Works
+The Settlement Cycle describes the frequency of settlement, i.e how often a beneficiary is credited for payments received on her behalf.
+
+
+There are two types of settlement cycles.
+
+
+Instant - Each transaction received is settled to the beneficiary individually immediately after the payment is received.
+Bulk Settlement - Transactions are settled to the beneficiary in bulk at the agreed settlement time (or settlement cycle.)
+
+
+Default Settlement Cycles for Monnify Merchants
+Payment Method	Settlement Cycle
+Account Transfer	10 PM same day
+Card	10 PM next working day
+USSD	10 PM next working day
+Phone Number	10 PM next working day
+
+
+How It Works
+A transaction is performed on Monnify by your customers.
+Internal postings required for the transaction to be settled to merchant is done. Time of this internal posting is dependent on the settlement trigger of the payment provider powering the payment method.
+At merchant’s settlement time, if internal posting required on transaction has been completed, funds are moved from settlement payable account to merchant’s wallet account number.
+If merchant has external sweep enabled, funds are moved to merchant’s bank account via Atlas.
+
+Settlement Retrieval API
+You can get information about any settlement done on your behalf by Monnify. You can get information about a settlement either by using settlement reference or transaction reference. For more details on implementation, check Get Transactions By Settlement Reference API and Get Settlement Information For Transaction.
+
+
+Settlement Webhook
+The Settlement webhook notifies merchants via API whenever settlement has been successfully made to his settlement destination(Wallet or Bank Account). Sample payload format for the settlement notification and hash calculation is found in the Webhook section.
+
+Rate this page
+How would you rate your experience?
+
+★
+★
+★
+★
+★
+On this page
+Settlements
+Settlement Time and How It Works
+Default Settlement Cycles for Monnify Merchants
+How It Works
+Settlement Retrieval API
+Settlement Webhook
+Rate this page
+On this page
+Got Questions
+Monnify Tutorial Videos
+Join Our Slack Community
+
+get info
+Got Questions
+Reach out to us at support@monnify.com if you have any questions as regards integrating with the Monnify API.
+youtube
+Monnify Tutorial Videos
+Check out Our Youtube channel for tutorials on how to integrate the Monnify API.
+slack
+Join Our Slack Community
+Click here to join the Monnify Slack community.
+Copyright © 2025 Monnify
+instagram
+facebook
+icon
+
+
+
+
 Injected by React
 Get Started
 The Monnify API provides extensive access to the features available on our dashboard, enabling you to leverage them for your own application.

@@ -255,7 +255,11 @@ const OrderSuccess = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Payment Status</p>
-                  <p className="font-medium text-green-600">Paid</p>
+                  <p className="font-medium text-green-600">{order.payment_status || 'Paid'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Escrow Status</p>
+                  <p className="font-medium text-orange-600">{order.escrow_status || 'Held'}</p>
                 </div>
               </div>
               {paymentReference && (

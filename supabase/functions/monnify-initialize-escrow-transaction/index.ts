@@ -111,58 +111,62 @@ serve(async (req) => {
     returnUrl,
     contractCode,
     paymentMethods,
-    incomeSplitConfig,
     customDescription,
     chargeRedirectUrl,
     metadata,
-    userId
+    userId,
+    orderId
   } = data;
 
-  // Handle development mode with test data
-  if (isDevelopmentMode) {
-    // Use provided data or defaults for testing
-    const testAmount = amount || 10000; // 100.00 in smallest currency unit
-    const testCurrency = currencyCode || "NGN";
-    const testCustomerName = customerName || "Test Customer";
-    const testCustomerEmail = customerEmail || "test@example.com";
-    const testPaymentRef = paymentReference || `MNFY_${Math.random().toString(36).substring(2, 10)}`;
-    const testUserId = userId || "test-user-123";
+  // Get platform escrow account from database to hold funds initially
+  let platformIncomeSplitConfig;
+  if (!isDevelopmentMode) {
+    // Initialize Supabase client to fetch platform account details from the database
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      return jsonResponse(500, { error: "Supabase configuration is missing" });
+    }
 
-    // Create mock transaction response
-    const mockTransactionReference = `MNFY|${Math.floor(10 + Math.random() * 90)}|${new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/g, '')}|${String(Math.floor(100000 + Math.random() * 900000)).slice(0, 6)}`;
-    const mockCheckoutUrl = "https://sandbox.monnify.com/pay/" + testPaymentRef;
-    const mockAccountNumber = `200${Math.random().toString().substring(2, 12)}`;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    return jsonResponse(200, {
-      status: true,
-      message: "Transaction initialized (Development Mode)",
-      dev_mode: true,
-      data: {
-        transactionReference: mockTransactionReference,
-        contractCode: contractCode || "CONTRACT_CODE",
-        amount: testAmount,
-        currencyCode: testCurrency,
-        paymentReference: testPaymentRef,
-        customer: {
-          customerName: testCustomerName,
-          customerEmail: testCustomerEmail
-        },
-        paymentStatus: "AWAITING_PAYMENT",
-        checkoutUrl: mockCheckoutUrl,
-        accountNumber: mockAccountNumber, // For bank transfer
-        accountName: "Test Merchant Account",
-        bankName: "Test Bank",
-        description: description || "Test Payment",
-        transactionDate: new Date().toISOString()
-      },
-      request_data: {
-        userId: testUserId,
-        amount: testAmount,
-        currencyCode: testCurrency,
-        customerEmail: testCustomerEmail,
-        paymentReference: testPaymentRef
+    // Fetch the platform escrow account details from the database
+    const { data: platformAccountData, error: platformAccountError } = await supabase
+      .from('platform_accounts')
+      .select('monnify_subaccount_code')
+      .eq('is_escrow_account', true)
+      .eq('is_active', true)
+      .single();
+
+    if (platformAccountError || !platformAccountData) {
+      console.error("Error fetching platform escrow account:", platformAccountError);
+      return jsonResponse(500, { 
+        error: "Platform escrow account not configured", 
+        details: platformAccountError?.message 
+      });
+    }
+
+    // For escrow transactions, 100% of funds go to the platform escrow account initially
+    // The original split configuration is stored for later release
+    platformIncomeSplitConfig = [
+      {
+        subAccountCode: platformAccountData.monnify_subaccount_code,
+        feePercentage: 0, // Fees will be handled separately when releasing
+        splitPercentage: 100, // 100% goes to platform escrow initially
+        feeBearer: true
       }
-    });
+    ];
+  } else {
+    // In development mode, use a mock platform subaccount
+    platformIncomeSplitConfig = [
+      {
+        subAccountCode: "DEV_PLATFORM_ESCROW_ACCT",
+        feePercentage: 0,
+        splitPercentage: 100,
+        feeBearer: true
+      }
+    ];
   }
 
   // Validate required fields according to Monnify docs
@@ -175,7 +179,7 @@ serve(async (req) => {
 
   // Get user ID for database storage (optional but recommended)
   if (!userId) {
-    console.warn("User ID is missing in transaction initialization");
+    console.warn("User ID is missing in escrow transaction initialization");
   }
 
   // Initialize Supabase client if environment variables are available
@@ -189,6 +193,25 @@ serve(async (req) => {
     return jsonResponse(500, { error: "Supabase configuration is missing" });
   }
 
+  // Store original income split configuration for later use during release
+  if (data.incomeSplitConfig && orderId) {
+    // Store the original split configuration to use when releasing funds from escrow
+    for (const splitConfig of data.incomeSplitConfig) {
+      await supabase.from('income_split_configs').upsert({
+        user_id: userId,
+        order_id: orderId,
+        subaccount_code: splitConfig.subAccountCode,
+        fee_percentage: splitConfig.feePercentage,
+        split_percentage: splitConfig.splitPercentage,
+        fee_bearer: splitConfig.feeBearer,
+        status: "pending_release", // Will be active when funds are released
+        created_at: new Date().toISOString()
+      }, {
+        onConflict: 'order_id,subaccount_code' // Only upsert if this combination doesn't exist
+      });
+    }
+  }
+
   // Get Monnify credentials from environment
   const MONNIFY_API_KEY = Deno.env.get("MONNIFY_API_KEY");
   const MONNIFY_SECRET_KEY = Deno.env.get("MONNIFY_SECRET_KEY");
@@ -199,6 +222,7 @@ serve(async (req) => {
   }
 
   // Prepare payload for Monnify according to their API documentation
+  // In escrow mode, we route all funds to the platform account initially
   const payload: MonnifyInitializeTransactionPayload = {
     amount: Number(amount),
     currencyCode: currencyCode,
@@ -210,7 +234,7 @@ serve(async (req) => {
     ...(returnUrl && { returnUrl }),
     ...(contractCode && { contractCode }),
     ...(paymentMethods && { paymentMethods }),
-    ...(incomeSplitConfig && { incomeSplitConfig }),
+    incomeSplitConfig: platformIncomeSplitConfig, // Use platform escrow split configuration
     ...(customDescription && { customDescription }),
     ...(chargeRedirectUrl && { chargeRedirectUrl }),
     ...(metadata && { metadata })
@@ -256,36 +280,51 @@ serve(async (req) => {
     const transactionReference = result.responseBody?.transactionReference;
     const checkoutUrl = result.responseBody?.checkoutUrl;
 
-    // Store transaction info in database if supabase is available
+    // Store escrow transaction info in database
     if (supabase && userId) {
       try {
-        await supabase.from('transactions').insert({
+        await supabase.from('escrow_transactions').insert({
           user_id: userId,
+          order_id: orderId,
           transaction_reference: transactionReference,
           payment_reference: paymentReference,
           amount: amount,
           currency: currencyCode,
           customer_email: customerEmail,
-          status: "initialized",
-          checkout_url: checkoutUrl,
+          status: "held", // Initially held in escrow
+          escrow_account_code: platformIncomeSplitConfig[0].subAccountCode,
+          original_income_split_config: data.incomeSplitConfig, // Store original config
           created_at: new Date().toISOString()
         });
 
+        // Also update the order to reflect that it's in escrow
+        if (orderId) {
+          await supabase
+            .from('orders')
+            .update({ escrow_status: 'held' })
+            .eq('id', orderId);
+        }
       } catch (dbError) {
-        console.error("Error storing transaction in database:", dbError);
+        console.error("Error storing escrow transaction in database:", dbError);
         // Continue with response - we still initialized the transaction, just failed to update local DB
       }
     }
 
     return jsonResponse(200, {
       status: true,
-      message: "Transaction initialized",
+      message: "Escrow transaction initialized",
       transactionReference: transactionReference,
       checkoutUrl: checkoutUrl,
-      data: result.responseBody
+      escrow_status: "held",
+      data: {
+        ...result.responseBody,
+        escrow_account_code: platformIncomeSplitConfig[0].subAccountCode,
+        original_transaction_split: data.incomeSplitConfig, // Include original split for reference
+        funds_destination: "platform_escrow_account" // Clarify where funds are going
+      }
     });
   } catch (error: any) {
-    console.error("Error initializing transaction:", error);
+    console.error("Error initializing escrow transaction:", error);
 
     // Check for timeout error
     if (error.name === "AbortError") {

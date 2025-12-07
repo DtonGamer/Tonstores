@@ -31,7 +31,7 @@ type OrderItem = {
 type OrderDetailsProps = {
   order: Order;
   onClose: () => void;
-  onStatusUpdate: (orderId: string, status: string, paymentStatus?: string) => Promise<void>;
+  onStatusUpdate: (orderId: string, status: string, paymentStatus?: string, escrowStatus?: string) => Promise<void>;
 };
 
 // Format social media source to display name
@@ -71,6 +71,7 @@ const OrderDetails = ({ order, onClose, onStatusUpdate }: OrderDetailsProps) => 
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState(order.status);
   const [paymentStatus, setPaymentStatus] = useState(order.payment_status || "pending");
+  const [escrowStatus, setEscrowStatus] = useState(order.escrow_status || "held");
   const [updating, setUpdating] = useState(false);
   
   useEffect(() => {
@@ -119,9 +120,9 @@ const OrderDetails = ({ order, onClose, onStatusUpdate }: OrderDetailsProps) => 
   const handleStatusChange = async (newStatus: string) => {
     try {
       setUpdating(true);
-      await onStatusUpdate(order.id, newStatus);
+      await onStatusUpdate(order.id, newStatus, undefined, undefined); // Don't change payment/escrow status when only changing business status
       setStatus(newStatus);
-      
+
       toast({
         title: "Status updated",
         description: `Order status has been changed to ${newStatus}.`,
@@ -140,9 +141,9 @@ const OrderDetails = ({ order, onClose, onStatusUpdate }: OrderDetailsProps) => 
   const handlePaymentStatusChange = async (newPaymentStatus: string) => {
     try {
       setUpdating(true);
-      await onStatusUpdate(order.id, status, newPaymentStatus);
+      await onStatusUpdate(order.id, status, newPaymentStatus, undefined); // Don't change escrow status when only changing payment status
       setPaymentStatus(newPaymentStatus);
-      
+
       toast({
         title: "Payment status updated",
         description: `Payment status has been changed to ${newPaymentStatus}.`,
@@ -157,7 +158,28 @@ const OrderDetails = ({ order, onClose, onStatusUpdate }: OrderDetailsProps) => 
       setUpdating(false);
     }
   };
-  
+
+  const handleEscrowStatusChange = async (newEscrowStatus: string) => {
+    try {
+      setUpdating(true);
+      await onStatusUpdate(order.id, status, undefined, newEscrowStatus); // Don't change order/payment status when only changing escrow status
+      setEscrowStatus(newEscrowStatus);
+
+      toast({
+        title: "Escrow status updated",
+        description: `Escrow status has been changed to ${newEscrowStatus}.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "Failed to update escrow status.",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending': return "bg-yellow-100 text-yellow-800 border-yellow-200";
@@ -166,6 +188,9 @@ const OrderDetails = ({ order, onClose, onStatusUpdate }: OrderDetailsProps) => 
       case 'shipped': return "bg-indigo-100 text-indigo-800 border-indigo-200";
       case 'delivered': return "bg-green-100 text-green-800 border-green-200";
       case 'cancelled': return "bg-red-100 text-red-800 border-red-200";
+      case 'held': return "bg-orange-100 text-orange-800 border-orange-200";
+      case 'released': return "bg-blue-100 text-blue-800 border-blue-200";
+      case 'refunded': return "bg-red-100 text-red-800 border-red-200";
       default: return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
@@ -187,6 +212,9 @@ const OrderDetails = ({ order, onClose, onStatusUpdate }: OrderDetailsProps) => 
           </Badge>
           <Badge className={getStatusColor(status)}>
             Order: {status.charAt(0).toUpperCase() + status.slice(1)}
+          </Badge>
+          <Badge className={getStatusColor(escrowStatus)}>
+            Escrow: {escrowStatus.charAt(0).toUpperCase() + escrowStatus.slice(1)}
           </Badge>
         </div>
       </div>
@@ -273,6 +301,26 @@ const OrderDetails = ({ order, onClose, onStatusUpdate }: OrderDetailsProps) => 
                         <SelectItem value="paid">Paid</SelectItem>
                         <SelectItem value="failed">Failed</SelectItem>
                         <SelectItem value="cancelled">Cancelled</SelectItem>
+                        <SelectItem value="refunded">Refunded</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Escrow Status</p>
+                  <div className="flex items-center gap-3">
+                    <Select
+                      value={escrowStatus}
+                      onValueChange={handleEscrowStatusChange}
+                      disabled={updating}
+                    >
+                      <SelectTrigger className="w-full md:w-40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="held">Held</SelectItem>
+                        <SelectItem value="released">Released</SelectItem>
                         <SelectItem value="refunded">Refunded</SelectItem>
                       </SelectContent>
                     </Select>
