@@ -117,14 +117,29 @@ serve(async (req) => {
       });
     }
 
+    // Check for duplicate release attempts
+    const { data: existingRelease, error: existingReleaseError } = await supabase
+      .from('escrow_transactions')
+      .select('id')
+      .eq('order_id', orderId)
+      .eq('status', 'released')
+      .maybeSingle();
+
+    if (existingRelease) {
+      return jsonResponse(400, {
+        error: "Funds already released for this order",
+        transactionId: existingRelease.id
+      });
+    }
+
     if (isDevelopmentMode) {
       // In development mode, simulate the fund release
       console.log(`Development Mode: Simulating transfer of ${releaseAmount} to subaccount: ${releaseToSubaccountCode}`);
-      
+
       // Update the order status to released in the database
       const { error: updateOrderError } = await supabase
         .from('orders')
-        .update({ 
+        .update({
           escrow_status: 'released',
           release_date: new Date().toISOString(),
           updated_at: new Date().toISOString()
@@ -139,7 +154,7 @@ serve(async (req) => {
       // Update the escrow transaction status
       const { error: updateEscrowTxnError } = await supabase
         .from('escrow_transactions')
-        .update({ 
+        .update({
           status: 'released',
           release_to_subaccount: releaseToSubaccountCode,
           release_amount: releaseAmount,
@@ -191,6 +206,37 @@ serve(async (req) => {
       // If there's an error with split config, just send funds to the specified subaccount
     }
 
+    // Check platform wallet balance before proceeding with disbursement
+    const authString = `${MONNIFY_API_KEY}:${MONNIFY_SECRET_KEY}`;
+    const base64Auth = btoa(authString);
+
+    const walletResponse = await fetch("https://api.monnify.com/api/v1/disbursements/wallet-balance", {
+      method: "GET",
+      headers: {
+        "Authorization": `Basic ${base64Auth}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    const walletData = await walletResponse.json();
+    if (walletResponse.status !== 200 || !walletData.requestSuccessful) {
+      console.error("Error fetching wallet balance:", walletData);
+      return jsonResponse(walletResponse.status, {
+        error: walletData.responseMessage || "Error fetching wallet balance",
+        details: walletData
+      });
+    }
+
+    const availableBalance = walletData.responseBody?.availableBalance * 100; // Convert to kobo
+    if (availableBalance < releaseAmount) {
+      return jsonResponse(400, {
+        error: "Insufficient balance in escrow account",
+        available: availableBalance / 100, // Convert back to naira for display
+        required: releaseAmount / 100,
+        currency: "NGN"
+      });
+    }
+
     let transferResult;
     let transferResponse;
 
@@ -215,7 +261,7 @@ serve(async (req) => {
         const authString = `${MONNIFY_API_KEY}:${MONNIFY_SECRET_KEY}`;
         const base64Auth = btoa(authString);
 
-        transferResponse = await fetch("https://api.monnify.com/api/v2/disbursements/single", {
+        transferResponse = await fetch("https://api.monnify.com/api/v1/disbursements/single", {
           method: "POST",
           headers: {
             "Authorization": `Basic ${base64Auth}`,
@@ -250,7 +296,7 @@ serve(async (req) => {
         const authString = `${MONNIFY_API_KEY}:${MONNIFY_SECRET_KEY}`;
         const base64Auth = btoa(authString);
 
-        transferResponse = await fetch("https://api.monnify.com/api/v2/disbursements/single", {
+        transferResponse = await fetch("https://api.monnify.com/api/v1/disbursements/single", {
           method: "POST",
           headers: {
             "Authorization": `Basic ${base64Auth}`,
@@ -282,7 +328,7 @@ serve(async (req) => {
       const authString = `${MONNIFY_API_KEY}:${MONNIFY_SECRET_KEY}`;
       const base64Auth = btoa(authString);
 
-      transferResponse = await fetch("https://api.monnify.com/api/v2/disbursements/single", {
+      transferResponse = await fetch("https://api.monnify.com/api/v1/disbursements/single", {
         method: "POST",
         headers: {
           "Authorization": `Basic ${base64Auth}`,
