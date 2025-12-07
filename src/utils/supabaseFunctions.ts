@@ -87,7 +87,7 @@ export const callSupabaseFunction = async (
 
 // Specific function calls for convenience
 export const callMonnifyBanks = async (options: { dev_mode?: boolean } = {}) => {
-  return callSupabaseFunction('monnify-banks', { dev_mode: options.dev_mode });
+  return callSupabaseFunction('monnify-banks', { dev_mode: options.dev_mode }, { method: 'GET' });
 };
 
 export const callMonnifyVerifyAccount = async (data: { 

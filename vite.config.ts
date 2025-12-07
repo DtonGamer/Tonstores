@@ -15,12 +15,6 @@ export default defineConfig(({ mode }) => ({
         target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false
-      },
-      // Proxy for Monnify API requests - redirect to Supabase functions
-      '/api/monnify-': {
-        target: 'http://localhost:3000', // This will be handled by the main proxy
-        changeOrigin: true,
-        secure: false
       }
     }
   },
