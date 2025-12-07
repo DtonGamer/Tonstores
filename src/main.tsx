@@ -41,16 +41,16 @@ import './tailwind.output.css';
 import { setupGuestIdInterceptor } from './utils/sessionParams';
 
 // Initialize global fetch interceptor for guest headers BEFORE any network requests
-setupGuestIdInterceptor();
+setupGuestIdInterceptor().then(() => {
+  const container = document.getElementById('root');
+  if (!container) {
+    throw new Error('Root container missing');
+  }
 
-const container = document.getElementById('root');
-if (!container) {
-  throw new Error('Root container missing');
-}
-
-const root = createRoot(container);
-root.render(
- // <React.StrictMode>
-    <App />
- // </React.StrictMode>
-);
+  const root = createRoot(container);
+  root.render(
+   // <React.StrictMode>
+      <App />
+   // </React.StrictMode>
+  );
+});

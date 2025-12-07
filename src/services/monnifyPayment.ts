@@ -38,10 +38,10 @@ export const createMonnifyConfig = async ({
   onClose
 }: CreateMonnifyConfigProps): Promise<MonnifyConfig> => {
   try {
-    // Get user profile to get full name
+    // Get user profile to get business name
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('full_name')
+      .select('business_name')
       .eq('id', user.id)
       .single();
 
@@ -52,7 +52,7 @@ export const createMonnifyConfig = async ({
 
     // Calculate amount based on billing cycle
     const planAmount = billingCycle === 'yearly' ? plan.yearly_price : plan.monthly_price;
-    
+
     // Create a reference for the transaction
     const reference = `MONNIFY_SUB_${user.id.substring(0, 8)}_${Date.now()}`;
 
@@ -60,7 +60,7 @@ export const createMonnifyConfig = async ({
     const config: MonnifyConfig = {
       amount: planAmount,
       customerEmail: user.email || '',
-      customerName: profile.full_name || user.email || 'Customer',
+      customerName: profile.business_name || user.email || 'Customer',
       currency: 'NGN',
       reference: reference,
       description: `Subscription to ${plan.name} plan (${billingCycle})`,

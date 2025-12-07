@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
-import { 
-  LayoutDashboard, 
-  ShoppingBag, 
-  ClipboardList, 
-  Settings, 
-  LogOut, 
-  Menu, 
+import { useSubscription } from "@/hooks/useSubscription";
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  ClipboardList,
+  Settings,
+  LogOut,
+  Menu,
   X,
   BarChart,
   Wallet
@@ -33,45 +34,59 @@ type NavItem = {
   icon: React.ReactNode;
 };
 
-const navItems: NavItem[] = [
-  {
-    name: "Dashboard",
-    href: "/dashboard",
-    icon: <LayoutDashboard className="h-5 w-5" />,
-  },
-  {
-    name: "Catalogs",
-    href: "/dashboard",
-    icon: <ShoppingBag className="h-5 w-5" />,
-  },
-  {
-    name: "Orders",
-    href: "/orders",
-    icon: <ClipboardList className="h-5 w-5" />,
-  },
-  {
-    name: "Analytics",
-    href: "/analytics",
-    icon: <BarChart className="h-5 w-5" />,
-  },
-  {
-    name: "Finances",
-    href: "/finances",
-    icon: <Wallet className="h-5 w-5" />,
-  },
-  {
-    name: "Settings",
-    href: "/settings",
-    icon: <Settings className="h-5 w-5" />,
-  },
-];
+type NavItem = {
+  name: string;
+  href: string;
+  icon: React.ReactNode;
+};
 
 export default function SidebarNav() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const { user, signOut, authInitialized } = useAuth();
   const { profile } = useProfile();
+  const { subscription } = useSubscription();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Determine if user has a business plan by checking if they have a subscription that is not 'Free'
+  const isBusinessUser = subscription &&
+                        subscription.pricing_plans &&
+                        subscription.pricing_plans.name !== 'Free' &&
+                        subscription.status === 'active';
+
+  // Define navigation items, conditionally including Finances for business users only
+  const navItems: NavItem[] = [
+    {
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: <LayoutDashboard className="h-5 w-5" />,
+    },
+    {
+      name: "Catalogs",
+      href: "/dashboard",
+      icon: <ShoppingBag className="h-5 w-5" />,
+    },
+    {
+      name: "Orders",
+      href: "/orders",
+      icon: <ClipboardList className="h-5 w-5" />,
+    },
+    {
+      name: "Analytics",
+      href: "/analytics",
+      icon: <BarChart className="h-5 w-5" />,
+    },
+    ...(isBusinessUser ? [{
+      name: "Finances",
+      href: "/finances",
+      icon: <Wallet className="h-5 w-5" />,
+    }] : []),
+    {
+      name: "Settings",
+      href: "/settings",
+      icon: <Settings className="h-5 w-5" />,
+    },
+  ];
 
   debugLog("Rendering with profile:", !!profile, "authInitialized:", authInitialized);
 

@@ -36,33 +36,52 @@ const corsHeaders = {
   "Expires": "0",
   "Surrogate-Control": "no-store"
 };
-
 serve(async (req) => {
-  // Handle OPTIONS request for CORS
   if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: corsHeaders
-    });
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   try {
-    // Check multiple possible header sources for authentication
-    // 1. Check for Authorization header (Bearer token format)
     const authHeader = req.headers.get("Authorization");
-    // 2. Check for apikey header (anonymous key format)
     const apiKeyHeader = req.headers.get("apikey");
-
     const expectedAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
 
-    // Allow access if either the Authorization header is present (for users with tokens)
-    // OR if the apikey matches the expected anon key (for public access)
-    const hasValidAuth = authHeader || (apiKeyHeader && apiKeyHeader === expectedAnonKey);
+    console.log("DEBUG - Auth check:", {
+      hasAuthHeader: !!authHeader,
+      hasApiKeyHeader: !!apiKeyHeader,
+      expectedAnonKey: !!expectedAnonKey,
+      apiKeyMatches: expectedAnonKey && apiKeyHeader === expectedAnonKey,
+      authHeaderValue: authHeader ? "PRESENT" : "MISSING", // Only log presence, not value
+      apiKeyHeaderValue: apiKeyHeader ? "PRESENT" : "MISSING" // Only log presence, not value
+    });
+
+    // For event tracking, allow if EITHER condition is true:
+    // 1. Has valid Bearer token (logged in user) - Authorization header should be present
+    // 2. Has valid anon key (public access) - apikey header should match expected value
+    // 3. In some cases, we might want to allow tracking even without authentication for
+    //    basic usage analytics, but that's a security decision to make carefully
+    const hasValidAuth = !!authHeader || (expectedAnonKey && apiKeyHeader && apiKeyHeader === expectedAnonKey);
 
     if (!hasValidAuth) {
-      return jsonResponse(401, { error: "Missing authorization header" });
+      console.error("Auth check failed:", {
+        hasAuthHeader: !!authHeader,
+        hasApiKeyHeader: !!apiKeyHeader,
+        expectedAnonKey: !!expectedAnonKey,
+        apiKeyMatches: expectedAnonKey && apiKeyHeader === expectedAnonKey,
+        actualApiKey: apiKeyHeader ? "PRESENT" : "MISSING",
+        expectedAnonKeyPresent: !!expectedAnonKey
+      });
+      return jsonResponse(401, {
+        error: "Missing authorization header",
+        details: {
+          hasAuthHeader: !!authHeader,
+          hasValidApiKey: expectedAnonKey && apiKeyHeader === expectedAnonKey,
+          expectedAnonKeyPresent: !!expectedAnonKey
+        }
+      });
     }
 
+    // ... rest of your code
     // Only allow POST
     if (req.method !== "POST") {
       return jsonResponse(405, { error: "Method Not Allowed" });
@@ -102,18 +121,18 @@ serve(async (req) => {
     // Initialize Supabase client with service role key to bypass RLS
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Prepare the event record
+    // Prepare the event record with guest_id column
     const eventRecord = {
       user_id: data.user_id || null,  // Use provided user_id or null
       session_id: data.session_id,
       event_type: data.event_type,
       event_data: data.event_data,
       source: data.source || 'frontend',
-      // Include the guest ID in event data if available for analytics
+      // Include the guest ID if available for analytics
       ...(guestIdFromHeader && { guest_id: guestIdFromHeader })
     };
 
-    // Insert the event record
+    // Insert the event record with the guest_id column
     const { error } = await supabase
       .from('events')
       .insert([eventRecord]);
@@ -125,6 +144,13 @@ serve(async (req) => {
         details: error.message
       });
     }
+
+    console.log("Event recorded successfully:", {
+      eventType: data.event_type,
+      hasUserId: !!data.user_id,
+      hasGuestId: !!guestIdFromHeader,
+      sessionId: data.session_id
+    });
 
     return jsonResponse(200, {
       success: true,

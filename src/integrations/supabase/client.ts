@@ -71,7 +71,7 @@ if (process.env.NODE_ENV === 'development') {
     SUPABASE_ANON_KEY,
     {
       auth: {
-        autoRefreshToken: true,
+        autoRefreshToken: false,  // Changed to false to prevent automatic session refresh issues
         persistSession: true,
         detectSessionInUrl: true,
         storageKey: 'tonstores-auth-token',

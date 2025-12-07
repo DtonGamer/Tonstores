@@ -327,6 +327,47 @@ export interface Database {
           updated_at?: string
         }
       }
+      events: {
+        Row: {
+          id: string
+          user_id: string | null
+          session_id: string | null
+          event_type: string
+          event_data: Json | null
+          source: string | null
+          created_at: string
+          guest_id: string | null
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          session_id?: string | null
+          event_type: string
+          event_data?: Json | null
+          source?: string | null
+          created_at?: string
+          guest_id?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          session_id?: string | null
+          event_type?: string
+          event_data?: Json | null
+          source?: string | null
+          created_at?: string
+          guest_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -354,6 +395,7 @@ export interface SupabaseTablesConfig {
   orders: Tables['orders']
   order_items: Tables['order_items']
   profiles: Tables['profiles']
+  events: Tables['events']
 }
 
 export const Constants = {

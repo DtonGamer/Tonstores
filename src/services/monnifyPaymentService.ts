@@ -347,7 +347,7 @@ export const createMonnifyConfig = async ({
   // Get profile data
   const { data: profile } = await supabase
     .from("profiles")
-    .select("email, full_name")
+    .select("email, business_name")
     .eq("id", user.id)
     .single();
 
@@ -358,7 +358,7 @@ export const createMonnifyConfig = async ({
     publicKey,
     amount,
     customerEmail: profile?.email || user.email || '',
-    customerName: profile?.full_name || user.email?.split('@')[0] || 'Customer',
+    customerName: profile?.business_name || user.email?.split('@')[0] || 'Customer',
     currency: 'NGN',
     metadata: {
       user_id: user.id,

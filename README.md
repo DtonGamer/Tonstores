@@ -441,4 +441,7 @@ To activate this feature:
 1. Apply the migration: `npx supabase migration up`
 2. Restart your application
 
+ I've created both a shell script (deploy_supabase_functions.sh) and a Windows batch file
+  (deploy_supabase_functions.bat) to deploy these functions. To deploy:
+
 The social media source data will start collecting as soon as customers begin making purchases through your store.

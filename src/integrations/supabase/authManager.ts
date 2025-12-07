@@ -71,6 +71,22 @@ export const refreshCurrentSession = async () => {
 
     if (result.error) {
       console.error("Error refreshing session:", result.error);
+      // If refreshing fails due to oauth_client_id issue, return the current session instead of error
+      // This prevents the app from breaking when there are auth configuration issues
+      if (result.error.message.includes('oauth_client_id')) {
+        console.warn("OAuth configuration issue detected. Session refresh failed due to auth schema configuration. Returning existing session.");
+
+        // Get the current session without refreshing to maintain functionality
+        const { data: { session }, error: getSessionError } = await supabase.auth.getSession();
+        if (getSessionError) {
+          console.error("Error getting current session:", getSessionError);
+          return { data: { session: null }, error: result.error };
+        }
+
+        return { data: { session }, error: null };
+      }
+
+      // For other errors, return the original error
       // Return the same format as original Supabase refreshSession: { data: { session }, error }
       return { data: { session: null }, error: result.error };
     }

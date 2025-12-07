@@ -7,15 +7,15 @@ import { v4 as uuidv4 } from 'uuid';
  */
 export const getGuestUserId = (): string => {
   if (typeof window === 'undefined') return generateUUID();
-  
+
   const storageKey = 'tonstores-guest-id';
   let guestId = localStorage.getItem(storageKey);
-  
+
   if (!guestId) {
     guestId = generateUUID();
     localStorage.setItem(storageKey, guestId);
   }
-  
+
   return guestId;
 };
 
@@ -30,14 +30,23 @@ export const generateUUID = (): string => {
  * Sets up a global fetch interceptor to add the X-Guest-ID header to all requests
  * This should be called once during app initialization
  */
-export const setupGuestIdInterceptor = (): void => {
+export const setupGuestIdInterceptor = async (): Promise<void> => {
   if (typeof window === 'undefined') return;
-  
+
   const originalFetch = window.fetch;
   window.fetch = async (input, init) => {
+    // Check if user is authenticated first
+    const supabase = (await import('@/integrations/supabase/client')).supabase;
+    const { data: { session } } = await supabase.auth.getSession();
+
+    // If user is authenticated, don't add guest ID header
+    if (session?.user) {
+      return originalFetch(input, init);
+    }
+
     // Get the current guest ID from sessionStorage, fallback to localStorage
     let guestId = sessionStorage.getItem('current-guest-id');
-    
+
     // Fall back to localStorage if not found in sessionStorage
     if (!guestId) {
       guestId = localStorage.getItem('tonstores-guest-id') ?? undefined;
@@ -46,14 +55,14 @@ export const setupGuestIdInterceptor = (): void => {
         sessionStorage.setItem('current-guest-id', guestId);
       }
     }
-    
+
     if (guestId) {
       // Create a new init object with the X-Guest-ID header
       const newInit = { ...init };
       if (!newInit.headers) {
         newInit.headers = {};
       }
-      
+
       // Convert Headers object to plain object if needed
       if (newInit.headers instanceof Headers) {
         const headers = {};
@@ -62,14 +71,14 @@ export const setupGuestIdInterceptor = (): void => {
         });
         newInit.headers = headers;
       }
-      
+
       // Add our header
       newInit.headers['X-Guest-ID'] = guestId;
-      
+
       // Call the original fetch with our modified init
       return originalFetch(input, newInit);
     }
-    
+
     // If no guest ID, just use the original fetch
     return originalFetch(input, init);
   };
@@ -78,7 +87,7 @@ export const setupGuestIdInterceptor = (): void => {
 /**
  * Sets the guest ID as a custom header for Supabase requests
  * This approach is more reliable than using session parameters
- * 
+ *
  * @param guestId - The guest ID to set
  * @returns Promise that resolves to true if successful
  */
@@ -88,17 +97,17 @@ export const setGuestSessionParam = async (guestId: string): Promise<boolean> =>
       console.error("Cannot set guest session param: guestId is empty");
       return false;
     }
-    
+
     console.log("Setting guest session with ID:", guestId);
-    
+
     // Set auth header for functions
     supabase.functions.setAuth(guestId);
-    
+
     // Store the guest ID in sessionStorage for fetch interceptor to access
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('current-guest-id', guestId);
     }
-    
+
     // Call RPC with retry logic
     let retries = 3;
     while (retries > 0) {
@@ -115,7 +124,7 @@ export const setGuestSessionParam = async (guestId: string): Promise<boolean> =>
       await new Promise(resolve => setTimeout(resolve, 200));
       retries--;
     }
-    
+
     return false;
   } catch (err) {
     console.error("Error setting guest session header:", err);
@@ -148,7 +157,7 @@ export const ensureSessionParams = async (): Promise<boolean> => {
 /**
  * Wrapper function for Supabase operations that ensures session parameters
  * are set correctly before executing the operation
- * 
+ *
  * @param operation - The database operation to perform
  * @returns Promise with the result of the operation
  */
@@ -157,7 +166,7 @@ export const withSessionParams = async <T>(
 ): Promise<T> => {
   // Ensure session parameters are set before operation
   await ensureSessionParams();
-  
+
   // Execute the operation
   return await operation();
-}; 
+};

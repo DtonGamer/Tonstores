@@ -257,8 +257,8 @@ const Pricing = () => {
                   <tr className="bg-gray-100">
                     <th className="py-4 px-6 text-left text-gray-700">Feature</th>
                     <th className="py-4 px-6 text-center text-gray-700">Free</th>
-                    <th className="py-4 px-6 text-center text-gray-700">Standard</th>
-                    <th className="py-4 px-6 text-center text-gray-700">Premium</th>
+                    <th className="py-4 px-6 text-center text-gray-700">Pro</th>
+                    <th className="py-4 px-6 text-center text-gray-700">Business</th>
                   </tr>
                 </thead>
                 <tbody>

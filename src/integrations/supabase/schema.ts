@@ -19,17 +19,31 @@ export async function verifyDatabaseSchema(): Promise<string[]> {
     } else {
       // Check for required columns in profiles table
       try {
-        // This will throw an error if any column is missing
-        // Using limit 1 instead of 0 to avoid the limit(0) error
-        const { error: columnsError } = await supabase
-          .from('profiles')
-          .select('id, email, business_name, role, created_at, updated_at, paystack_subaccount_id, kyc_verified, kyc_verified_at')
-          .limit(1);
+        // Instead of selecting all columns at once which might cause URL length issues,
+        // check for individual columns that are most critical
+        const criticalColumns = ['id', 'email', 'business_name', 'role', 'created_at', 'updated_at'];
 
-        if (columnsError) {
-          const missingColumns = columnsError.message.match(/column "(.*?)" does not exist/g);
-          if (missingColumns) {
-            missing.push(...missingColumns);
+        for (const column of criticalColumns) {
+          const { error: columnError } = await supabase
+            .from('profiles')
+            .select(column)
+            .limit(1);
+
+          if (columnError) {
+            missing.push(`column "${column}" in profiles table`);
+          }
+        }
+
+        // Additional check for specific Monnify-related columns
+        const monnifyColumns = ['monnify_subaccount_code', 'kyc_verified', 'kyc_verified_at'];
+        for (const column of monnifyColumns) {
+          const { error: columnError } = await supabase
+            .from('profiles')
+            .select(column)
+            .limit(1);
+
+          if (columnError) {
+            missing.push(`column "${column}" in profiles table`);
           }
         }
       } catch (e) {

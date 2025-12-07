@@ -1,4 +1,5 @@
 ﻿import { supabase } from "@/integrations/supabase/client";
+import { refreshCurrentSession } from "@/integrations/supabase/authManager";
 import { toast } from "@/components/ui/use-toast";
 
 // Set this to true to enable debug logging
@@ -113,13 +114,14 @@ export const initReconnectHandler = () => {
 export const refreshSession = async () => {
   try {
     debugLog("Refreshing Supabase session");
-    const { data, error } = await supabase.auth.refreshSession();
-    
-    if (error) {
-      throw error;
+    const result = await refreshCurrentSession();
+
+    if (result.error) {
+      debugLog("Error refreshing session:", result.error);
+      throw result.error;
     }
-    
-    debugLog("Session refreshed successfully:", !!data.session);
+
+    debugLog("Session refreshed successfully:", !!result.data.session);
     return true;
   } catch (error) {
     debugLog("Error refreshing session:", error);

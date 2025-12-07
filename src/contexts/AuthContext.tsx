@@ -116,7 +116,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (refreshResult.error) {
               console.error("Error refreshing session:", refreshResult.error);
               debugLog("Error refreshing session:", refreshResult.error);
-              // Continue with the existing session
+
+              // Continue with the existing session instead of failing completely
+              debugLog("Continuing with existing session");
+              setSession(sessionResult.data.session);
+              setUser(sessionResult.data.session.user);
+
+              if (sessionResult.data.session.user) {
+                await fetchProfile(sessionResult.data.session.user.id);
+              }
+
+              if (mounted) {
+                setAuthInitialized(true);
+                setIsLoading(false);
+              }
+              return;
             } else if (refreshResult.data.session) {
               debugLog("Session refreshed successfully");
               setSession(refreshResult.data.session);
@@ -135,7 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           } catch (refreshError) {
             console.error("Exception refreshing session:", refreshError);
             debugLog("Exception refreshing session:", refreshError);
-            // Continue with the existing session
+            // Continue with the existing session regardless of refresh error
           }
         }
 

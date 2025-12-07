@@ -46,28 +46,28 @@ const Navbar = () => {
           <div className="hidden md:flex md:items-center md:space-x-6">
             {!isAuthenticated && (
               <>
-                <Link to="/" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors">
+                <Link to="/" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
                   Home
                 </Link>
-                <Link to="/features" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors">
+                <Link to="/features" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
                   Features
                 </Link>
-                <Link to="/pricing" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors">
+                <Link to="/pricing" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
                   Pricing
                 </Link>
-                <Link to="/about" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors">
+                <Link to="/about" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
                   About
                 </Link>
-                <Link to="/contact" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors">
+                <Link to="/contact" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
                   Contact
                 </Link>
                 <div className="ml-4 flex items-center space-x-3">
-                  <Link to="/login">
+                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                     <Button variant="outline" className="border-gray-300 hover:border-tonstores-green text-gray-700 hover:text-tonstores-green">
                       Log In
                     </Button>
                   </Link>
-                  <Link to="/register">
+                  <Link to="/register" onClick={() => setIsMenuOpen(false)}>
                     <Button className="bg-tonstores-green hover:bg-tonstores-darkblue text-white">
                       Sign Up
                       <ArrowRight className="ml-2" size={16} />
@@ -79,7 +79,7 @@ const Navbar = () => {
 
             {/* If authenticated on home page, show only Dashboard */}
             {isAuthenticated && onHomeRoute && (
-              <Link to="/dashboard">
+              <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
                 <Button className="bg-tonstores-green hover:bg-tonstores-darkblue text-white flex items-center space-x-2">
                   <User size={18} />
                   <span>Dashboard</span>
@@ -89,7 +89,7 @@ const Navbar = () => {
 
             {/* If authenticated but not on home page, show Dashboard */}
             {isAuthenticated && !onHomeRoute && (
-              <Link to="/dashboard">
+              <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
                 <Button variant="outline" className="border-gray-300 text-tonstores-darkblue hover:bg-gray-50">
                   Dashboard
                 </Button>
@@ -120,32 +120,32 @@ const Navbar = () => {
           <div className="flex flex-col space-y-3 pb-3 border-b border-gray-200">
             {!isAuthenticated && (
               <>
-                <Link to="/" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green">
+                <Link to="/" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
                   Home
                 </Link>
-                <Link to="/features" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green">
+                <Link to="/features" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
                   Features
                 </Link>
-                <Link to="/pricing" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green">
+                <Link to="/pricing" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
                   Pricing
                 </Link>
-                <Link to="/about" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green">
+                <Link to="/about" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
                   About
                 </Link>
-                <Link to="/contact" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green">
+                <Link to="/contact" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
                   Contact
                 </Link>
               </>
             )}
 
             {isAuthenticated && onHomeRoute && (
-              <Link to="/dashboard" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green">
+              <Link to="/dashboard" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
                 Dashboard
               </Link>
             )}
 
             {isAuthenticated && !onHomeRoute && (
-              <Link to="/dashboard" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green">
+              <Link to="/dashboard" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
                 Dashboard
               </Link>
             )}
@@ -153,12 +153,12 @@ const Navbar = () => {
           
           {!isAuthenticated && (
             <div className="mt-4 flex flex-col space-y-3">
-              <Link to="/login" className="w-full">
+              <Link to="/login" className="w-full" onClick={() => setIsMenuOpen(false)}>
                 <Button variant="outline" className="w-full justify-center border-gray-300 text-gray-700">
                   Log In
                 </Button>
               </Link>
-              <Link to="/register" className="w-full">
+              <Link to="/register" className="w-full" onClick={() => setIsMenuOpen(false)}>
                 <Button className="w-full justify-center bg-tonstores-green hover:bg-tonstores-darkblue text-white">
                   Sign Up
                 </Button>
