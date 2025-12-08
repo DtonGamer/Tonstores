@@ -299,7 +299,14 @@ export default function SidebarNav() {
         <div className={`sidebar-content relative transform transition-transform duration-300 ease-in-out ${isMobileNavOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col w-72 max-w-[80%] h-full bg-white shadow-xl`}>
           <div className="flex items-center justify-between h-16 flex-shrink-0 px-4 border-b border-gray-200">
             <Link to="/" className="flex items-center">
-              <span className="text-2xl font-bold text-tonstores-darkblue">TonStores</span>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-lg bg-tonstores-green flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">T</span>
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-tonstores-green to-tonstores-darkblue bg-clip-text text-transparent">
+                  TonStores
+                </span>
+              </div>
             </Link>
           </div>
 
