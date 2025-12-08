@@ -12,6 +12,19 @@ interface UpdateRoleRequest {
 }
 
 serve(async (req) => {
+  // Handle OPTIONS request for CORS
+  if (req.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Pragma": "no-cache"
+      }
+    });
+  }
+
   // Parse request body to check for dev_mode
   let requestData;
   try {
@@ -19,7 +32,16 @@ serve(async (req) => {
   } catch (e) {
     return new Response(
       JSON.stringify({ error: 'Invalid JSON body' }),
-      { headers: { 'Content-Type': 'application/json' }, status: 400 }
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Pragma': 'no-cache'
+        },
+        status: 400
+      }
     );
   }
 
@@ -34,7 +56,16 @@ serve(async (req) => {
     if (!target_user_id || !new_role) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
-        { headers: { 'Content-Type': 'application/json' }, status: 400 }
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Pragma': 'no-cache'
+          },
+          status: 400
+        }
       );
     }
 
@@ -42,7 +73,16 @@ serve(async (req) => {
     if (new_role !== 'user' && new_role !== 'admin') {
       return new Response(
         JSON.stringify({ error: 'Invalid role specified' }),
-        { headers: { 'Content-Type': 'application/json' }, status: 400 }
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Pragma': 'no-cache'
+          },
+          status: 400
+        }
       );
     }
 
@@ -56,7 +96,16 @@ serve(async (req) => {
           role: new_role
         }
       }),
-      { headers: { 'Content-Type': 'application/json' }, status: 200 }
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Pragma': 'no-cache'
+        },
+        status: 200
+      }
     );
   }
 
@@ -75,7 +124,16 @@ serve(async (req) => {
   if (req.method !== 'POST') {
     return new Response(
       JSON.stringify({ error: 'Method not allowed' }),
-      { headers: { 'Content-Type': 'application/json' }, status: 405 }
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Pragma': 'no-cache'
+        },
+        status: 405
+      }
     );
   }
 
@@ -86,7 +144,16 @@ serve(async (req) => {
     if (!target_user_id || !new_role) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
-        { headers: { 'Content-Type': 'application/json' }, status: 400 }
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Pragma': 'no-cache'
+          },
+          status: 400
+        }
       );
     }
 
@@ -94,7 +161,16 @@ serve(async (req) => {
     if (new_role !== 'user' && new_role !== 'admin') {
       return new Response(
         JSON.stringify({ error: 'Invalid role specified' }),
-        { headers: { 'Content-Type': 'application/json' }, status: 400 }
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Pragma': 'no-cache'
+          },
+          status: 400
+        }
       );
     }
 
@@ -104,7 +180,16 @@ serve(async (req) => {
     if (userError || !user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized', details: userError?.message }),
-        { headers: { 'Content-Type': 'application/json' }, status: 401 }
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Pragma': 'no-cache'
+          },
+          status: 401
+        }
       );
     }
 
@@ -118,14 +203,32 @@ serve(async (req) => {
     if (adminCheckError || !adminCheckData) {
       return new Response(
         JSON.stringify({ error: 'Failed to verify admin status', details: adminCheckError?.message }),
-        { headers: { 'Content-Type': 'application/json' }, status: 403 }
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Pragma': 'no-cache'
+          },
+          status: 403
+        }
       );
     }
 
     if (adminCheckData.role !== 'admin') {
       return new Response(
         JSON.stringify({ error: 'Only admins can update user roles' }),
-        { headers: { 'Content-Type': 'application/json' }, status: 403 }
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Pragma': 'no-cache'
+          },
+          status: 403
+        }
       );
     }
 
@@ -140,7 +243,16 @@ serve(async (req) => {
     if (updateError) {
       return new Response(
         JSON.stringify({ error: 'Failed to update user role', details: updateError.message }),
-        { headers: { 'Content-Type': 'application/json' }, status: 500 }
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Pragma': 'no-cache'
+          },
+          status: 500
+        }
       );
     }
 
@@ -153,12 +265,30 @@ serve(async (req) => {
           business_name: updateData.business_name
         }
       }),
-      { headers: { 'Content-Type': 'application/json' }, status: 200 }
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Pragma': 'no-cache'
+        },
+        status: 200
+      }
     );
   } catch (error) {
     return new Response(
       JSON.stringify({ error: 'Internal server error', details: error.message }),
-      { headers: { 'Content-Type': 'application/json' }, status: 500 }
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Pragma': 'no-cache'
+        },
+        status: 500
+      }
     );
   }
 });

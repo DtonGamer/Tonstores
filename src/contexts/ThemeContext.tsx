@@ -29,8 +29,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   // Function to set theme and save to localStorage
   const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem('tonstores-theme', newTheme);
+    // Force light theme only - disable dark mode
+    setThemeState('light');
+    localStorage.setItem('tonstores-theme', 'light');
   };
 
   // Check if user is authenticated
@@ -73,43 +74,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   // Effect to handle system theme changes and apply theme to document
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
     const handleChange = () => {
-      // Always use light theme for non-authenticated users
-      if (!isAuthenticated) {
-        setResolvedTheme('light');
-        document.documentElement.classList.remove('dark');
-        document.documentElement.classList.add('light');
-        return;
-      }
+      // Force light theme only - disable dark mode
+      setResolvedTheme('light');
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
+    };
 
-      // For authenticated users, follow their preference
-      const systemTheme = mediaQuery.matches ? 'dark' : 'light';
-      const themeToApply = theme === 'system' ? systemTheme : theme;
-      
-      setResolvedTheme(themeToApply);
-      
-      // Apply theme to document
-      if (themeToApply === 'dark') {
-        document.documentElement.classList.add('dark');
-        document.documentElement.classList.remove('light');
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.classList.add('light');
-      }
-    };
-    
-    // Initial setup
+    // Initial setup - always use light theme
     handleChange();
-    
-    // Listen for system theme changes
-    mediaQuery.addEventListener('change', handleChange);
-    
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange);
-    };
-  }, [theme, isAuthenticated]);
+
+    // Never listen for system theme changes since we're forcing light mode
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme }}>

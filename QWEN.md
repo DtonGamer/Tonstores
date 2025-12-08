@@ -1,15 +1,15 @@
 # TonStores Catalog Hub - Project Context
 
 ## Overview
-TonStores Catalog Hub is a modern e-commerce catalog management system built with React, Vite, and Supabase. It enables users to create and share beautiful product catalogs, manage orders, and process payments seamlessly using Paystack integration. The platform also includes admin capabilities for managing users, catalogs, products, orders, and subscriptions.
+TonStores Catalog Hub is a modern e-commerce catalog management system built with React, Vite, and Supabase. It enables users to create and share beautiful product catalogs, manage orders, and process payments seamlessly using Monnify integration. The platform also includes admin capabilities for managing users, catalogs, products, orders, and subscriptions.
 
 ## Tech Stack
 - **Frontend:** React + TypeScript + Vite
 - **UI Components:** Shadcn/ui + Tailwind CSS + Lucide React
 - **Backend:** Supabase (PostgreSQL database with Row Level Security)
-- **Payment Processing:** Paystack
+- **Payment Processing:** Monnify
 - **Email Service:** Resend
-- **Hosting:** Netlify
+- **Hosting:** Vercel
 - **Build System:** Vite with TypeScript
 - **UI Styling:** Tailwind CSS with CSS variables
 
@@ -29,7 +29,7 @@ src/
 ### Key Features
 - Product catalog creation and management
 - Shopping cart functionality
-- Secure payment processing with Paystack
+- Secure payment processing with Monnify
 - User authentication with Supabase
 - Admin role system for platform management
 - Order management with status tracking
@@ -42,11 +42,11 @@ src/
 ## Environment Setup
 
 ### Prerequisites
-- Node.js (v18 or higher)
+- Node.js (v24 or higher as specified in package.json)
 - npm or yarn
 - Git
 - Supabase account
-- Paystack account
+- Monnify account
 - Resend account
 
 ### Installation
@@ -59,9 +59,10 @@ src/
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    VITE_SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-   # Paystack Configuration
-   VITE_PAYSTACK_PUBLIC_KEY=your_paystack_public_key
-   VITE_PAYSTACK_SECRET_KEY=your_paystack_secret_key
+   # Monnify Configuration
+   VITE_MONNIFY_API_KEY=your_monnify_api_key
+   VITE_MONNIFY_SECRET_KEY=your_monnify_secret_key
+   VITE_MONNIFY_CONTRACT_CODE=your_monnify_contract_code
 
    # Resend Configuration
    VITE_RESEND_API_KEY=your_resend_api_key
@@ -76,43 +77,38 @@ src/
 ## Development Commands
 
 ### Available Scripts
-- `npm run dev` - Start development server on port 8080
+- `npm run dev` - Start development server on port 3000
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build locally
 - `npm run lint` - Run ESLint
 - `npm run format` - Format code with Prettier
 - `npm run process-payouts` - Run payout processing script
-- `npm run install:functions` - Install dependencies for Netlify functions
+- `npm run deploy-functions` - Deploy Supabase functions
 
 ### Development Server Configuration
-The development server runs on port 8080 and includes:
+The development server runs on port 3000 and includes:
 - Proxy for API requests to avoid CORS issues
-- Proxy for Paystack API requests
 - Host configuration to accept connections from any interface
 
 ## Deployment Configuration
 
-### Netlify Deployment
-The project includes `netlify.toml` for easy Netlify deployment with:
-- Custom build command: `npm install && npm install autoprefixer postcss tailwindcss -g && npm run install:functions && npm run build`
-- Static output directory: `dist`
-- Functions directory: `netlify/functions`
-- API route redirects to Netlify Functions
-- CORS headers configuration
-- Security headers for all routes
+### Vercel Deployment
+The project includes `vercel.json` for easy deployment on Vercel with:
+- Build command: `npm run build`
+- Output directory: `dist`
+- Environment variable configuration
 
 ### Build Process
 The build process involves:
 1. Installing dependencies
-2. Installing Tailwind CSS and related tools globally
-3. Installing Netlify function dependencies
-4. Running the Vite build process
-5. Outputting to the `dist` directory
+2. Running TypeScript compilation with skipLibCheck
+3. Executing the Vite build process
+4. Outputting to the `dist` directory
 
 ## Payment Integration
 
-### Paystack Implementation
-TonStores integrates with Paystack for payment processing with the following features:
+### Monnify Implementation
+TonStores integrates with Monnify for payment processing with the following features:
 - KYC onboarding for sellers
 - Automatic subaccount creation for direct payments
 - White-label payment experience
@@ -121,10 +117,10 @@ TonStores integrates with Paystack for payment processing with the following fea
 - Real-time payment status updates
 
 ### Order Status Handling
-- **Pending:** Default state before payment completion
 - **Paid:** When a payment is successful
 - **Cancelled:** When a user deliberately cancels a payment
 - **Failed:** When a payment operation fails due to technical issues or declined cards
+- **Pending:** Default state before payment completion
 
 ### Automatic Order Expiration
 Pending orders automatically expire after 30 minutes if payment isn't completed:
@@ -262,7 +258,7 @@ Common events tracked include:
 - Configuration required in environment variables: `VITE_TURNSTILE_SITE_KEY`
 
 ### CORS and Security Headers
-- Configured in `netlify.toml` for API routes
+- Configured in Supabase functions for API routes
 - Security headers for all routes (X-Frame-Options, X-XSS-Protection, etc.)
 - Cache control for static assets
 
@@ -278,9 +274,9 @@ Common events tracked include:
 
 ### Common Issues
 1. **Supabase Signup 500 Errors:** Check `emailRedirectTo` configuration and use service role key
-2. **Paystack Subaccount Creation:** Verify API keys and bank information format
+2. **Monnify Subaccount Creation:** Verify API keys and bank information format
 3. **Order Status Updates:** Ensure RLS policies are correctly applied
-4. **Netlify Functions:** Check function logs for processing errors
+4. **Supabase Functions:** Check function logs for processing errors
 
 ### Environment Variables
 Ensure all required environment variables are correctly set for development and production.
@@ -289,23 +285,22 @@ Ensure all required environment variables are correctly set for development and 
 - `package.json`: Dependencies and scripts
 - `vite.config.ts`: Vite build configuration
 - `tailwind.config.js`: Tailwind CSS configuration
-- `netlify.toml`: Netlify deployment settings
+- `vercel.json`: Vercel deployment settings
 - `components.json`: Shadcn/ui component configuration
 - `tsconfig.*.json`: TypeScript configuration files
 - `index.html`: Main HTML entry point
-- `build.mjs`: Custom build script for Netlify
+- `build.mjs`: Custom build script
 
 ## API Integration
 
 ### Backend Services
 - Supabase for database and authentication
-- Paystack for payment processing
+- Monnify for payment processing
 - Resend for email delivery
-- Netlify Functions for server-side logic
-- Edge functions for specific operations
+- Supabase Functions for server-side logic
 
 ### API Redirects
-Netlify configuration handles API redirects to appropriate serverless functions, including payment processing, subaccount creation, bank verification, and payout processing.
+Supabase configuration handles API redirects to appropriate serverless functions, including payment processing, subaccount creation, bank verification, and payout processing.
 
 ## Frontend Architecture
 

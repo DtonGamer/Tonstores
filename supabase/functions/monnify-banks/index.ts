@@ -7,9 +7,10 @@ const jsonResponse = (statusCode: number, body: any) => {
     headers: {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
       "Cache-Control": "no-cache, no-store, must-revalidate",
+      "Pragma": "no-cache",
       "Expires": "0"
     },
   });
@@ -22,7 +23,7 @@ serve(async (req) => {
       status: 204,
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma",
         "Access-Control-Allow-Methods": "GET, OPTIONS"
       }
     });

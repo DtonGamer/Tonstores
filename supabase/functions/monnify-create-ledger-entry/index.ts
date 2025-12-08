@@ -26,7 +26,8 @@ function jsonResponse(status: number, body: ResponseBody) {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Client-Source, X-Guest-ID, apikey, cache-control",
+      "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Client-Source, X-Guest-ID, apikey, cache-control, pragma",
+      "Pragma": "no-cache"
     },
   });
 }
@@ -38,7 +39,8 @@ function handleOptions() {
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Client-Source, X-Guest-ID, apikey, cache-control",
+      "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Client-Source, X-Guest-ID, apikey, cache-control, pragma",
+      "Pragma": "no-cache"
     },
   });
 }

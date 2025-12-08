@@ -47,54 +47,56 @@ export function Footer() {
   
   // If in Dashboard mode, show a simple footer
   if (user) {
-  return (
+    return (
       <footer className="w-full border-t bg-background px-4 py-6 mt-auto">
-      <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="text-sm text-muted-foreground">
-          © {currentYear} TonStores. All rights reserved.
-        </div>
-        
-        <div className="flex items-center gap-6">
-          <a 
-            href="/terms" 
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Terms
-          </a>
-          <a 
-            href="/privacy" 
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Privacy Policy
-          </a>
-          <a 
-            href="/contact" 
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Contact Us
-          </a>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <a 
-            href="https://github.com/DtonGamer" 
-            target="_blank" 
-            rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="GitHub"
-          >
-            <Github size={18} />
-          </a>
-          <a 
-            href="mailto:Creatorrichie@gmail.com" 
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Email"
-          >
-            <Mail size={18} />
-          </a>
-            <span className="text-xs text-muted-foreground flex items-center gap-1">
-              Built with <Heart size={12} className="text-red-500 fill-current" /> in Nigeria
-            </span>
+        <div className="container mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="text-sm text-muted-foreground">
+              © {currentYear} TonStores. All rights reserved.
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
+              <a
+                href="/terms"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Terms
+              </a>
+              <a
+                href="/privacy"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="/contact"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Contact Us
+              </a>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <a
+                href="https://github.com/DtonGamer"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="GitHub"
+              >
+                <Github size={18} />
+              </a>
+              <a
+                href="mailto:Creatorrichie@gmail.com"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Email"
+              >
+                <Mail size={18} />
+              </a>
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                Built with <Heart size={12} className="text-red-500 fill-current" /> in Nigeria
+              </span>
+            </div>
           </div>
         </div>
       </footer>

@@ -3,7 +3,6 @@ import SidebarNav from "./SidebarNav";
 import Breadcrumbs from "./Breadcrumbs";
 import { Footer } from "./Footer";
 import useAuth from "@/contexts/AuthContext";
-import { SubscriptionHeader } from "../subscription/SubscriptionHeader";
 import { Disclaimer } from "./Disclaimer";
 import { ErrorBoundary } from "../layout/ErrorBoundary"; // <-- import it
 import { useLocation, useNavigate } from "react-router-dom";
@@ -90,19 +89,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   debugLog("Rendering dashboard content");
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         {!isCheckoutRoute && <SidebarNav />}
 
         {/* Main content */}
-        <div className={`${!isCheckoutRoute ? 'lg:pl-64' : ''} pt-16 lg:pt-0 flex flex-col flex-grow`}>
-          {!isCheckoutRoute && <SubscriptionHeader />}
-          <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow">
-            {!isCheckoutRoute && (
-              <div className="mb-6">
-                <Breadcrumbs />
-              </div>
-            )}
-
+        <div className={`${!isCheckoutRoute ? 'lg:pl-[var(--sidebar-width,16rem)]' : ''} pt-4 lg:pt-0 flex flex-col flex-grow`}>
+          {!isCheckoutRoute && (
+            <div className="px-4 sm:px-6 lg:px-8 pt-4">
+              <Breadcrumbs />
+            </div>
+          )}
+          <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex-grow">
             {children}
           </main>
           <Footer />
