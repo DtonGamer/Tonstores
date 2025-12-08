@@ -173,8 +173,21 @@ export default function SidebarNav() {
         <div className="flex flex-col flex-grow border-r border-gray-200 bg-white overflow-y-auto">
           <div className="flex items-center justify-between h-16 flex-shrink-0 px-4 border-b border-gray-200">
             <Link to="/" className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : ''}`}>
-              {!isSidebarCollapsed && <span className="text-2xl font-bold text-tonstores-darkblue">TonStores</span>}
-              {isSidebarCollapsed && <span className="text-2xl font-bold text-tonstores-darkblue">T</span>}
+              {!isSidebarCollapsed && (
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 rounded-lg bg-tonstores-green flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">T</span>
+                  </div>
+                  <span className="text-xl font-bold bg-gradient-to-r from-tonstores-green to-tonstores-darkblue bg-clip-text text-transparent">
+                    TonStores
+                  </span>
+                </div>
+              )}
+              {isSidebarCollapsed && (
+                <div className="w-8 h-8 rounded-lg bg-tonstores-green flex items-center justify-center">
+                  <span className="text-white font-bold">T</span>
+                </div>
+              )}
             </Link>
             <Button
               variant="ghost"

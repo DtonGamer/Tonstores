@@ -247,23 +247,21 @@ const OrderTracking = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
       <div className="max-w-4xl mx-auto p-4">
-        {order.catalogs?.slug ? (
-          <Link
-            to={`/c/${order.catalogs.slug}`}
-            className="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-6"
-          >
-            <ArrowLeft className="mr-2" size={18} />
-            Back to Catalog
-          </Link>
-        ) : (
-          <button
-            onClick={() => window.history.back()}
-            className="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-6"
-          >
-            <ArrowLeft className="mr-2" size={18} />
-            Back
-          </button>
-        )}
+        <button
+          onClick={() => {
+            // Check if browser history has previous entries
+            if (window.history.length > 1) {
+              window.history.back();
+            } else {
+              // Fallback to orders page if no history
+              navigate('/orders');
+            }
+          }}
+          className="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-6"
+        >
+          <ArrowLeft className="mr-2" size={18} />
+          Back
+        </button>
         
         <h1 className="text-2xl md:text-3xl font-bold mb-6 dark:text-white">Track Your Order</h1>
         

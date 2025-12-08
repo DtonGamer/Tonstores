@@ -210,52 +210,83 @@ const Analytics = () => {
         )}
       </div>
       
-      {/* Interactive Dashboard Tiles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <Card 
-          className="cursor-pointer hover:shadow-md transition-shadow"
+      {/* Compact Analytics Tiles */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <Card
+          className="cursor-pointer hover:shadow-md transition-shadow flex flex-col h-full"
           onClick={() => setExpandedSection("sales")}
         >
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Sales Overview</CardTitle>
-            <CardDescription>Track sales performance over time</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="h-24 bg-gray-100 dark:bg-gray-700 rounded-md flex items-center justify-center text-gray-500 dark:text-gray-400">
-              <span>View Sales Chart</span>
+          <CardHeader className="pb-3">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+              </svg>
             </div>
+            <CardTitle className="text-lg">Sales Overview</CardTitle>
+          </CardHeader>
+          <CardContent className="flex-grow flex flex-col justify-between">
+            <CardDescription className="mb-4">
+              Track sales performance over time
+            </CardDescription>
+            <Button variant="outline" size="sm" className="w-fit">
+              View Chart
+            </Button>
           </CardContent>
         </Card>
-        
-        <Card 
-          className={`cursor-pointer hover:shadow-md transition-shadow ${isFreePlan ? 'opacity-70' : ''}`}
+
+        <Card
+          className={`cursor-pointer hover:shadow-md transition-shadow flex flex-col h-full ${isFreePlan ? 'opacity-70' : ''}`}
           onClick={() => toggleSection("products")}
         >
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Products & Channels</CardTitle>
-            <CardDescription>View top performers and traffic sources</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="h-24 bg-gray-100 dark:bg-gray-700 rounded-md flex items-center justify-center text-gray-500 dark:text-gray-400">
-              {isFreePlan && <LockIcon className="h-4 w-4 mr-1 text-amber-500" />}
-              <span>View Product Analytics</span>
+          <CardHeader className="pb-3">
+            <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600 dark:text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+              </svg>
             </div>
+            <CardTitle className="text-lg">Products & Channels</CardTitle>
+          </CardHeader>
+          <CardContent className="flex-grow flex flex-col justify-between">
+            <CardDescription className="mb-4">
+              View top performers and traffic sources
+            </CardDescription>
+            {isFreePlan && <LockIcon className="h-4 w-4 text-amber-500 mb-4" />}
+            <Button
+              variant="outline"
+              size="sm"
+              className={`w-fit ${isFreePlan ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={isFreePlan}
+            >
+              {isFreePlan ? 'Premium' : 'View Data'}
+            </Button>
           </CardContent>
         </Card>
-        
-        <Card 
-          className={`cursor-pointer hover:shadow-md transition-shadow ${isFreePlan ? 'opacity-70' : ''}`}
+
+        <Card
+          className={`cursor-pointer hover:shadow-md transition-shadow flex flex-col h-full ${isFreePlan ? 'opacity-70' : ''}`}
           onClick={() => toggleSection("customers")}
         >
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Customer Insights</CardTitle>
-            <CardDescription>Analyze customer behavior and payments</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="h-24 bg-gray-100 dark:bg-gray-700 rounded-md flex items-center justify-center text-gray-500 dark:text-gray-400">
-              {isFreePlan && <LockIcon className="h-4 w-4 mr-1 text-amber-500" />}
-              <span>View Customer Data</span>
+          <CardHeader className="pb-3">
+            <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-600 dark:text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 005 10a6 6 0 0012 0c0-.35-.036-.687-.101-1.016A5 5 0 0010 11z" clipRule="evenodd" />
+              </svg>
             </div>
+            <CardTitle className="text-lg">Customer Insights</CardTitle>
+          </CardHeader>
+          <CardContent className="flex-grow flex flex-col justify-between">
+            <CardDescription className="mb-4">
+              Analyze customer behavior and payments
+            </CardDescription>
+            {isFreePlan && <LockIcon className="h-4 w-4 text-amber-500 mb-4" />}
+            <Button
+              variant="outline"
+              size="sm"
+              className={`w-fit ${isFreePlan ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={isFreePlan}
+            >
+              {isFreePlan ? 'Premium' : 'View Data'}
+            </Button>
           </CardContent>
         </Card>
       </div>
