@@ -152,9 +152,10 @@ serve(async (req) => {
 
   } catch (error) {
     console.error("Unexpected error in update-stock function:", error);
-    return jsonResponse(500, { 
-      success: false, 
-      error: `Unexpected error: ${error.message}` 
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return jsonResponse(500, {
+      success: false,
+      error: `Unexpected error: ${errorMessage}`
     });
   }
 });

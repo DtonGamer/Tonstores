@@ -118,56 +118,74 @@ serve(async (req) => {
     orderId
   } = data;
 
+  // Handle development mode
+  if (isDevelopmentMode) {
+    console.log("Development mode - returning mock escrow transaction initialization");
+
+    // Generate a mock transaction reference
+    const mockTransactionReference = `DEV_ESCROW_${Math.floor(Math.random() * 1000000)}`;
+    const mockCheckoutUrl = `https://test.monnify.com/checkout/${mockTransactionReference}`;
+
+    // Return mock response similar to Monnify API
+    return jsonResponse(200, {
+      status: true,
+      message: "Escrow transaction initialized (Development Mode)",
+      dev_mode: true,
+      transactionReference: mockTransactionReference,
+      checkoutUrl: mockCheckoutUrl,
+      escrow_status: "held",
+      data: {
+        transactionReference: mockTransactionReference,
+        checkoutUrl: mockCheckoutUrl,
+        amount: amount,
+        currencyCode: currencyCode,
+        customerEmail: customerEmail,
+        paymentReference: paymentReference,
+        escrow_account_code: "DEV_PLATFORM_ESCROW_ACCT",
+        original_transaction_split: data.incomeSplitConfig, // Include original split for reference
+        funds_destination: "platform_escrow_account" // Clarify where funds are going
+      }
+    });
+  }
+
   // Get platform escrow account from database to hold funds initially
   let platformIncomeSplitConfig;
-  if (!isDevelopmentMode) {
-    // Initialize Supabase client to fetch platform account details from the database
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
-    if (!supabaseUrl || !supabaseServiceKey) {
-      return jsonResponse(500, { error: "Supabase configuration is missing" });
-    }
+  // Initialize Supabase client to fetch platform account details from the database
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Fetch the platform escrow account details from the database
-    const { data: platformAccountData, error: platformAccountError } = await supabase
-      .from('platform_accounts')
-      .select('monnify_subaccount_code')
-      .eq('is_escrow_account', true)
-      .eq('is_active', true)
-      .single();
-
-    if (platformAccountError || !platformAccountData) {
-      console.error("Error fetching platform escrow account:", platformAccountError);
-      return jsonResponse(500, { 
-        error: "Platform escrow account not configured", 
-        details: platformAccountError?.message 
-      });
-    }
-
-    // For escrow transactions, 100% of funds go to the platform escrow account initially
-    // The original split configuration is stored for later release
-    platformIncomeSplitConfig = [
-      {
-        subAccountCode: platformAccountData.monnify_subaccount_code,
-        feePercentage: 0, // Fees will be handled separately when releasing
-        splitPercentage: 100, // 100% goes to platform escrow initially
-        feeBearer: true
-      }
-    ];
-  } else {
-    // In development mode, use a mock platform subaccount
-    platformIncomeSplitConfig = [
-      {
-        subAccountCode: "DEV_PLATFORM_ESCROW_ACCT",
-        feePercentage: 0,
-        splitPercentage: 100,
-        feeBearer: true
-      }
-    ];
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return jsonResponse(500, { error: "Supabase configuration is missing" });
   }
+
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+  // Fetch the platform escrow account details from the database
+  const { data: platformAccountData, error: platformAccountError } = await supabase
+    .from('platform_accounts')
+    .select('monnify_subaccount_code')
+    .eq('is_escrow_account', true)
+    .eq('is_active', true)
+    .single();
+
+  if (platformAccountError || !platformAccountData) {
+    console.error("Error fetching platform escrow account:", platformAccountError);
+    return jsonResponse(500, {
+      error: "Platform escrow account not configured",
+      details: platformAccountError?.message
+    });
+  }
+
+  // For escrow transactions, 100% of funds go to the platform escrow account initially
+  // The original split configuration is stored for later release
+  platformIncomeSplitConfig = [
+    {
+      subAccountCode: platformAccountData.monnify_subaccount_code,
+      feePercentage: 0, // Fees will be handled separately when releasing
+      splitPercentage: 100, // 100% goes to platform escrow initially
+      feeBearer: true
+    }
+  ];
 
   // Validate required fields according to Monnify docs
   if (!amount || !currencyCode || !customerEmail || !paymentReference || !description || !callbackUrl) {
@@ -182,16 +200,7 @@ serve(async (req) => {
     console.warn("User ID is missing in escrow transaction initialization");
   }
 
-  // Initialize Supabase client if environment variables are available
-  const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  let supabase;
-
-  if (supabaseUrl && supabaseServiceKey) {
-    supabase = createClient(supabaseUrl, supabaseServiceKey);
-  } else {
-    return jsonResponse(500, { error: "Supabase configuration is missing" });
-  }
+  // Use the existing supabase client that was already initialized
 
   // Store original income split configuration for later use during release
   if (data.incomeSplitConfig && orderId) {

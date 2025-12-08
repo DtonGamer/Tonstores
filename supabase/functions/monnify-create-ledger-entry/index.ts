@@ -55,7 +55,24 @@ serve(async (req) => {
       return jsonResponse(405, { success: false, error: "Method not allowed" });
     }
 
-    // Get Supabase credentials from environment
+    // Parse request body
+    const requestData: CreateLedgerEntryRequest = await req.json();
+
+    // Check for development mode
+    const isDevelopmentMode = requestData.params.dev_mode === true || Deno.env.get("DEV_MODE") === "true";
+
+    // Handle development mode
+    if (isDevelopmentMode) {
+      // Return success without actually inserting into the database
+      console.log('Development mode - creating ledger entry mock:', requestData.params);
+
+      return jsonResponse(200, {
+        success: true,
+        message: "Ledger entry created (Development Mode)"
+      });
+    }
+
+    // Get Supabase credentials from environment (only needed in regular mode)
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
@@ -66,24 +83,21 @@ serve(async (req) => {
     // Initialize Supabase client with service role key to bypass RLS
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse request body
-    const requestData: CreateLedgerEntryRequest = await req.json();
-
     // Validate required fields
     const { subaccount_code, type, amount, reference, description, seller_id } = requestData.params;
-    
+
     if (!subaccount_code || !type || !amount || !reference || !description || !seller_id) {
-      return jsonResponse(400, { 
-        success: false, 
-        error: "Missing required parameters: subaccount_code, type, amount, reference, description, or seller_id" 
+      return jsonResponse(400, {
+        success: false,
+        error: "Missing required parameters: subaccount_code, type, amount, reference, description, or seller_id"
       });
     }
 
     // Validate type
     if (type !== 'credit' && type !== 'debit') {
-      return jsonResponse(400, { 
-        success: false, 
-        error: "Type must be either 'credit' or 'debit'" 
+      return jsonResponse(400, {
+        success: false,
+        error: "Type must be either 'credit' or 'debit'"
       });
     }
 
@@ -102,21 +116,21 @@ serve(async (req) => {
 
     if (error) {
       console.error('Error creating ledger entry:', error);
-      return jsonResponse(500, { 
-        success: false, 
-        error: `Error creating ledger entry: ${error.message}` 
+      return jsonResponse(500, {
+        success: false,
+        error: `Error creating ledger entry: ${error.message}`
       });
     }
 
-    return jsonResponse(200, { 
-      success: true 
+    return jsonResponse(200, {
+      success: true
     });
 
   } catch (error) {
     console.error("Unexpected error in monnify-create-ledger-entry function:", error);
-    return jsonResponse(500, { 
-      success: false, 
-      error: `Unexpected error: ${error.message}` 
+    return jsonResponse(500, {
+      success: false,
+      error: `Unexpected error: ${error.message}`
     });
   }
 });

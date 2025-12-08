@@ -49,18 +49,43 @@ serve(async (req) => {
   try {
     // Read raw body for hash validation
     const rawBody = await req.text();
-    
-    // Get the signature from the header
+
+    // Check for development mode - if dev_mode parameter is present in body
+    const isDevelopmentMode = req.headers.get("dev_mode") === "true" || Deno.env.get("DEV_MODE") === "true";
+
+    // Handle development mode
+    if (isDevelopmentMode) {
+      console.log("Development mode - skipping signature validation for webhook");
+      // Parse the body directly without signature validation
+      const eventData = JSON.parse(rawBody);
+      const { eventType, eventData: eventPayload } = eventData;
+
+      // Log the event processing in development mode
+      console.log(`Webhook (Dev Mode): Processing event ${eventType}`, {
+        transactionReference: eventPayload?.transactionReference,
+        eventType
+      });
+
+      // Return success response to acknowledge webhook
+      return jsonResponse(200, {
+        status: 'success',
+        message: 'Webhook processed successfully in development mode',
+        dev_mode: true,
+        eventType: eventType
+      });
+    }
+
+    // Get the signature from the header (for production mode)
     const signature = req.headers.get("monnify-signature");
-    
+
     if (!signature) {
       console.error("Missing monnify signature in webhook");
       return jsonResponse(401, { error: "Missing signature" });
     }
-    
+
     // Validate the signature
     const computedHash = computeHash(rawBody);
-    
+
     if (signature !== computedHash) {
       console.error("Invalid signature in webhook:", {
         received: signature,
@@ -77,29 +102,29 @@ serve(async (req) => {
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
+
     if (!supabaseUrl || !supabaseServiceKey) {
       return jsonResponse(500, { error: "Supabase configuration is missing" });
     }
-    
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Process different event types
     switch (eventType) {
       case "SUCCESSFUL_TRANSACTION": {
-        const { 
-          transactionReference, 
-          paymentReference, 
-          amountPaid, 
-          paymentStatus, 
-          customer 
+        const {
+          transactionReference,
+          paymentReference,
+          amountPaid,
+          paymentStatus,
+          customer
         } = eventPayload;
 
         // Update the transaction status in the database
         const { error } = await supabase
           .from('transactions')
-          .update({ 
-            status: 'completed', 
+          .update({
+            status: 'completed',
             payment_status: paymentStatus,
             amount_paid: amountPaid,
             updated_at: new Date().toISOString()
@@ -114,8 +139,8 @@ serve(async (req) => {
         try {
           const { error: orderError } = await supabase
             .from('orders')
-            .update({ 
-              status: 'paid', 
+            .update({
+              status: 'paid',
               payment_status: paymentStatus,
               updated_at: new Date().toISOString()
             })
@@ -134,17 +159,17 @@ serve(async (req) => {
       }
 
       case "FAILED_TRANSACTION": {
-        const { 
-          transactionReference, 
-          paymentReference, 
-          paymentStatus 
+        const {
+          transactionReference,
+          paymentReference,
+          paymentStatus
         } = eventPayload;
 
         // Update the transaction status in the database
         const { error } = await supabase
           .from('transactions')
-          .update({ 
-            status: 'failed', 
+          .update({
+            status: 'failed',
             payment_status: paymentStatus,
             updated_at: new Date().toISOString()
           })
@@ -159,11 +184,11 @@ serve(async (req) => {
       }
 
       case "SETTLEMENT": {
-        const { 
-          settlementReference, 
-          amount, 
+        const {
+          settlementReference,
+          amount,
           destinationAccountNumber,
-          transactions: relatedTransactions 
+          transactions: relatedTransactions
         } = eventPayload;
 
         // Update settlement in database
@@ -187,7 +212,7 @@ serve(async (req) => {
             const { transactionReference } = transaction;
             const { error: txError } = await supabase
               .from('transactions')
-              .update({ 
+              .update({
                 settlement_reference: settlementReference,
                 status: 'settled',
                 updated_at: new Date().toISOString()
@@ -210,8 +235,8 @@ serve(async (req) => {
     }
 
     // Return 200 status to acknowledge receipt (required by Monnify to prevent resending)
-    return jsonResponse(200, { 
-      message: "Webhook processed successfully", 
+    return jsonResponse(200, {
+      message: "Webhook processed successfully",
       eventType: eventType,
       timestamp: new Date().toISOString()
     });
@@ -220,8 +245,8 @@ serve(async (req) => {
 
     // Return 500 to indicate processing error
     // Monnify will retry if it doesn't receive 200
-    return jsonResponse(500, { 
-      error: error.message || "Internal server error processing webhook" 
+    return jsonResponse(500, {
+      error: error.message || "Internal server error processing webhook"
     });
   }
 });

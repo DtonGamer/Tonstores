@@ -19,6 +19,14 @@ const jsonResponse = (statusCode: number, body: any) => {
   });
 };
 
+// Declare environment variables
+declare global {
+  interface WindowOrWorkerGlobalScope {
+    SUPABASE_URL: string;
+    SUPABASE_ANON_KEY: string;
+  }
+}
+
 serve(async (req) => {
   // Handle OPTIONS request for CORS
   if (req.method === "OPTIONS") {
@@ -297,12 +305,71 @@ serve(async (req) => {
       });
     }
 
+    // Get customer and seller phone numbers for WhatsApp notifications
+    const customerPhone = orderData.customer_phone;
+
+    const { data: sellerProfile, error: sellerProfileError } = await supabase
+      .from('profiles')
+      .select('whatsapp_support')
+      .eq('id', orderData.user_id)
+      .single();
+
+    // Prepare order details for WhatsApp notification
+    const orderDetails = {
+      items: orderItems.map(item => ({
+        name: item.product_name || 'Product',
+        quantity: item.quantity,
+        price: item.price_at_purchase
+      })),
+      total_amount: totalAmount,
+      customer_name: orderData.customer_name || customerName,
+      customer_email: customerEmail,
+      payment_reference: reference
+    };
+
+    // Send WhatsApp notifications if phone numbers are available
+    if (customerPhone && sellerProfile?.whatsapp_support) {
+      try {
+        // Prepare to call WhatsApp notification function
+        const supabaseUrl = Deno.env.get("SUPABASE_URL");
+        const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+
+        if (supabaseUrl && anonKey) {
+          const whatsappResponse = await fetch(`${supabaseUrl}/functions/v1/send-whatsapp-notification`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${anonKey}`,
+              'apikey': anonKey,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              order_id: orderData.id,
+              customer_phone: customerPhone,
+              seller_phone: sellerProfile.whatsapp_support,
+              order_details: orderDetails,
+              dev_mode: isDevelopmentMode  // Pass through the same dev_mode setting
+            })
+          });
+
+          const whatsappResult = await whatsappResponse.json();
+
+          if (!whatsappResponse.ok) {
+            console.error("Error sending WhatsApp notifications:", whatsappResult);
+          } else {
+            console.log("WhatsApp notifications sent successfully:", whatsappResult);
+          }
+        }
+      } catch (whatsappError) {
+        console.error("Unexpected error sending WhatsApp notifications:", whatsappError);
+      }
+    }
+
     // Update the order to mark receipts as sent
     await supabase
       .from('orders')
-      .update({ 
-        notes: orderData.notes 
-          ? `${orderData.notes}, Receipts sent: ${new Date().toISOString()}` 
+      .update({
+        notes: orderData.notes
+          ? `${orderData.notes}, Receipts sent: ${new Date().toISOString()}`
           : `Receipts sent: ${new Date().toISOString()}`
       })
       .eq('id', orderData.id);
@@ -313,6 +380,10 @@ serve(async (req) => {
       sentTo: {
         customer: customerEmail,
         seller: sellerEmail
+      },
+      whatsappNotifications: {
+        customer: !!customerPhone,
+        seller: !!sellerProfile?.whatsapp_support
       },
       transactionReference: reference,
       orderId: orderData.id

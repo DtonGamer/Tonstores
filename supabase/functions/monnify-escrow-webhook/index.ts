@@ -50,7 +50,27 @@ serve(async (req) => {
     // Read raw body for hash validation
     const rawBody = await req.text();
 
-    // Get the signature from the header
+    // Check for development mode
+    const isDevelopmentMode = req.headers.get("dev_mode") === "true" || Deno.env.get("DEV_MODE") === "true";
+
+    // Handle development mode
+    if (isDevelopmentMode) {
+      console.log("Development mode - skipping signature validation for escrow webhook");
+      // Parse the body directly without signature validation
+      const payload = JSON.parse(rawBody);
+
+      console.log("Received Monnify escrow webhook (Dev Mode):", payload.eventName, payload);
+
+      // Return success response to acknowledge webhook
+      return jsonResponse(200, {
+        status: 'success',
+        message: 'Escrow webhook processed successfully in development mode',
+        dev_mode: true,
+        eventName: payload.eventName
+      });
+    }
+
+    // Get the signature from the header (for production mode)
     const signature = req.headers.get("monnify-signature");
 
     if (!signature) {
@@ -60,7 +80,7 @@ serve(async (req) => {
 
     // Validate the signature
     const computedHash = computeHash(rawBody);
-    
+
     if (computedHash !== signature) {
       console.error("Invalid webhook signature");
       console.log("Computed hash:", computedHash);

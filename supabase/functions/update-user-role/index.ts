@@ -12,6 +12,54 @@ interface UpdateRoleRequest {
 }
 
 serve(async (req) => {
+  // Parse request body to check for dev_mode
+  let requestData;
+  try {
+    requestData = await req.json();
+  } catch (e) {
+    return new Response(
+      JSON.stringify({ error: 'Invalid JSON body' }),
+      { headers: { 'Content-Type': 'application/json' }, status: 400 }
+    );
+  }
+
+  // Check for development mode
+  const isDevelopmentMode = requestData.dev_mode === true || Deno.env.get("DEV_MODE") === "true";
+
+  // Handle development mode
+  if (isDevelopmentMode) {
+    const { target_user_id, new_role } = requestData as UpdateRoleRequest;
+
+    // Validate inputs
+    if (!target_user_id || !new_role) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields' }),
+        { headers: { 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    // Verify if role is valid
+    if (new_role !== 'user' && new_role !== 'admin') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid role specified' }),
+        { headers: { 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    // Return mock success response
+    return new Response(
+      JSON.stringify({
+        message: 'User role updated successfully (Development Mode)',
+        dev_mode: true,
+        user: {
+          id: target_user_id,
+          role: new_role
+        }
+      }),
+      { headers: { 'Content-Type': 'application/json' }, status: 200 }
+    );
+  }
+
   // Create a Supabase client with the Auth context of the logged in user
   const authorization = req.headers.get('Authorization')!;
   const supabaseClient = createClient(
@@ -22,7 +70,7 @@ serve(async (req) => {
 
   // Get the JWT token from the request
   const token = authorization.replace('Bearer ', '');
-  
+
   // Verify the request method
   if (req.method !== 'POST') {
     return new Response(
@@ -32,7 +80,7 @@ serve(async (req) => {
   }
 
   try {
-    const { target_user_id, new_role } = await req.json() as UpdateRoleRequest;
+    const { target_user_id, new_role } = requestData as UpdateRoleRequest;
 
     // Validate inputs
     if (!target_user_id || !new_role) {
@@ -52,7 +100,7 @@ serve(async (req) => {
 
     // Get the current user
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
-    
+
     if (userError || !user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized', details: userError?.message }),
@@ -97,7 +145,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         message: 'User role updated successfully',
         user: {
           id: updateData.id,
@@ -113,4 +161,4 @@ serve(async (req) => {
       { headers: { 'Content-Type': 'application/json' }, status: 500 }
     );
   }
-}); 
+});

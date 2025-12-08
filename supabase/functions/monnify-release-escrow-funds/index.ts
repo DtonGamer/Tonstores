@@ -53,7 +53,6 @@ serve(async (req) => {
   }
 
   const { orderId, releaseToSubaccountCode, amount, userId, dev_mode } = data;
-  const isDevelopmentMode = dev_mode || Deno.env.get("DEV_MODE") === "true";
 
   // Validate required fields
   if (!orderId || !releaseToSubaccountCode) {
@@ -63,10 +62,32 @@ serve(async (req) => {
     });
   }
 
+  // Check for development mode early
+  const isDevelopmentMode = dev_mode || Deno.env.get("DEV_MODE") === "true";
+
+  // Handle development mode before database operations
+  if (isDevelopmentMode) {
+    // In development mode, simulate the fund release without checking database
+    console.log(`Development Mode: Simulating release of funds to subaccount: ${releaseToSubaccountCode}`);
+
+    // Return mock success response
+    return jsonResponse(200, {
+      status: true,
+      message: "Funds released successfully (Development Mode)",
+      dev_mode: true,
+      data: {
+        orderId: orderId,
+        releaseAmount: amount || 0, // Use provided amount or 0 in dev mode
+        releasedToSubaccount: releaseToSubaccountCode,
+        originalEscrowAccount: "DEV_MOCK_ACCOUNT"
+      }
+    });
+  }
+
   // Initialize Supabase client
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  
+
   if (!supabaseUrl || !supabaseServiceKey) {
     return jsonResponse(500, { error: "Supabase configuration is missing" });
   }
