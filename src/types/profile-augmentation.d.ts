@@ -10,6 +10,11 @@ declare module "@/types/profile" {
     monnify_secret_key?: string;
     monnify_subaccount_code?: string;
     monnify_subaccount_id?: string;
+    monnify_account_number?: string;
+    monnify_bvn?: string;
+    monnify_kyc_status?: string;
+    monnify_kyc_submitted_at?: string;
+    monnify_percentage_charge?: number;
   }
 }
 
@@ -23,5 +28,10 @@ declare module '@/hooks/useProfile' {
     monnify_secret_key?: string;
     monnify_subaccount_code?: string;
     monnify_subaccount_id?: string;
+    monnify_account_number?: string;
+    monnify_bvn?: string;
+    monnify_kyc_status?: string;
+    monnify_kyc_submitted_at?: string;
+    monnify_percentage_charge?: number;
   }
 } 

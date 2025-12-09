@@ -8,6 +8,7 @@ import useWithSession from "@/utils/useWithSession";
 import { PaymentStatusService } from "@/services/PaymentStatusService";
 import { PaymentConfigService } from "@/services/PaymentConfigService";
 import { StockService } from "@/services/StockService";
+import { monnifyApi } from "@/services/monnifyApi";
 
 // Define payment provider types
 export type PaymentProvider = "monnify" | "moniepoint" | "opay";
@@ -348,25 +349,12 @@ export const useMonnifyPayment = () => {
         metadata: paymentConfig.metadata
       };
 
-      // Call the API to initialize the Monnify escrow transaction
-      const response = await fetch('/api/monnify-initialize-escrow-transaction', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...monnifyTransactionData,
-          userId: order.user_id,
-          orderId: order.id  // Include order ID for escrow tracking
-        }),
+      // Call the monnifyApi service to initialize the escrow transaction
+      const transactionData = await monnifyApi.initializeEscrowTransaction({
+        ...monnifyTransactionData,
+        userId: order.user_id,
+        orderId: order.id  // Include order ID for escrow tracking
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to initialize Monnify transaction');
-      }
-
-      const transactionData = await response.json();
 
       if (transactionData.status && transactionData.data?.checkoutUrl) {
         // Open the Monnify checkout page in the same window

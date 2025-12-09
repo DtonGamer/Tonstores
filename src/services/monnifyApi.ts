@@ -24,15 +24,15 @@ export const monnifyApi = {
     return response;
   },
 
-  // Initialize transaction
-  initializeTransaction: async (data: any) => {
-    const response = await callSupabaseFunction('monnify-initialize-transaction', data);
+  // Initialize escrow transaction for product purchases
+  initializeEscrowTransaction: async (data: any) => {
+    const response = await callSupabaseFunction('monnify-initialize-escrow-transaction', data);
     return response;
   },
 
-  // Create split configuration
-  createSplit: async (data: any) => {
-    const response = await callSupabaseFunction('monnify-create-split', data);
+  // Initialize direct transaction (non-escrow) for subscriptions and other direct payments
+  initializeDirectTransaction: async (data: any) => {
+    const response = await callSupabaseFunction('monnify-initialize-transaction', data);
     return response;
   },
 
@@ -57,6 +57,42 @@ export const monnifyApi = {
   // Process payout
   processPayout: async (data: any) => {
     const response = await callSupabaseFunction('monnify-process-payout', data);
+    return response;
+  },
+
+  // Verify bank account
+  verifyAccount: async (data: { account_number: string; bank_code: string; dev_mode?: boolean }) => {
+    const response = await callSupabaseFunction('monnify-verify-account', data);
+    return response;
+  },
+
+  // Get list of banks
+  getBanks: async (options: { dev_mode?: boolean } = {}) => {
+    const response = await callSupabaseFunction('monnify-banks', { dev_mode: options.dev_mode }, { method: 'GET' });
+    return response;
+  },
+
+  // Create subaccount
+  createSubaccount: async (data: any) => {
+    const response = await callSupabaseFunction('monnify-subaccount', data);
+    return response;
+  },
+
+  // Customer verification
+  customerVerification: async (data: {
+    userId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string;
+    bvn?: string;
+    dev_mode?: boolean;
+  }) => {
+    const requestData = {
+      ...data,
+      dev_mode: data.dev_mode ?? (import.meta.env.MODE === 'development' || import.meta.env.DEV_MODE === 'true')
+    };
+    const response = await callSupabaseFunction('monnify-customer-verification', requestData);
     return response;
   },
 

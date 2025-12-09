@@ -11,12 +11,9 @@ import { useToast } from '@/components/ui/use-toast';
 import { useProfile } from '@/hooks/useProfile';
 import { Loader2 } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
-import {
-  callMonnifyBanks,
-  callMonnifyVerifyAccount,
-  callMonnifySubaccount
-} from '@/utils/supabaseFunctions';
+import { monnifyApi } from '@/services/monnifyApi';
 import { useEventTracker } from '@/hooks/useEventTracker';
+import { paymentConfig } from '@/lib/config';
 
 // Define bank interface
 interface Bank {
@@ -95,9 +92,10 @@ export default function KYCForm() {
     try {
       // console.log(`Verifying account: ${accountNumber} with bank code: ${bankCode}`);
 
-      const result = await callMonnifyVerifyAccount({
+      const result = await monnifyApi.verifyAccount({
         account_number: accountNumber,
         bank_code: bankCode,
+        dev_mode: import.meta.env.MODE === 'development' || import.meta.env.DEV_MODE === 'true'
       });
 
       // console.log("Account verification result:", result);
@@ -126,11 +124,11 @@ export default function KYCForm() {
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error verifying account:", error);
       toast({
         title: "Verification Error",
-        description: "Could not verify account automatically. Please enter details manually.",
+        description: error.message || "Could not verify account automatically. Please enter details manually.",
         variant: "destructive",
       });
     } finally {
@@ -150,7 +148,7 @@ export default function KYCForm() {
           return;
         }
         
-        const data = await callMonnifyBanks();
+        const data = await monnifyApi.getBanks({ dev_mode: import.meta.env.MODE === 'development' || import.meta.env.DEV_MODE === 'true' });
         if (data && data.data && Array.isArray(data.data)) {
           setBanks(data.data);
           // Cache for future use
@@ -160,11 +158,11 @@ export default function KYCForm() {
           console.error('Invalid bank data format:', data);
           useFallbackBanks();
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching banks:", error);
         toast({
           title: "Error",
-          description: "Failed to load bank list. Using default banks instead.",
+          description: error.message || "Failed to load bank list. Using default banks instead.",
           variant: "destructive"
         });
         useFallbackBanks();
@@ -234,53 +232,116 @@ export default function KYCForm() {
 
     setIsSubmitting(true);
     try {
-      const result = await callMonnifySubaccount({
-        userId: profile.id,
-        accountName: profile.business_name,
-        bankCode: values.bankName,
-        accountNumber: values.accountNumber,
-        percentageCharge: 1.5, // Monnify's lower fee
-        contactEmail: profile.email_support || profile.contact_email || "",
-        contactName: values.accountName,
-        contactPhone: profile.phone_number || "00000000000",
-        additionalInformation: `Subaccount for ${profile.business_name}`,
-        bvn: values.idNumber // Add BVN to the payload
-      });
-      // console.log("Subaccount creation result:", result);
-      
-      // Fix the response validation to check for either status or success
-      if (result.status !== true && result.success !== true) {
-        console.error('Error creating subaccount:', result);
-        throw new Error('Failed to create subaccount. Invalid response received.');
+      let subaccountCode: string | undefined;
+
+      try {
+        const result = await monnifyApi.createSubaccount({
+          userId: profile.id,
+          accountName: profile.business_name,
+          bankCode: values.bankName,
+          accountNumber: values.accountNumber,
+          currencyCode: "NGN", // Required field
+          percentageCharge: profile.monnify_percentage_charge || (paymentConfig.monnify.percentageFee * 100), // Required field - Use user-specific percentage or default
+          contactEmail: profile.email_support || profile.contact_email || profile.email || "",
+          contactName: values.accountName,
+          contactPhone: profile.phone_number || "00000000000",
+          additionalInformation: `Subaccount for ${profile.business_name}`,
+          bvn: values.idNumber // Add BVN to the payload
+        });
+
+        console.log("Subaccount creation result:", result);
+
+        // Fix the response validation to check for either status or success
+        if (result.status !== true && result.success !== true) {
+          console.error('Error creating subaccount:', result);
+          throw new Error(result.responseMessage || 'Failed to create subaccount. Invalid response received.');
+        }
+
+        // Properly extract all fields from the response (Monnify format)
+        const subaccountData = result.data || {};
+        subaccountCode = subaccountData.subaccountCode || result.subaccountCode;
+        const bankDetails = subaccountData.bank || {};
+        const bankName = bankDetails.name || banks.find(bank => bank.code === values.bankName)?.name || 'Unknown Bank';
+
+        // Current timestamp for verification date
+        const verificationDate = new Date().toISOString();
+
+        // Update local profile state with Monnify subaccount code and KYC status
+        await updateProfile({
+          // @ts-ignore - These fields are declared in the module augmentation
+          monnify_subaccount_code: subaccountCode,
+          monnify_bvn: values.idNumber,            // Store the BVN provided by the user
+          monnify_kyc_status: 'pending',          // Set KYC status to pending initially
+          monnify_kyc_submitted_at: verificationDate, // Store when KYC was submitted
+          kyc_verified: false,                    // Set to false initially, will update after Monnify verification
+          kyc_verified_at: null                   // Set to null initially
+        });
+
+      } catch (subaccountError: any) {
+        console.error('Subaccount creation error:', subaccountError);
+        throw new Error(`Failed to create subaccount: ${subaccountError.message || 'Unknown error'}`);
       }
 
-      // Properly extract all fields from the response (Monnify format)
-      const subaccountData = result.data || {};
-      const subaccountCode = subaccountData.subaccountCode || result.subaccountCode;
-      const bankDetails = subaccountData.bank || {};
-      const bankName = bankDetails.name || banks.find(bank => bank.code === values.bankName)?.name || 'Unknown Bank';
+      // Perform Monnify customer verification only if subaccount was created successfully
+      if (subaccountCode) {
+        try {
+          const verificationResult = await monnifyApi.customerVerification({
+            userId: profile.id,
+            firstName: profile.business_name, // Using business name as first name
+            lastName: 'Merchant',             // Using 'Merchant' as last name
+            email: profile.email_support || profile.email || "unknown@example.com", // Use support email or fallback
+            phoneNumber: profile.phone_number || "+2348000000000", // Use phone number or fallback
+            bvn: values.idNumber,             // Include BVN for verification
+            dev_mode: import.meta.env.MODE === 'development' || import.meta.env.DEV_MODE === 'true'
+          });
 
-     //  // console.log("Extracted subaccount details:", {
-     //   subaccountCode,
-      //  bankName
-      //});
+          console.log("Customer verification result:", verificationResult);
 
-      // Current timestamp for verification date
-      const verificationDate = new Date().toISOString();
+          // Update KYC status based on Monnify response
+          let kycStatus = 'pending';
+          let kycVerified = false;
+          let kycVerifiedAt: string | null = null;
 
-      // Update local profile state with Monnify subaccount code and KYC status
-      await updateProfile({
-        // @ts-ignore - These fields are declared in the module augmentation
-        monnify_subaccount_code: subaccountCode,
-        kyc_verified: true,
-        kyc_verified_at: verificationDate
-      });
+          if (verificationResult.status === true || verificationResult.success === true) {
+            kycStatus = 'verified';
+            kycVerified = true;
+            kycVerifiedAt = new Date().toISOString();
+          } else if (verificationResult.status === 'failed' || verificationResult.status === 'rejected') {
+            kycStatus = verificationResult.status;
+          }
+
+          // Update profile with final KYC status
+          await updateProfile({
+            // @ts-ignore - These fields are declared in the module augmentation
+            monnify_kyc_status: kycStatus,
+            kyc_verified: kycVerified,
+            kyc_verified_at: kycVerifiedAt
+          });
+
+        } catch (verificationError: any) {
+          console.error("Customer verification error:", verificationError);
+          // Even if Monnify verification fails, we still store the KYC information locally
+          await updateProfile({
+            // @ts-ignore - These fields are declared in the module augmentation
+            monnify_kyc_status: 'failed',
+            kyc_verified: false
+          });
+
+          // Don't throw error here since subaccount was created; allow the process to continue
+          toast({
+            title: "Verification Incomplete",
+            description: "Subaccount created but verification needs manual review. Please contact support if issues persist.",
+            variant: "destructive"
+          });
+        }
+      }
 
       // Track KYC verification completion
-      trackKYCEvent('kyc_verified', {
+      trackKYCEvent('kyc_submitted', {
         profile_id: profile.id,
         subaccount_code: subaccountCode,
-        success: true
+        success: true,
+        bvn_provided: !!values.idNumber
       }).catch(console.error);
 
       // Also save bank details to payment_accounts table
@@ -370,6 +431,22 @@ export default function KYCForm() {
 
   return (
     <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="text-xl">KYC Verification</CardTitle>
+        {/* Show KYC status if already verified */}
+        {profile?.monnify_kyc_status && (
+          <div className={`text-sm p-2 rounded-md ${
+            profile.monnify_kyc_status === 'verified' ? 'bg-green-100 text-green-800' :
+            profile.monnify_kyc_status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+            'bg-red-100 text-red-800'
+          }`}>
+            KYC Status: <span className="font-semibold">{profile.monnify_kyc_status}</span>
+            {profile.monnify_kyc_submitted_at && (
+              <div className="text-xs mt-1">Submitted: {new Date(profile.monnify_kyc_submitted_at).toLocaleDateString()}</div>
+            )}
+          </div>
+        )}
+      </CardHeader>
       <CardContent className="pt-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -488,15 +565,15 @@ export default function KYCForm() {
             <Button
               type="submit"
               className="w-full"
-              disabled={isSubmitting || isVerifyingAccount || profile?.kyc_verified}
+              disabled={isSubmitting || isVerifyingAccount || (profile?.kyc_verified && profile?.monnify_kyc_status === 'verified')}
             >
               {isSubmitting ? (
                 <div className="flex items-center">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  <span>Verifying...</span>
+                  <span>Processing...</span>
                 </div>
-              ) : profile?.kyc_verified ? (
-                "Account Already Verified"
+              ) : (profile?.kyc_verified && profile?.monnify_kyc_status === 'verified') ? (
+                "KYC Already Verified"
               ) : (
                 "Verify Account"
               )}

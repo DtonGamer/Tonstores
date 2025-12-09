@@ -5,12 +5,12 @@ import { PricingPlan } from "@/hooks/usePricingPlans";
 import { useSubscription } from "@/hooks/useSubscription";
 import useAuth from "@/contexts/AuthContext";
 import { createMonnifyConfig } from "@/services/monnifyPayment";
+import { monnifyApi } from "@/services/monnifyApi";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { callSupabaseFunction } from '@/utils/supabaseFunctions';
 
 interface SubscriptionDialogProps {
   isOpen: boolean;
@@ -209,7 +209,7 @@ export function SubscriptionDialog({
         metadata: monnifyConfig.metadata
       };
 
-      const transactionData = await callSupabaseFunction('monnify-initialize-transaction', monnifyTransactionData);
+      const transactionData = await monnifyApi.initializeDirectTransaction(monnifyTransactionData);
 
       if (transactionData.status && transactionData.data?.checkoutUrl) {
         // Open the Monnify checkout page in the same window

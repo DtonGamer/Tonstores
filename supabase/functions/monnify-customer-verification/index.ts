@@ -170,11 +170,12 @@ serve(async (req) => {
     }
 
     // Prepare the payload for Monnify KYC verification
-    // Using the reserved accounts endpoint as that seems to be the main KYC endpoint in Monnify
+    // According to Monnify documentation, we use the reserved accounts endpoint for customer verification
     const monnifyPayload = {
       customerName: `${data.firstName} ${data.lastName}`,
       customerEmail: data.email,
       customerPhoneNumber: data.phoneNumber,
+      // According to documentation, BVN can be included for enhanced verification
       ...(data.bvn && { customerBvn: data.bvn }),
       // Additional KYC fields would go here based on Monnify's specific requirements
     };
@@ -186,7 +187,8 @@ serve(async (req) => {
     const authString = `${MONNIFY_API_KEY}:${MONNIFY_SECRET_KEY}`;
     const base64Auth = btoa(authString);
 
-    // For customer verification, Monnify uses reserved accounts endpoint (from documentation)
+    // For customer verification, we'll use the reserved accounts endpoint
+    // This endpoint handles customer information and can store KYC details
     const resp = await fetch(`https://api.monnify.com/api/v1/bank-transfer/reserved-accounts`, {
       method: "POST",
       headers: {

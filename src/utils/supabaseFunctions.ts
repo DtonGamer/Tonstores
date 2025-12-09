@@ -85,27 +85,5 @@ export const callSupabaseFunction = async (
   }
 };
 
-// Specific function calls for convenience
-export const callMonnifyBanks = async (options: { dev_mode?: boolean } = {}) => {
-  return callSupabaseFunction('monnify-banks', { dev_mode: options.dev_mode }, { method: 'GET' });
-};
-
-export const callMonnifyVerifyAccount = async (data: { 
-  account_number: string; 
-  bank_code: string; 
-  dev_mode?: boolean 
-}) => {
-  return callSupabaseFunction('monnify-verify-account', data);
-};
-
-export const callMonnifySubaccount = async (data: any) => {
-  return callSupabaseFunction('monnify-subaccount', data);
-};
-
-export const callMonnifyCustomerVerification = async (data: any) => {
-  return callSupabaseFunction('monnify-customer-verification', data);
-};
-
-export const callMonnifyInitializeTransaction = async (data: any) => {
-  return callSupabaseFunction('monnify-initialize-transaction', data);
-};
+// Export the core utility function for direct use when needed
+export { callSupabaseFunction };
