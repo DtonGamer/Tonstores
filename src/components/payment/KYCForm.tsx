@@ -242,7 +242,7 @@ export default function KYCForm() {
           accountNumber: values.accountNumber,
           currencyCode: "NGN", // Required field
           percentageCharge: profile.monnify_percentage_charge || (paymentConfig.monnify.percentageFee * 100), // Required field - Use user-specific percentage or default
-          contactEmail: profile.email_support || profile.contact_email || profile.email || "",
+          contactEmail: profile.email_support || profile.contact_email || "",
           contactName: values.accountName,
           contactPhone: profile.phone_number || "00000000000",
           additionalInformation: `Subaccount for ${profile.business_name}`,
@@ -289,7 +289,7 @@ export default function KYCForm() {
             userId: profile.id,
             firstName: profile.business_name, // Using business name as first name
             lastName: 'Merchant',             // Using 'Merchant' as last name
-            email: profile.email_support || profile.email || "unknown@example.com", // Use support email or fallback
+            email: profile.email_support || profile.contact_email || "unknown@example.com", // Use support email or fallback
             phoneNumber: profile.phone_number || "+2348000000000", // Use phone number or fallback
             bvn: values.idNumber,             // Include BVN for verification
             dev_mode: import.meta.env.MODE === 'development' || import.meta.env.DEV_MODE === 'true'

@@ -13,14 +13,14 @@ export const monnifyApi = {
   },
 
   // Bank verification
-  verifyAccount: async (data: { account_number: string; bank_code: string }) => {
+  verifyAccount: async (data: { account_number: string; bank_code: string; dev_mode?: boolean }) => {
     const response = await callSupabaseFunction('monnify-verify-account', data);
     return response;
   },
 
   // Get banks
-  getBanks: async () => {
-    const response = await callSupabaseFunction('monnify-banks', {}, { method: 'GET' });
+  getBanks: async (options: { dev_mode?: boolean } = {}) => {
+    const response = await callSupabaseFunction('monnify-banks', { dev_mode: options.dev_mode }, { method: 'GET' });
     return response;
   },
 
@@ -60,23 +60,6 @@ export const monnifyApi = {
     return response;
   },
 
-  // Verify bank account
-  verifyAccount: async (data: { account_number: string; bank_code: string; dev_mode?: boolean }) => {
-    const response = await callSupabaseFunction('monnify-verify-account', data);
-    return response;
-  },
-
-  // Get list of banks
-  getBanks: async (options: { dev_mode?: boolean } = {}) => {
-    const response = await callSupabaseFunction('monnify-banks', { dev_mode: options.dev_mode }, { method: 'GET' });
-    return response;
-  },
-
-  // Create subaccount
-  createSubaccount: async (data: any) => {
-    const response = await callSupabaseFunction('monnify-subaccount', data);
-    return response;
-  },
 
   // Customer verification
   customerVerification: async (data: {

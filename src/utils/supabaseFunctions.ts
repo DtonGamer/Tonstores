@@ -85,5 +85,3 @@ export const callSupabaseFunction = async (
   }
 };
 
-// Export the core utility function for direct use when needed
-export { callSupabaseFunction };
