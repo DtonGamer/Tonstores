@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,15 +8,29 @@ import ProductForm from "@/components/catalog/ProductForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "@/components/ui/form";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/use-toast";
-import { PlusCircle, Save, Eye, Trash2, ArrowLeft, Share2 } from "lucide-react";
+import { Save, Eye, Trash2, ArrowLeft, Share2, PlusCircle } from "lucide-react";
 import { useCatalog } from "@/hooks/useCatalog";
 import { useProducts, Product } from "@/hooks/useProducts";
 import useAuth from "@/contexts/AuthContext";
 import DeleteConfirmationDialog from "@/components/catalog/DeleteConfirmationDialog";
+import CatalogHeader from "@/components/catalog/CatalogHeader";
+import ProductsSection from "@/components/catalog/ProductsSection";
 
 // Form schema for catalog
 const catalogSchema = z.object({
@@ -412,69 +426,19 @@ const CatalogBuilder = () => {
   return (
     <div className="min-h-screen flex flex-col dark:bg-gray-900">
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link to="/dashboard" className="inline-flex items-center text-tonstores-darkblue hover:text-tonstores-blue dark:text-white dark:hover:text-tonstores-lightblue mb-4">
-          <ArrowLeft size={16} className="mr-1" />
-          Back to Dashboard
-        </Link>
-        
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-tonstores-darkblue dark:text-white">
-            {isNewCatalog ? "Create New Catalog" : "Edit Catalog"}
-          </h1>
-          
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="flex flex-wrap gap-2">
-              {!isNewCatalog && (
-                <>
-                  <Button 
-                    variant="outline" 
-                    className="flex items-center gap-1 px-3 text-sm dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                    size="sm"
-                    onClick={previewCatalog}
-                  >
-                    <Eye size={16} />
-                    <span>Preview</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-1 px-3 text-sm dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                    size="sm"
-                    onClick={copyLinkToClipboard}
-                  >
-                    <Share2 size={16} />
-                    <span>Share</span>
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="flex items-center gap-1 px-3 text-sm"
-                    size="sm"
-                    onClick={() => setIsDeleteDialogOpen(true)}
-                  >
-                    <Trash2 size={16} />
-                    <span>Delete</span>
-                  </Button>
-                </>
-              )}
-            </div>
-            
-            <Button 
-              onClick={(e) => {
-                e.preventDefault();
-                form.handleSubmit(handleSaveCatalog)();
-              }}
-              className="bg-tonstores-green hover:bg-tonstores-darkblue flex items-center gap-2 px-4"
-              size="default"
-              disabled={isSaving}
-            >
-              {isSaving ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              ) : (
-                <Save size={16} />
-              )}
-              <span>{isSaving ? "Saving..." : "Save Catalog"}</span>
-            </Button>
-          </div>
-        </div>
+        <CatalogHeader
+          isNewCatalog={isNewCatalog}
+          catalogName={isNewCatalog ? "Create New Catalog" : "Edit Catalog"}
+          shareableLink={shareableLink}
+          onSave={(e) => {
+            e.preventDefault();
+            form.handleSubmit(handleSaveCatalog)();
+          }}
+          onPreview={previewCatalog}
+          onShare={copyLinkToClipboard}
+          onDelete={() => setIsDeleteDialogOpen(true)}
+          isSaving={isSaving}
+        />
         
         <Form {...form}>
           <form onSubmit={(e) => {
@@ -605,76 +569,14 @@ const CatalogBuilder = () => {
               </TabsContent>
               
               <TabsContent value="products">
-                {isNewCatalog ? (
-                  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700 text-center">
-                    <h2 className="text-xl font-semibold mb-2 dark:text-white">Save your catalog first</h2>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">You need to save your catalog before adding products.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div>
-                        <h2 className="text-xl font-semibold dark:text-white">Products</h2>
-                        <p className="text-gray-600 dark:text-gray-400">Manage products in your catalog</p>
-                      </div>
-                      <Button 
-                        onClick={() => handleOpenProductModal()}
-                        className="bg-tonstores-green hover:bg-tonstores-darkblue flex items-center gap-2"
-                      >
-                        <PlusCircle size={16} />
-                        Add New Product
-                      </Button>
-                    </div>
-                    
-                    {productsLoading ? (
-                      <div className="flex justify-center items-center p-12">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tonstores-green"></div>
-                      </div>
-                    ) : products.length === 0 ? (
-                      <div className="bg-white dark:bg-gray-800 p-12 rounded-lg shadow-sm border dark:border-gray-700 text-center">
-                        <h3 className="text-lg font-semibold mb-2 dark:text-white">No products yet</h3>
-                        <p className="text-gray-600 dark:text-gray-400 mb-6">Add your first product to get started</p>
-                        <Button 
-                          onClick={() => handleOpenProductModal()}
-                          className="bg-tonstores-green hover:bg-tonstores-darkblue flex items-center gap-2"
-                        >
-                          <PlusCircle size={16} />
-                          Add New Product
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {products.map(product => (
-                          <div key={product.id} className="relative">
-                            <Button 
-                              variant="destructive" 
-                              size="icon"
-                              className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full opacity-80 hover:opacity-100"
-                              onClick={() => handleDeleteProduct(product.id!)}
-                            >
-                              <Trash2 size={16} />
-                            </Button>
-                            <ProductCard
-                              id={product.id!}
-                              name={product.name}
-                              description={product.description || ""}
-                              price={product.price}
-                              imageUrl={product.image_url || "/placeholder.svg"}
-                              inStock={product.in_stock}
-                              stockQuantity={product.stock_quantity}
-                              lowStockThreshold={product.low_stock_threshold}
-                              isEditable={true}
-                              onEdit={() => {
-                                // Open product modal without saving catalog
-                                handleOpenProductModal(product);
-                              }}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
+                <ProductsSection
+                  isNewCatalog={isNewCatalog}
+                  products={products}
+                  isLoading={productsLoading}
+                  onAddProduct={() => handleOpenProductModal()}
+                  onEditProduct={handleOpenProductModal}
+                  onDeleteProduct={handleDeleteProduct}
+                />
               </TabsContent>
             </Tabs>
           </form>

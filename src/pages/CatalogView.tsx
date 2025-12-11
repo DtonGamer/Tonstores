@@ -13,13 +13,16 @@ import { toast } from "@/components/ui/use-toast";
 import { getAdminProfile } from "@/hooks/useProfile";
 import { refreshSession } from "@/utils/reconnectHandler";
 import { Helmet } from "react-helmet";
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getStorageUrl } from "@/utils/imageHelpers";
+import ContactMethods from "@/components/catalog/ContactMethods";
+import CartSidebar from "@/components/catalog/CartSidebar";
+import TikTokIcon from "@/components/catalog/tiktokIcon";
 
 // Default admin contact information as last-resort fallback
 const DEFAULT_CONTACTS = {
@@ -30,21 +33,6 @@ const DEFAULT_CONTACTS = {
   facebook_handle: "Tonstore",
   tiktok_handle: "tonrichie",
 };
-
-// TikTok icon component
-const TikTokIcon = ({ size = 16, className = "" }) => (
-  <svg 
-    width={size} 
-    height={size} 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-  >
-    <path d="M19.321 5.562a5.124 5.124 0 0 1-1.38 1.015 5.086 5.086 0 0 1-1.616.518V9.39a5.052 5.052 0 0 1-2.299-.56v3.947a5.16 5.16 0 0 1-1.378 3.53 5.2 5.2 0 0 1-7.313.01 5.161 5.161 0 0 1 0-7.313 5.2 5.2 0 0 1 7.313.01c.011.01.02.022.03.032V5.332A9.885 9.885 0 0 0 10.95 4.4a9.9 9.9 0 0 0-5.213 1.495 9.938 9.938 0 0 0-3.595 4.144A9.892 9.892 0 0 0 1.2 14.91a9.958 9.958 0 0 0 2.892 7.024 9.958 9.958 0 0 0 6.817 2.866h.082a9.958 9.958 0 0 0 7.024-2.866 9.958 9.958 0 0 0 2.866-7.024V8.593a9.885 9.885 0 0 0 4.92 1.3V5.783a5.07 5.07 0 0 1-2.766-.768 5.16 5.16 0 0 1-1.815-1.816 5.07 5.07 0 0 1-.769-2.766h-3.109c.002 1.088.287 2.156.829 3.13z" 
-    fill="currentColor" />
-  </svg>
-);
 
 const CatalogView = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -507,7 +495,7 @@ const CatalogView = () => {
       <header className="bg-white dark:bg-gray-900 shadow-lg dark:shadow-gray-950 sticky top-0 z-40 border-b dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-xl font-bold text-tonstores-darkblue dark:text-tonstores-blue truncate max-w-xs sm:max-w-md">
+            <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-tonstores-green to-tonstores-darkblue bg-clip-text text-transparent truncate max-w-xs sm:max-w-md">
               {catalog.name}
             </h1>
             <div className="flex items-center gap-3">
@@ -571,9 +559,9 @@ const CatalogView = () => {
       
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold text-tonstores-darkblue dark:text-tonstores-blue mb-2">{catalog.name}</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-tonstores-green to-tonstores-darkblue bg-clip-text text-transparent mb-2">{catalog.name}</h2>
           {catalog.description && (
-            <p className="text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">{catalog.description}</p>
+            <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">{catalog.description}</p>
           )}
         </div>
 
@@ -649,201 +637,22 @@ const CatalogView = () => {
           </div>
         )}
 
-        {/* Contact Methods Section */}
-        <div className="mt-12 border-t dark:border-gray-700 pt-6">
-          <div className="text-center mb-6">
-            <h3 className="text-lg sm:text-xl font-semibold mb-2 dark:text-white">Need Support?</h3>
-            <p className="text-gray-600 dark:text-gray-300 text-sm max-w-md mx-auto">Our support team is available to assist you with any questions.</p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 max-w-4xl mx-auto">
-            {/* Email Support */}
-            <a
-              href={`mailto:${contactMethods.email}`}
-              className="flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
-            >
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-2">
-                <Mail className="text-blue-600 dark:text-blue-400" size={16} />
-              </div>
-              <span className="text-xs font-medium dark:text-white">Email</span>
-            </a>
-
-            {/* WhatsApp Support */}
-            <a
-              href={getWhatsAppLink(contactMethods.whatsapp)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
-            >
-              <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-2">
-                <Phone className="text-green-600 dark:text-green-400" size={16} />
-              </div>
-              <span className="text-xs font-medium dark:text-white">WhatsApp</span>
-            </a>
-
-            {/* Twitter */}
-            <a
-              href={getTwitterLink(contactMethods.twitter)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
-            >
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-2">
-                <Twitter className="text-blue-500 dark:text-blue-400" size={16} />
-              </div>
-              <span className="text-xs font-medium dark:text-white">Twitter</span>
-            </a>
-
-           {/* Instagram */}
-            <a
-              href={getInstagramLink(contactMethods.instagram)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
-            >
-              <div className="w-10 h-10 bg-pink-100 dark:bg-pink-900 rounded-full flex items-center justify-center mb-2">
-                <Instagram className="text-pink-500 dark:text-pink-400" size={16} />
-              </div>
-              <span className="text-xs font-medium dark:text-white">Instagram</span>
-            </a>
-
-            {/* Facebook */}
-            <a
-              href={getFacebookLink(contactMethods.facebook)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
-            >
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-2">
-                <Facebook className="text-blue-600 dark:text-blue-400" size={16} />
-              </div>
-              <span className="text-xs font-medium dark:text-white">Facebook</span>
-            </a>
-
-            {/* TikTok */}
-            <a
-              href={getTikTokLink(contactMethods.tiktok)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
-            >
-              <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-2">
-                <TikTokIcon className="text-gray-800 dark:text-gray-200" size={16} />
-              </div>
-              <span className="text-xs font-medium dark:text-white">TikTok</span>
-            </a>
-          </div>
-        </div>
+        <ContactMethods
+          contactMethods={contactMethods}
+          getWhatsAppLink={getWhatsAppLink}
+          getTwitterLink={getTwitterLink}
+          getInstagramLink={getInstagramLink}
+          getFacebookLink={getFacebookLink}
+          getTikTokLink={getTikTokLink}
+        />
       </main>
       
-      {/* Cart Sidebar */}
-      {isCartOpen && (
-        <>
-          <div
-            className="fixed inset-0 bg-black bg-opacity-40 z-40 transition-opacity"
-            onClick={closeCart}
-          ></div>
-          <div
-            className="fixed inset-y-0 right-0 max-w-sm w-full bg-white shadow-xl transform z-50 transition-transform duration-300 ease-in-out"
-          >
-            <div className="h-full flex flex-col p-5">
-              <div className="flex justify-between items-center mb-4 pb-2 border-b">
-                <h2 className="text-lg font-bold">Your Cart ({cart.items.length})</h2>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={closeCart}
-                  className="rounded-full hover:bg-gray-100"
-                >
-                  <X size={20} />
-                </Button>
-              </div>
-
-              {cart.isEmpty ? (
-                <div className="flex-grow flex flex-col items-center justify-center text-center py-8">
-                  <div className="bg-tonstores-lightgreen p-4 rounded-full mb-4">
-                    <ShoppingCart size={40} className="text-tonstores-green mx-auto" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Your cart is empty</h3>
-                  <p className="text-gray-600 mb-6">
-                    Start adding some products to your cart
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="border-tonstores-green text-tonstores-green hover:bg-tonstores-lightgreen"
-                    onClick={closeCart}
-                  >
-                    Continue Shopping
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <div className="flex-grow overflow-y-auto space-y-4 py-2">
-                    {cart.items.map(item => (
-                      <div key={item.id} className="flex items-center py-3 border-b border-gray-100 dark:border-gray-700">
-                        <img
-                          src={item.image_urls?.[0] ? getStorageUrl(item.image_urls[0]) : (item.image_url ? getStorageUrl(item.image_url) : "/placeholder.svg")}
-                          alt={item.name}
-                          className="w-16 h-16 object-cover rounded-lg mr-3"
-                        />
-                        <div className="flex-grow min-w-0">
-                          <h4 className="font-medium text-sm truncate">{item.name}</h4>
-                          <div className="flex items-center justify-between mt-1">
-                            <div className="flex items-center border rounded">
-                              <button
-                                className="p-1 text-gray-600 hover:bg-gray-100"
-                                onClick={() => cart.updateQuantity(item.id, item.quantity - 1)}
-                                type="button"
-                                disabled={item.quantity <= 1}
-                              >
-                                -
-                              </button>
-                              <span className="px-2 py-1 min-w-[40px] text-center">{item.quantity}</span>
-                              <button
-                                className="p-1 text-gray-600 hover:bg-gray-100"
-                                onClick={() => cart.updateQuantity(item.id, item.quantity + 1)}
-                                type="button"
-                              >
-                                +
-                              </button>
-                            </div>
-                            <span className="font-medium text-sm">
-                              ₦{((item.price * item.quantity) / 100).toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="ml-1 p-0 w-8 h-8 rounded-full hover:bg-gray-100"
-                          onClick={() => cart.removeItem(item.id)}
-                        >
-                          <X size={16} />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="border-t border-gray-200 pt-4 mt-auto">
-                    <div className="flex justify-between text-base font-semibold mb-2">
-                      <span>Total:</span>
-                      <span>₦{(cart.total / 100).toLocaleString()}</span>
-                    </div>
-
-                    <Button
-                      className="w-full bg-tonstores-green hover:bg-tonstores-darkgreen py-2.5 flex items-center justify-center"
-                      onClick={proceedToCheckout}
-                    >
-                      Proceed to Checkout
-                      <ArrowRight className="ml-2" size={18} />
-                    </Button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+      <CartSidebar
+        isOpen={isCartOpen}
+        onClose={closeCart}
+        cart={cart}
+        onProceedToCheckout={proceedToCheckout}
+      />
     </div>
   );
 };
