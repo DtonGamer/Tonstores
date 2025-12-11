@@ -504,60 +504,62 @@ const CatalogView = () => {
         </script>
       </Helmet>
       
-      <header className="bg-white dark:bg-gray-900 shadow-md dark:shadow-gray-950 sticky top-0 z-40">
+      <header className="bg-white dark:bg-gray-900 shadow-lg dark:shadow-gray-950 sticky top-0 z-40 border-b dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-xl font-bold text-tonstores-darkblue dark:text-tonstores-blue">
+            <h1 className="text-xl font-bold text-tonstores-darkblue dark:text-tonstores-blue truncate max-w-xs sm:max-w-md">
               {catalog.name}
             </h1>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
+                  <Button
                     variant="outline"
-                    className="flex items-center space-x-2 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                    size="sm"
+                    className="flex items-center space-x-1 sm:space-x-2 h-9 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-800 transition-colors"
                   >
-                    <Share2 size={20} />
+                    <Share2 size={18} />
                     <span className="hidden sm:inline">Share</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={shareOnWhatsApp} className="cursor-pointer">
+                <DropdownMenuContent align="end" className="w-48 dark:bg-gray-800 dark:border-gray-700">
+                  <DropdownMenuItem onClick={shareOnWhatsApp} className="cursor-pointer py-2 dark:focus:bg-gray-700">
                     <Phone className="mr-2 h-4 w-4 text-green-600" />
                     <span>WhatsApp</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={shareOnTwitter} className="cursor-pointer">
+                  <DropdownMenuItem onClick={shareOnTwitter} className="cursor-pointer py-2 dark:focus:bg-gray-700">
                     <Twitter className="mr-2 h-4 w-4 text-blue-500" />
                     <span>Twitter</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={shareOnFacebook} className="cursor-pointer">
+                  <DropdownMenuItem onClick={shareOnFacebook} className="cursor-pointer py-2 dark:focus:bg-gray-700">
                     <Facebook className="mr-2 h-4 w-4 text-blue-600" />
                     <span>Facebook</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={shareOnTikTok} className="cursor-pointer">
+                  <DropdownMenuItem onClick={shareOnTikTok} className="cursor-pointer py-2 dark:focus:bg-gray-700">
                     <TikTokIcon className="mr-2 h-4 w-4" />
                     <span>TikTok</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={shareOnInstagram} className="cursor-pointer">
+                  <DropdownMenuItem onClick={shareOnInstagram} className="cursor-pointer py-2 dark:focus:bg-gray-700">
                     <Instagram className="mr-2 h-4 w-4 text-pink-500" />
                     <span>Instagram</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={copyLink} className="cursor-pointer">
+                  <DropdownMenuItem onClick={copyLink} className="cursor-pointer py-2 dark:focus:bg-gray-700">
                     <Link2 className="mr-2 h-4 w-4" />
                     <span>Copy Link</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              
-              <Button 
+
+              <Button
                 variant="outline"
-                className="flex items-center space-x-2 relative dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                size="sm"
+                className="flex items-center space-x-1 sm:space-x-2 relative h-9 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-800 transition-colors"
                 onClick={toggleCart}
               >
-                <ShoppingCart size={20} />
+                <ShoppingCart size={18} />
                 <span className="hidden sm:inline">Cart</span>
                 {cart.items.length > 0 && (
-                  <Badge className="absolute -top-2 -right-2 bg-tonstores-green">
+                  <Badge className="absolute -top-2 -right-2 bg-tonstores-green text-xs w-5 h-5 flex items-center justify-center">
                     {cart.items.reduce((sum, item) => sum + item.quantity, 0)}
                   </Badge>
                 )}
@@ -569,53 +571,58 @@ const CatalogView = () => {
       
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold text-tonstores-darkblue dark:text-tonstores-blue">{catalog.name}</h2>
+          <h2 className="text-3xl font-bold text-tonstores-darkblue dark:text-tonstores-blue mb-2">{catalog.name}</h2>
           {catalog.description && (
-            <p className="mt-4 text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">{catalog.description}</p>
+            <p className="text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">{catalog.description}</p>
           )}
         </div>
 
         {/* Search and filter section */}
-        <div className="mb-8">
-          <div className="relative max-w-md mx-auto">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
+        <div className="mb-10">
+          <div className="relative max-w-lg mx-auto">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Search className="text-gray-400 dark:text-gray-500" size={20} />
+            </div>
             <Input
               type="text"
               placeholder="Search products..."
-              className="pl-10 pr-4 py-2"
+              className="pl-10 pr-10 py-3 text-base rounded-lg border-2 border-gray-200 dark:border-gray-700 focus:border-tonstores-green dark:focus:border-tonstores-green transition-colors"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             {searchTerm && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => setSearchTerm('')}
               >
-                <X size={16} />
+                <X size={18} className="text-gray-500" />
               </Button>
             )}
           </div>
           {searchTerm && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">
+            <p className="text-sm text-gray-600 dark:text-gray-400 text-center mt-3">
               Found {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'} matching "{searchTerm}"
             </p>
           )}
         </div>
         
         {filteredProducts.length === 0 ? (
-          <div className="text-center p-8">
+          <div className="text-center p-12">
+            <div className="mx-auto w-24 h-24 bg-tonstores-lightgreen rounded-full flex items-center justify-center mb-6">
+              <Search className="text-tonstores-green w-12 h-12" />
+            </div>
             <h3 className="text-xl font-semibold mb-2 dark:text-white">No Products Found</h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              {products.length === 0 
-                ? "This catalog currently has no products." 
+            <p className="text-gray-600 dark:text-gray-300 max-w-md mx-auto">
+              {products.length === 0
+                ? "This catalog currently has no products."
                 : "No products match your search criteria."}
             </p>
             {products.length > 0 && searchTerm && (
-              <Button 
-                variant="outline" 
-                className="mt-4 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+              <Button
+                variant="outline"
+                className="mt-6 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                 onClick={() => setSearchTerm('')}
               >
                 Clear Search
@@ -623,7 +630,7 @@ const CatalogView = () => {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map(product => (
               <ProductCard
                 key={product.id}
@@ -644,82 +651,84 @@ const CatalogView = () => {
 
         {/* Contact Methods Section */}
         <div className="mt-12 border-t dark:border-gray-700 pt-6">
-          <h3 className="text-lg sm:text-xl font-semibold text-center mb-3 dark:text-white">Still need help?</h3>
-          <p className="text-center text-gray-600 dark:text-gray-300 text-sm mb-6">Our support team is available to assist you.</p>
-          
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 max-w-4xl mx-auto px-2">
+          <div className="text-center mb-6">
+            <h3 className="text-lg sm:text-xl font-semibold mb-2 dark:text-white">Need Support?</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-sm max-w-md mx-auto">Our support team is available to assist you with any questions.</p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 max-w-4xl mx-auto">
             {/* Email Support */}
             <a
               href={`mailto:${contactMethods.email}`}
-              className="flex flex-col items-center p-2 border dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
             >
-              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-1">
-                <Mail className="text-blue-600 dark:text-blue-400" size={14} />
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-2">
+                <Mail className="text-blue-600 dark:text-blue-400" size={16} />
               </div>
               <span className="text-xs font-medium dark:text-white">Email</span>
             </a>
-            
+
             {/* WhatsApp Support */}
-            <a 
-              href={getWhatsAppLink(contactMethods.whatsapp)} 
-              target="_blank" 
+            <a
+              href={getWhatsAppLink(contactMethods.whatsapp)}
+              target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col items-center p-2 border dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
             >
-              <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-1">
-                <Phone className="text-green-600 dark:text-green-400" size={14} />
+              <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-2">
+                <Phone className="text-green-600 dark:text-green-400" size={16} />
               </div>
               <span className="text-xs font-medium dark:text-white">WhatsApp</span>
             </a>
-            
+
             {/* Twitter */}
-            <a 
-              href={getTwitterLink(contactMethods.twitter)} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="flex flex-col items-center p-2 border dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            <a
+              href={getTwitterLink(contactMethods.twitter)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
             >
-              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-1">
-                <Twitter className="text-blue-500 dark:text-blue-400" size={14} />
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-2">
+                <Twitter className="text-blue-500 dark:text-blue-400" size={16} />
               </div>
               <span className="text-xs font-medium dark:text-white">Twitter</span>
             </a>
 
            {/* Instagram */}
-            <a 
-              href={getInstagramLink(contactMethods.instagram)} 
-              target="_blank" 
+            <a
+              href={getInstagramLink(contactMethods.instagram)}
+              target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col items-center p-2 border dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
             >
-              <div className="w-8 h-8 bg-pink-100 dark:bg-pink-900 rounded-full flex items-center justify-center mb-1">
-                <Instagram className="text-pink-500 dark:text-pink-400" size={14} />
+              <div className="w-10 h-10 bg-pink-100 dark:bg-pink-900 rounded-full flex items-center justify-center mb-2">
+                <Instagram className="text-pink-500 dark:text-pink-400" size={16} />
               </div>
               <span className="text-xs font-medium dark:text-white">Instagram</span>
             </a>
 
             {/* Facebook */}
-            <a 
-              href={getFacebookLink(contactMethods.facebook)} 
-              target="_blank" 
+            <a
+              href={getFacebookLink(contactMethods.facebook)}
+              target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col items-center p-2 border dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
             >
-              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-1">
-                <Facebook className="text-blue-600 dark:text-blue-400" size={14} />
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-2">
+                <Facebook className="text-blue-600 dark:text-blue-400" size={16} />
               </div>
               <span className="text-xs font-medium dark:text-white">Facebook</span>
             </a>
-            
+
             {/* TikTok */}
-            <a 
-              href={getTikTokLink(contactMethods.tiktok)} 
-              target="_blank" 
+            <a
+              href={getTikTokLink(contactMethods.tiktok)}
+              target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col items-center p-2 border dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
             >
-              <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-1">
-                <TikTokIcon className="text-gray-800 dark:text-gray-200" size={14} />
+              <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-2">
+                <TikTokIcon className="text-gray-800 dark:text-gray-200" size={16} />
               </div>
               <span className="text-xs font-medium dark:text-white">TikTok</span>
             </a>
@@ -730,81 +739,83 @@ const CatalogView = () => {
       {/* Cart Sidebar */}
       {isCartOpen && (
         <>
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          <div
+            className="fixed inset-0 bg-black bg-opacity-40 z-40 transition-opacity"
             onClick={closeCart}
           ></div>
-          <div 
-            className="fixed inset-y-0 right-0 max-w-md w-full bg-white shadow-lg transform z-50 transition-transform duration-300 ease-in-out"
+          <div
+            className="fixed inset-y-0 right-0 max-w-sm w-full bg-white shadow-xl transform z-50 transition-transform duration-300 ease-in-out"
           >
-            <div className="h-full flex flex-col p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold">Your Cart</h2>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+            <div className="h-full flex flex-col p-5">
+              <div className="flex justify-between items-center mb-4 pb-2 border-b">
+                <h2 className="text-lg font-bold">Your Cart ({cart.items.length})</h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={closeCart}
+                  className="rounded-full hover:bg-gray-100"
                 >
-                  <X size={24} />
+                  <X size={20} />
                 </Button>
               </div>
-              
+
               {cart.isEmpty ? (
-                <div className="flex-grow flex items-center justify-center">
-                  <div className="text-center">
-                    <ShoppingCart size={64} className="mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">Your cart is empty</h3>
-                    <p className="text-gray-600 mb-4">
-                      Start adding products to your cart
-                    </p>
-                    <Button 
-                      variant="outline" 
-                      onClick={closeCart}
-                    >
-                      Continue Shopping
-                    </Button>
+                <div className="flex-grow flex flex-col items-center justify-center text-center py-8">
+                  <div className="bg-tonstores-lightgreen p-4 rounded-full mb-4">
+                    <ShoppingCart size={40} className="text-tonstores-green mx-auto" />
                   </div>
+                  <h3 className="text-lg font-semibold mb-2">Your cart is empty</h3>
+                  <p className="text-gray-600 mb-6">
+                    Start adding some products to your cart
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="border-tonstores-green text-tonstores-green hover:bg-tonstores-lightgreen"
+                    onClick={closeCart}
+                  >
+                    Continue Shopping
+                  </Button>
                 </div>
               ) : (
                 <>
-                  <div className="flex-grow overflow-y-auto space-y-4">
+                  <div className="flex-grow overflow-y-auto space-y-4 py-2">
                     {cart.items.map(item => (
-                      <div key={item.id} className="flex items-center border-b pb-4">
-                        <img 
-                          src={item.image_urls?.[0] ? getStorageUrl(item.image_urls[0]) : (item.image_url ? getStorageUrl(item.image_url) : "/placeholder.svg")} 
+                      <div key={item.id} className="flex items-center py-3 border-b border-gray-100 dark:border-gray-700">
+                        <img
+                          src={item.image_urls?.[0] ? getStorageUrl(item.image_urls[0]) : (item.image_url ? getStorageUrl(item.image_url) : "/placeholder.svg")}
                           alt={item.name}
-                          className="w-16 h-16 object-cover rounded mr-4"
+                          className="w-16 h-16 object-cover rounded-lg mr-3"
                         />
-                        <div className="flex-grow">
-                          <h4 className="font-medium">{item.name}</h4>
+                        <div className="flex-grow min-w-0">
+                          <h4 className="font-medium text-sm truncate">{item.name}</h4>
                           <div className="flex items-center justify-between mt-1">
-                            <div className="flex items-center">
-                              <button 
-                                className="p-1 border rounded-l text-gray-500"
+                            <div className="flex items-center border rounded">
+                              <button
+                                className="p-1 text-gray-600 hover:bg-gray-100"
                                 onClick={() => cart.updateQuantity(item.id, item.quantity - 1)}
                                 type="button"
                                 disabled={item.quantity <= 1}
                               >
                                 -
                               </button>
-                              <span className="px-2 py-1 border-t border-b">{item.quantity}</span>
-                              <button 
-                                className="p-1 border rounded-r text-gray-500"
+                              <span className="px-2 py-1 min-w-[40px] text-center">{item.quantity}</span>
+                              <button
+                                className="p-1 text-gray-600 hover:bg-gray-100"
                                 onClick={() => cart.updateQuantity(item.id, item.quantity + 1)}
                                 type="button"
                               >
                                 +
                               </button>
                             </div>
-                            <span className="font-medium">
+                            <span className="font-medium text-sm">
                               ₦{((item.price * item.quantity) / 100).toLocaleString()}
                             </span>
                           </div>
                         </div>
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="sm"
-                          className="ml-2"
+                          className="ml-1 p-0 w-8 h-8 rounded-full hover:bg-gray-100"
                           onClick={() => cart.removeItem(item.id)}
                         >
                           <X size={16} />
@@ -812,18 +823,18 @@ const CatalogView = () => {
                       </div>
                     ))}
                   </div>
-                  
-                  <div className="border-t pt-4 mt-auto">
-                    <div className="flex justify-between text-lg font-semibold mb-4">
+
+                  <div className="border-t border-gray-200 pt-4 mt-auto">
+                    <div className="flex justify-between text-base font-semibold mb-2">
                       <span>Total:</span>
                       <span>₦{(cart.total / 100).toLocaleString()}</span>
                     </div>
-                    
-                    <Button 
-                      className="w-full bg-tonstores-green hover:bg-tonstores-darkblue flex items-center justify-center"
+
+                    <Button
+                      className="w-full bg-tonstores-green hover:bg-tonstores-darkgreen py-2.5 flex items-center justify-center"
                       onClick={proceedToCheckout}
                     >
-                      Checkout
+                      Proceed to Checkout
                       <ArrowRight className="ml-2" size={18} />
                     </Button>
                   </div>
