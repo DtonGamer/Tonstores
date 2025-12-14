@@ -47,6 +47,12 @@ type ProfileUpdate = {
   monnify_secret_key?: string;
   monnify_subaccount_code?: string;
   monnify_subaccount_id?: string;
+  monnify_bvn?: string;
+  monnify_kyc_status?: string;
+  monnify_kyc_submitted_at?: string;
+  monnify_percentage_charge?: number;
+  kyc_verified?: boolean;
+  kyc_verified_at?: string;
   email_support?: string;
   whatsapp_support?: string;
   twitter_handle?: string;

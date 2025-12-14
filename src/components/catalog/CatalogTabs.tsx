@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import CatalogFormSection from "@/components/catalog\CatalogFormSection";
+import CatalogFormSection from "@/components/catalog/CatalogFormSection";
 import ProductsSection from "@/components/catalog/ProductsSection";
 import { Product } from "@/hooks/useProducts";
 

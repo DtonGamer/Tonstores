@@ -351,7 +351,7 @@ const AffiliateDashboard = () => {
                 </li>
                 <li className="flex items-start">
                   <div className="bg-Tonstores-green/10 rounded-full p-1 mr-2 mt-0.5">
-                    <Building2 className="h-4 w-4 text-Tonstores-green" />
+                    <Building className="h-4 w-4 text-Tonstores-green" />
                   </div>
                   <span className="text-gray-700 dark:text-gray-300">Build the parallel infrastructure ecosystem</span>
                 </li>

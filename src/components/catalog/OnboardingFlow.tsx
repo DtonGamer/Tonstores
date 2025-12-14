@@ -249,10 +249,10 @@ const OnboardingFlow = () => {
             <div className="flex items-center justify-between mb-8">
               <div className={`flex flex-col items-center ${currentStep === "catalog" ? "text-Tonstores-green" : "text-gray-400"}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
-                  currentStep === "catalog" ? "bg-Tonstores-green text-white" : 
-                  currentStep !== "catalog" ? "bg-green-500 text-white" : "bg-gray-200"
+                  currentStep === "catalog" ? "bg-Tonstores-green text-white" :
+                  currentStep === "product" || currentStep === "complete" ? "bg-green-500 text-white" : "bg-gray-200"
                 }`}>
-                  {currentStep !== "catalog" ? <CheckCircle size={16} /> : 1}
+                  {currentStep === "catalog" ? 1 : <CheckCircle size={16} />}
                 </div>
                 <span className="text-sm">Catalog</span>
               </div>
