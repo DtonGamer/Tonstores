@@ -1,5 +1,5 @@
-import { supabase } from "@/integrations/supabase/client";
 import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Gets the guest user ID from local storage or generates a new one if not found
@@ -36,7 +36,6 @@ export const setupGuestIdInterceptor = async (): Promise<void> => {
   const originalFetch = window.fetch;
   window.fetch = async (input, init) => {
     // Check if user is authenticated first
-    const supabase = (await import('@/integrations/supabase/client')).supabase;
     const { data: { session } } = await supabase.auth.getSession();
 
     // If user is authenticated, don't add guest ID header

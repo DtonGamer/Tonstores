@@ -16,6 +16,8 @@ import {
   getCurrentUser
 } from "@/integrations/supabase/authManager";
 import { trackAuthEvent, trackError } from "@/utils/eventTracker";
+import { supabase } from "@/integrations/supabase/client";
+
 
 // Debug flag - set to true to enable detailed logging
 const DEBUG = false;
@@ -60,7 +62,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       // Use the shared supabase client instance
-      const { supabase } = await import("@/integrations/supabase/client");
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
