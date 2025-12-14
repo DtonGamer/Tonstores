@@ -38,7 +38,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-bold bg-gradient-to-r from-tonstores-darkblue to-tonstores-green bg-clip-text text-transparent">Tonstores</span>
+              <span className="text-2xl font-bold bg-gradient-to-r from-Tonstores-darkblue to-Tonstores-green bg-clip-text text-transparent">Tonstores</span>
             </Link>
           </div>
 
@@ -46,29 +46,29 @@ const Navbar = () => {
           <div className="hidden md:flex md:items-center md:space-x-6">
             {!isAuthenticated && (
               <>
-                <Link to="/" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/" className="px-3 py-2 font-medium text-gray-700 hover:text-Tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
                   Home
                 </Link>
-                <Link to="/features" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/features" className="px-3 py-2 font-medium text-gray-700 hover:text-Tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
                   Features
                 </Link>
-                <Link to="/pricing" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/pricing" className="px-3 py-2 font-medium text-gray-700 hover:text-Tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
                   Pricing
                 </Link>
-                <Link to="/about" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/about" className="px-3 py-2 font-medium text-gray-700 hover:text-Tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
                   About
                 </Link>
-                <Link to="/contact" className="px-3 py-2 font-medium text-gray-700 hover:text-tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/contact" className="px-3 py-2 font-medium text-gray-700 hover:text-Tonstores-green transition-colors" onClick={() => setIsMenuOpen(false)}>
                   Contact
                 </Link>
                 <div className="ml-4 flex items-center space-x-3">
                   <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="border-gray-300 hover:border-tonstores-green text-gray-700 hover:text-tonstores-green">
+                    <Button variant="outline" className="border-gray-300 hover:border-Tonstores-green text-gray-700 hover:text-Tonstores-green">
                       Log In
                     </Button>
                   </Link>
                   <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="bg-tonstores-green hover:bg-tonstores-darkblue text-white">
+                    <Button className="bg-Tonstores-green hover:bg-Tonstores-darkblue text-white">
                       Sign Up
                       <ArrowRight className="ml-2" size={16} />
                     </Button>
@@ -80,7 +80,7 @@ const Navbar = () => {
             {/* If authenticated on home page, show only Dashboard */}
             {isAuthenticated && onHomeRoute && (
               <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                <Button className="bg-tonstores-green hover:bg-tonstores-darkblue text-white flex items-center space-x-2">
+                <Button className="bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center space-x-2">
                   <User size={18} />
                   <span>Dashboard</span>
                 </Button>
@@ -90,7 +90,7 @@ const Navbar = () => {
             {/* If authenticated but not on home page, show Dashboard */}
             {isAuthenticated && !onHomeRoute && (
               <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                <Button variant="outline" className="border-gray-300 text-tonstores-darkblue hover:bg-gray-50">
+                <Button variant="outline" className="border-gray-300 text-Tonstores-darkblue hover:bg-gray-50">
                   Dashboard
                 </Button>
               </Link>
@@ -101,7 +101,7 @@ const Navbar = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-tonstores-green focus:outline-none"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-Tonstores-green focus:outline-none"
             >
               <span className="sr-only">Open main menu</span>
               {isMenuOpen ? (
@@ -120,32 +120,32 @@ const Navbar = () => {
           <div className="flex flex-col space-y-3 pb-3 border-b border-gray-200">
             {!isAuthenticated && (
               <>
-                <Link to="/" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-Tonstores-green" onClick={() => setIsMenuOpen(false)}>
                   Home
                 </Link>
-                <Link to="/features" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/features" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-Tonstores-green" onClick={() => setIsMenuOpen(false)}>
                   Features
                 </Link>
-                <Link to="/pricing" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/pricing" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-Tonstores-green" onClick={() => setIsMenuOpen(false)}>
                   Pricing
                 </Link>
-                <Link to="/about" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/about" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-Tonstores-green" onClick={() => setIsMenuOpen(false)}>
                   About
                 </Link>
-                <Link to="/contact" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/contact" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-Tonstores-green" onClick={() => setIsMenuOpen(false)}>
                   Contact
                 </Link>
               </>
             )}
 
             {isAuthenticated && onHomeRoute && (
-              <Link to="/dashboard" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/dashboard" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-Tonstores-green" onClick={() => setIsMenuOpen(false)}>
                 Dashboard
               </Link>
             )}
 
             {isAuthenticated && !onHomeRoute && (
-              <Link to="/dashboard" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-tonstores-green" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/dashboard" className="px-3 py-2 text-base font-medium text-gray-700 hover:text-Tonstores-green" onClick={() => setIsMenuOpen(false)}>
                 Dashboard
               </Link>
             )}
@@ -159,7 +159,7 @@ const Navbar = () => {
                 </Button>
               </Link>
               <Link to="/register" className="w-full" onClick={() => setIsMenuOpen(false)}>
-                <Button className="w-full justify-center bg-tonstores-green hover:bg-tonstores-darkblue text-white">
+                <Button className="w-full justify-center bg-Tonstores-green hover:bg-Tonstores-darkblue text-white">
                   Sign Up
                 </Button>
               </Link>

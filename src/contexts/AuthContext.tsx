@@ -5,6 +5,7 @@ import { Profile } from "@/hooks/useProfile";
 import { resendService } from "@/services/resendService";
 import { emailService } from "@/services/emailService";
 import { verifyDatabaseSchema } from "@/integrations/supabase/schema";
+import { AffiliateService } from "@/services/AffiliateService";
 import {
   addAuthStateListener,
   getCurrentSession,
@@ -35,6 +36,7 @@ type AuthContextType = {
   authInitialized: boolean;
   signIn: (email: string, password: string, captchaToken?: string | null) => Promise<void>;
   signUp: (email: string, password: string, businessName: string, captchaToken?: string | null) => Promise<void>;
+  processReferralAfterSignup: (referralCode?: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -256,6 +258,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Memoize context value to prevent unnecessary re-renders
+  // Separate function to handle referral processing after signup
+  const processReferralAfterSignup = async (referralCode: string = '') => {
+    try {
+      // Get the currently authenticated user from the context
+      if (user) {
+        // Process the referral
+        await AffiliateService.processReferralFromUrl(user.id, referralCode);
+      }
+    } catch (error) {
+      console.error("Error processing referral after signup:", error);
+    }
+  };
+
   const contextValue = useMemo(() => ({
     user,
     session,
@@ -371,11 +386,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error("Failed to send welcome email:", emailError);
           }
 
+          // Process affiliate referral if applicable (from URL parameters only, manual input handled differently)
+          try {
+            await AffiliateService.processReferralFromUrl(data.user.id);
+          } catch (affiliateError) {
+            console.error("Failed to process affiliate referral:", affiliateError);
+            // Don't fail the signup if affiliate processing fails
+          }
+
           // Automatically sign in the user after registration
           if (data.session) {
             toast({
               title: "Account created successfully!",
-              description: "Welcome to TonStores Hub",
+              description: "Welcome to Tonstores Hub",
             });
 
             // Navigate to dashboard
@@ -388,7 +411,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               if (!signInError) {
                 toast({
                   title: "Account created successfully!",
-                  description: "Welcome to TonStores Hub",
+                  description: "Welcome to Tonstores Hub",
                 });
 
                 // Navigate to dashboard
@@ -427,6 +450,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
       }
     },
+
+    // Additional method to process referral after signup if needed
+    processReferralAfterSignup: async (referralCode: string = '') => {
+      if (user) {
+        try {
+          await AffiliateService.processReferralFromUrl(user.id, referralCode);
+        } catch (error) {
+          console.error("Error processing referral:", error);
+        }
+      }
+    },
+
     signOut: async () => {
       debugLog("Signing out user");
       try {

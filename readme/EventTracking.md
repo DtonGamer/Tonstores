@@ -1,8 +1,8 @@
-# Event Tracking System Documentation for TonStores
+# Event Tracking System Documentation for Tonstores
 
 ## Overview
 
-This document describes the implementation of an event tracking system for the TonStores application. The system was designed as a lightweight alternative to complex analytics infrastructure, storing behavioral data in the existing Supabase database rather than adding external services.
+This document describes the implementation of an event tracking system for the Tonstores application. The system was designed as a lightweight alternative to complex analytics infrastructure, storing behavioral data in the existing Supabase database rather than adding external services.
 
 ## System Architecture
 

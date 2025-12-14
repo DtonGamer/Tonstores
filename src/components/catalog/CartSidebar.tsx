@@ -58,8 +58,8 @@ const CartSidebar = ({
 
           {cart.isEmpty ? (
             <div className="flex-grow flex flex-col items-center justify-center text-center py-8">
-              <div className="bg-tonstores-lightgreen p-4 rounded-full mb-4">
-                <ShoppingCart size={40} className="text-tonstores-green mx-auto" />
+              <div className="bg-Tonstores-lightgreen p-4 rounded-full mb-4">
+                <ShoppingCart size={40} className="text-Tonstores-green mx-auto" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Your cart is empty</h3>
               <p className="text-gray-600 mb-6">
@@ -67,7 +67,7 @@ const CartSidebar = ({
               </p>
               <Button
                 variant="outline"
-                className="border-tonstores-green text-tonstores-green hover:bg-tonstores-lightgreen"
+                className="border-Tonstores-green text-Tonstores-green hover:bg-Tonstores-lightgreen"
                 onClick={onClose}
               >
                 Continue Shopping
@@ -137,7 +137,7 @@ const CartSidebar = ({
                 </div>
 
                 <Button
-                  className="w-full bg-tonstores-green hover:bg-tonstores-darkgreen py-2.5 flex items-center justify-center"
+                  className="w-full bg-Tonstores-green hover:bg-Tonstores-darkgreen py-2.5 flex items-center justify-center"
                   onClick={onProceedToCheckout}
                 >
                   Proceed to Checkout

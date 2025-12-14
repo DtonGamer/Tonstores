@@ -58,7 +58,7 @@ export default function Breadcrumbs() {
         <li className="inline-flex items-center">
           <Link
             to="/"
-            className="inline-flex items-center text-sm font-medium text-tonstores-darkgray hover:text-tonstores-darkblue dark:text-gray-300 dark:hover:text-white"
+            className="inline-flex items-center text-sm font-medium text-Tonstores-darkgray hover:text-Tonstores-darkblue dark:text-gray-300 dark:hover:text-white"
           >
             <Home className="w-4 h-4 mr-2" />
             Home
@@ -73,8 +73,8 @@ export default function Breadcrumbs() {
                 to={breadcrumb.path}
                 className={`ml-1 text-sm font-medium md:ml-2 ${
                   index === breadcrumbs.length - 1 
-                    ? "text-tonstores-darkblue dark:text-tonstores-lightblue" 
-                    : "text-tonstores-darkgray hover:text-tonstores-darkblue dark:text-gray-300 dark:hover:text-white"
+                    ? "text-Tonstores-darkblue dark:text-Tonstores-lightblue" 
+                    : "text-Tonstores-darkgray hover:text-Tonstores-darkblue dark:text-gray-300 dark:hover:text-white"
                 }`}
                 aria-current={index === breadcrumbs.length - 1 ? "page" : undefined}
               >

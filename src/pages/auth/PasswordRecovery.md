@@ -1,8 +1,8 @@
-# Password Recovery System Documentation for TonStores
+# Password Recovery System Documentation for Tonstores
 
 ## Overview
 
-This document describes the implementation of the password recovery system for the TonStores application. The system leverages Supabase's built-in authentication features to provide a secure and user-friendly password reset workflow.
+This document describes the implementation of the password recovery system for the Tonstores application. The system leverages Supabase's built-in authentication features to provide a secure and user-friendly password reset workflow.
 
 ## System Architecture
 

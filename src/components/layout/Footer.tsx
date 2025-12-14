@@ -52,7 +52,7 @@ export function Footer() {
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-sm text-muted-foreground">
-              © {currentYear} TonStores. All rights reserved.
+              © {currentYear} Tonstores. All rights reserved.
             </div>
 
             <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
@@ -105,12 +105,12 @@ export function Footer() {
 
   // Public facing modern footer for non-authenticated users
   return (
-    <footer className="bg-tonstores-darkblue text-white py-12">
+    <footer className="bg-Tonstores-darkblue text-white py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand column */}
           <div className="col-span-1 md:col-span-1">
-            <h3 className="text-2xl font-bold">TonStores</h3>
+            <h3 className="text-2xl font-bold">Tonstores</h3>
             <p className="mt-4 text-gray-300 max-w-md">
               The easiest way to sell on social media for Nigerian businesses
             </p>
@@ -118,7 +118,7 @@ export function Footer() {
               <a href="https://wa.me/2349038650178" className="text-gray-300 hover:text-white transition-colors" aria-label="WhatsApp">
                 <WhatsAppIcon size={20} />
               </a>
-              <a href="https://instagram.com/tonstores" className="text-gray-300 hover:text-white transition-colors" aria-label="Instagram">
+              <a href="https://instagram.com/Tonstores" className="text-gray-300 hover:text-white transition-colors" aria-label="Instagram">
                 <Instagram size={20} />
               </a>
               <a href="https://tiktok.com/@tonrichie" className="text-gray-300 hover:text-white transition-colors" aria-label="TikTok">
@@ -167,13 +167,13 @@ export function Footer() {
             <h4 className="font-semibold text-lg mb-4">Contact</h4>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
-                <Mail size={16} className="text-tonstores-green" />
+                <Mail size={16} className="text-Tonstores-green" />
                 <a href="mailto:Creatorrichie@gmail.com" className="text-gray-300 hover:text-white transition-colors">
                   Creatorrichie@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <WhatsAppIcon size={16} className="text-tonstores-green" />
+                <WhatsAppIcon size={16} className="text-Tonstores-green" />
                 <a href="https://wa.me/2349038650178" className="text-gray-300 hover:text-white transition-colors">
                   +234 903 865 0178
                 </a>
@@ -184,7 +184,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © {currentYear} TonStores. All rights reserved.
+            © {currentYear} Tonstores. All rights reserved.
           </p>
           <div className="flex items-center gap-1 text-gray-400 text-sm mt-4 md:mt-0">
             Built with <Heart size={12} className="text-red-500 fill-current" /> in Nigeria

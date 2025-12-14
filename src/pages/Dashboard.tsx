@@ -262,7 +262,7 @@ const Dashboard = () => {
     // console.log('Dashboard is loading...');
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-tonstores-green" />
+        <Loader2 className="h-8 w-8 animate-spin text-Tonstores-green" />
       </div>
     );
   }
@@ -282,7 +282,7 @@ const Dashboard = () => {
       
       {/* Subscription Information */}
       {subscriptionLimits && (
-        <Card className="border-tonstores-green dark:border-tonstores-green/70">
+        <Card className="border-Tonstores-green dark:border-Tonstores-green/70">
           <CardContent className="p-4">
             <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-1">
@@ -291,7 +291,7 @@ const Dashboard = () => {
               </div>
               {!subscriptionLimits.canCreateCatalog && (
                 <Link to="/pricing">
-                  <Button variant="outline" size="sm" className="h-7 text-xs border-tonstores-green text-tonstores-green hover:bg-tonstores-green/10 dark:border-tonstores-green/70 dark:text-tonstores-green/90 dark:hover:bg-tonstores-green/20">
+                  <Button variant="outline" size="sm" className="h-7 text-xs border-Tonstores-green text-Tonstores-green hover:bg-Tonstores-green/10 dark:border-Tonstores-green/70 dark:text-Tonstores-green/90 dark:hover:bg-Tonstores-green/20">
                     Upgrade
                   </Button>
                 </Link>
@@ -331,23 +331,34 @@ const Dashboard = () => {
       )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-  <Card className="flex flex-row items-center p-6 bg-gradient-to-br from-tonstores-lightgreen to-tonstores-green shadow-sm dark:from-tonstores-green/80 dark:to-tonstores-darkgreen">
+  <Card className="flex flex-row items-center p-6 bg-gradient-to-br from-Tonstores-lightgreen to-Tonstores-green shadow-sm dark:from-Tonstores-green/80 dark:to-Tonstores-darkgreen">
     <div className="text-black dark:text-white flex-1">
       <h2 className="text-lg font-semibold mb-1">New Catalog</h2>
       <p className="text-black dark:text-white/80 text-sm opacity-90">Create a product catalog</p>
     </div>
-    <Link to="/catalog/new">
-      <Button
-        className="bg-white text-tonstores-darkgreen hover:bg-gray-100 dark:bg-gray-800 dark:text-tonstores-green dark:hover:bg-gray-700 flex items-center h-10 px-4"
-        disabled={subscriptionLimits && !subscriptionLimits.canCreateCatalog}
-      >
-        <Plus size={14} className="mr-1" />
-        <span className="text-sm">Create</span>
-      </Button>
-    </Link>
+    <div className="flex gap-2">
+      <Link to="/onboarding">
+        <Button
+          className="bg-white text-Tonstores-darkgreen hover:bg-gray-100 dark:bg-gray-800 dark:text-Tonstores-green dark:hover:bg-gray-700 flex items-center h-10 px-4"
+          disabled={subscriptionLimits && !subscriptionLimits.canCreateCatalog}
+        >
+          <Plus size={14} className="mr-1" />
+          <span className="text-sm">Quick Start</span>
+        </Button>
+      </Link>
+      <Link to="/catalog/new">
+        <Button
+          variant="outline"
+          className="text-Tonstores-darkgreen hover:bg-Tonstores-lightgreen dark:text-Tonstores-green dark:hover:bg-gray-700 border dark:border-gray-600 h-10 px-4"
+          disabled={subscriptionLimits && !subscriptionLimits.canCreateCatalog}
+        >
+          <span className="text-sm">Advanced</span>
+        </Button>
+      </Link>
+    </div>
   </Card>
 
-  <Card className="flex flex-row items-center p-6 bg-gradient-to-br from-tonstores-lightblue to-tonstores-blue shadow-sm dark:from-tonstores-blue/80 dark:to-tonstores-darkblue">
+  <Card className="flex flex-row items-center p-6 bg-gradient-to-br from-Tonstores-lightblue to-Tonstores-blue shadow-sm dark:from-Tonstores-blue/80 dark:to-Tonstores-darkblue">
     <div className="text-black dark:text-white flex-1">
       <h2 className="text-lg font-semibold mb-1">Orders</h2>
       <p className="text-black dark:text-white/80 text-sm opacity-90">
@@ -355,7 +366,7 @@ const Dashboard = () => {
       </p>
     </div>
     <Link to="/orders">
-      <Button className="bg-white text-tonstores-darkblue hover:bg-gray-100 dark:bg-gray-800 dark:text-tonstores-lightblue dark:hover:bg-gray-700 flex items-center h-10 px-4">
+      <Button className="bg-white text-Tonstores-darkblue hover:bg-gray-100 dark:bg-gray-800 dark:text-Tonstores-lightblue dark:hover:bg-gray-700 flex items-center h-10 px-4">
         <ListCheck size={14} className="mr-1" />
         <span className="text-sm">View</span>
       </Button>
@@ -368,18 +379,25 @@ const Dashboard = () => {
       
       {loading ? (
         <div className="flex justify-center items-center p-12">
-          <Loader2 className="h-8 w-8 animate-spin text-tonstores-green" />
+          <Loader2 className="h-8 w-8 animate-spin text-Tonstores-green" />
         </div>
       ) : catalogs.length === 0 ? (
         <Card className="p-12 text-center dark:bg-gray-800 dark:border-gray-700">
           <h3 className="text-lg font-medium mb-2 dark:text-white">No catalogs yet</h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6">Create your first catalog to get started</p>
-          <Link to="/catalog/new">
-            <Button className="bg-tonstores-green hover:bg-tonstores-darkblue flex items-center gap-2">
-              <Plus size={18} />
-              Create New Catalog
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link to="/onboarding">
+              <Button className="bg-Tonstores-green hover:bg-Tonstores-darkblue flex items-center gap-2">
+                <Plus size={18} />
+                Start Quick Setup
+              </Button>
+            </Link>
+            <Link to="/catalog/new">
+              <Button variant="outline" className="dark:border-gray-600">
+                Create Advanced Catalog
+              </Button>
+            </Link>
+          </div>
         </Card>
       ) : (
         <div className="grid grid-cols-1 gap-4">
@@ -421,7 +439,7 @@ const Dashboard = () => {
                       {catalog.is_active ? 'Deactivate' : 'Activate'}
                     </Button>
                     <Link to={`/catalog/${catalog.id}/edit`}>
-                      <Button size="sm" className="whitespace-nowrap bg-tonstores-green hover:bg-tonstores-darkblue text-white">Edit</Button>
+                      <Button size="sm" className="whitespace-nowrap bg-Tonstores-green hover:bg-Tonstores-darkblue text-white">Edit</Button>
                     </Link>
                   </div>
                 </div>

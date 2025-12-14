@@ -18,7 +18,7 @@ export function Disclaimer() {
     >
       <div className="absolute -top-6 left-0 right-0 h-6 bg-transparent" />
       <p className="text-xs italic text-gray-600 dark:text-gray-300">
-        TonStores uses Monnify for secure payments. We are not an official partner.
+        Tonstores uses Monnify for secure payments. We are not an official partner.
       </p>
     </div>
   );

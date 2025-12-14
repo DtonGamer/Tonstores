@@ -29,7 +29,7 @@ const DEFAULT_CONTACTS = {
   email_support: "Creatorrichie@gmail",
   whatsapp_support: "+239038650178",
   twitter_handle: "RichieDbuilder",
-  instagram_handle: "tonstores",
+  instagram_handle: "Tonstores",
   facebook_handle: "Tonstore",
   tiktok_handle: "tonrichie",
 };
@@ -396,7 +396,7 @@ const CatalogView = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tonstores-green"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-Tonstores-green"></div>
       </div>
     );
   }
@@ -420,7 +420,7 @@ const CatalogView = () => {
     <div className="min-h-screen flex flex-col">
       <Helmet>
         {/* Primary Meta Tags */}
-        <title>{catalog?.name || "Product Catalog"} - Shop Online | TonStores Hub</title>
+        <title>{catalog?.name || "Product Catalog"} - Shop Online | Tonstores Hub</title>
         <meta name="description" content={catalog?.description || `Shop ${catalog?.name || "quality products"} online with secure payment and fast delivery. Buy directly from WhatsApp, Instagram and TikTok.`} />
         <meta name="keywords" content={`${catalog?.name}, online shopping, WhatsApp store, Instagram shop, TikTok shop, ecommerce, Nigeria, ${products.slice(0, 3).map(p => p.name).join(', ')}`} />
         
@@ -429,8 +429,8 @@ const CatalogView = () => {
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="TonStores Hub" />
-        <meta property="og:title" content={`${catalog?.name || "Shop Online"} - Easy Checkout | TonStores Hub`} />
+        <meta property="og:site_name" content="Tonstores Hub" />
+        <meta property="og:title" content={`${catalog?.name || "Shop Online"} - Easy Checkout | Tonstores Hub`} />
         <meta property="og:description" content={catalog?.description || `Shop ${catalog?.name || "quality products"} with secure checkout. Fast delivery available. Buy now!`} />
         {products.length > 0 && (
           <meta 
@@ -448,7 +448,7 @@ const CatalogView = () => {
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@RichieDBuilder" />
-        <meta name="twitter:title" content={`${catalog?.name || "Shop Online"} - TonStores Hub`} />
+        <meta name="twitter:title" content={`${catalog?.name || "Shop Online"} - Tonstores Hub`} />
         <meta name="twitter:description" content={catalog?.description || `Shop ${catalog?.name || "quality products"} online with secure payment. Buy directly from social media!`} />
         {products.length > 0 && (
           <meta 
@@ -463,7 +463,7 @@ const CatalogView = () => {
         
         {/* Additional SEO Tags */}
         <meta name="robots" content="index, follow" />
-        <meta name="author" content="TonStores" />
+        <meta name="author" content="Tonstores" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="theme-color" content="#4CAF50" />
         
@@ -495,7 +495,7 @@ const CatalogView = () => {
       <header className="bg-white dark:bg-gray-900 shadow-lg dark:shadow-gray-950 sticky top-0 z-40 border-b dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-tonstores-green to-tonstores-darkblue bg-clip-text text-transparent truncate max-w-xs sm:max-w-md">
+            <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-Tonstores-green to-Tonstores-darkblue bg-clip-text text-transparent truncate max-w-xs sm:max-w-md">
               {catalog.name}
             </h1>
             <div className="flex items-center gap-3">
@@ -504,7 +504,7 @@ const CatalogView = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex items-center space-x-1 sm:space-x-2 h-9 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-800 transition-colors"
+                    className="flex items-center space-x-1 sm:space-x-2 h-9 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 hover:bg-Tonstores-lightgreen dark:hover:bg-gray-800 transition-colors"
                   >
                     <Share2 size={18} />
                     <span className="hidden sm:inline">Share</span>
@@ -541,13 +541,13 @@ const CatalogView = () => {
               <Button
                 variant="outline"
                 size="sm"
-                className="flex items-center space-x-1 sm:space-x-2 relative h-9 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 hover:bg-tonstores-lightgreen dark:hover:bg-gray-800 transition-colors"
+                className="flex items-center space-x-1 sm:space-x-2 relative h-9 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 hover:bg-Tonstores-lightgreen dark:hover:bg-gray-800 transition-colors"
                 onClick={toggleCart}
               >
                 <ShoppingCart size={18} />
                 <span className="hidden sm:inline">Cart</span>
                 {cart.items.length > 0 && (
-                  <Badge className="absolute -top-2 -right-2 bg-tonstores-green text-xs w-5 h-5 flex items-center justify-center">
+                  <Badge className="absolute -top-2 -right-2 bg-Tonstores-green text-xs w-5 h-5 flex items-center justify-center">
                     {cart.items.reduce((sum, item) => sum + item.quantity, 0)}
                   </Badge>
                 )}
@@ -559,7 +559,7 @@ const CatalogView = () => {
       
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-tonstores-green to-tonstores-darkblue bg-clip-text text-transparent mb-2">{catalog.name}</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-Tonstores-green to-Tonstores-darkblue bg-clip-text text-transparent mb-2">{catalog.name}</h2>
           {catalog.description && (
             <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">{catalog.description}</p>
           )}
@@ -574,7 +574,7 @@ const CatalogView = () => {
             <Input
               type="text"
               placeholder="Search products..."
-              className="pl-10 pr-10 py-3 text-base rounded-lg border-2 border-gray-200 dark:border-gray-700 focus:border-tonstores-green dark:focus:border-tonstores-green transition-colors"
+              className="pl-10 pr-10 py-3 text-base rounded-lg border-2 border-gray-200 dark:border-gray-700 focus:border-Tonstores-green dark:focus:border-Tonstores-green transition-colors"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -598,8 +598,8 @@ const CatalogView = () => {
         
         {filteredProducts.length === 0 ? (
           <div className="text-center p-12">
-            <div className="mx-auto w-24 h-24 bg-tonstores-lightgreen rounded-full flex items-center justify-center mb-6">
-              <Search className="text-tonstores-green w-12 h-12" />
+            <div className="mx-auto w-24 h-24 bg-Tonstores-lightgreen rounded-full flex items-center justify-center mb-6">
+              <Search className="text-Tonstores-green w-12 h-12" />
             </div>
             <h3 className="text-xl font-semibold mb-2 dark:text-white">No Products Found</h3>
             <p className="text-gray-600 dark:text-gray-300 max-w-md mx-auto">

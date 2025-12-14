@@ -316,7 +316,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, initialData }: ProductFormProp
               
               <div className="flex flex-col gap-2 items-center">
                 <label className="cursor-pointer">
-                  <div className="flex items-center gap-2 bg-tonstores-blue bg-opacity-10 hover:bg-opacity-20 text-tonstores-blue px-4 py-2 rounded-md text-sm">
+                  <div className="flex items-center gap-2 bg-Tonstores-blue bg-opacity-10 hover:bg-opacity-20 text-Tonstores-blue px-4 py-2 rounded-md text-sm">
                     <Upload size={16} />
                     <span>{previewUrls.length > 0 ? "Add Image" : "Upload Image"}</span>
                   </div>
@@ -336,7 +336,7 @@ const ProductForm = ({ isOpen, onClose, onSubmit, initialData }: ProductFormProp
                       <div 
                         key={index}
                         className={`w-8 h-8 rounded-md overflow-hidden border-2 cursor-pointer ${
-                          index === currentImageIndex ? 'border-tonstores-blue' : 'border-gray-200'
+                          index === currentImageIndex ? 'border-Tonstores-blue' : 'border-gray-200'
                         }`}
                         onClick={() => setCurrentImageIndex(index)}
                       >

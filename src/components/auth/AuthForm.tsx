@@ -9,6 +9,7 @@ import useAuth from "@/contexts/AuthContext";
 import { toast } from "@/components/ui/use-toast";
 import { Turnstile } from '@marsidev/react-turnstile';
 import { TURNSTILE_SITE_KEY } from "@/utils/env";
+import { AffiliateService } from "@/services/AffiliateService";
 
 type AuthFormProps = {
   type: "login" | "register";
@@ -18,6 +19,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [businessName, setBusinessName] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
@@ -90,7 +92,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
           setIsLoading(false);
           return;
         }
-        
+
         try {
           await signUp(email, password, businessName, captchaToken);
           // Navigation to dashboard is handled in the AuthContext after signup
@@ -121,7 +123,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
   return (
     <div className="w-full max-w-sm sm:max-w-md px-4">
       <div className="mb-4 sm:mb-6 flex items-center">
-        <Link to="/" className="flex items-center text-tonstores-darkblue hover:text-tonstores-green transition-colors text-sm sm:text-base">
+        <Link to="/" className="flex items-center text-Tonstores-darkblue hover:text-Tonstores-green transition-colors text-sm sm:text-base">
           <ArrowLeft className="mr-1 sm:mr-2" size={16} />
           <span>Back to Home</span>
         </Link>
@@ -140,54 +142,71 @@ const AuthForm = ({ type }: AuthFormProps) => {
         <CardContent className="px-5 sm:px-6">
           <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           {type === "register" && (
+            <>
               <div className="space-y-1 sm:space-y-2">
                 <Label htmlFor="businessName" className="text-sm text-black">Business Name</Label>
-              <Input 
-                id="businessName"
-                type="text" 
-                placeholder="Your Business Name" 
-                value={businessName}
-                onChange={(e) => setBusinessName(e.target.value)}
-                required
-                className="h-9 sm:h-10 text-sm sm:text-base bg-white text-black"
-              />
-            </div>
+                <Input
+                  id="businessName"
+                  type="text"
+                  placeholder="Your Business Name"
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  required
+                  className="h-9 sm:h-10 text-sm sm:text-base bg-white text-black"
+                />
+              </div>
+            </>
           )}
-          
+
             <div className="space-y-1 sm:space-y-2">
               <Label htmlFor="email" className="text-sm text-black">Email</Label>
-            <Input 
+            <Input
               id="email"
-              type="email" 
-              placeholder="you@example.com" 
+              type="email"
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               className="h-9 sm:h-10 text-sm sm:text-base bg-white text-black"
             />
           </div>
-          
+
             <div className="space-y-1 sm:space-y-2">
               <Label htmlFor="password" className="text-sm text-black">Password</Label>
             <div className="relative">
-              <Input 
+              <Input
                 id="password"
-                type={showPassword ? "text" : "password"} 
-                placeholder="Password" 
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="h-9 sm:h-10 text-sm sm:text-base bg-white text-black"
               />
-              <button 
-                type="button" 
-                className="absolute right-3 top-1/2 transform -translate-y-1/2" 
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2"
                 onClick={togglePasswordVisibility}
               >
                   {showPassword ? <EyeOff size={16} className="text-gray-500" /> : <Eye size={16} className="text-gray-500" />}
               </button>
             </div>
           </div>
+
+          {type === "register" && (
+            <div className="space-y-1 sm:space-y-2">
+              <Label htmlFor="referralCode" className="text-sm text-black">Referral Code (Optional)</Label>
+              <Input
+                id="referralCode"
+                type="text"
+                placeholder="Enter referral code (if any)"
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value)}
+                className="h-9 sm:h-10 text-sm sm:text-base bg-white text-black"
+              />
+              <p className="text-xs text-gray-500">If someone referred you to Tonstores, enter their referral code here</p>
+            </div>
+          )}
 
           <div className="flex justify-center pt-2">
             <div className="w-full min-h-[65px] flex items-center justify-center border border-gray-200 rounded-md p-2 bg-white">
@@ -221,7 +240,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
             <div className="pt-2 sm:pt-3">
           <Button
             type="submit"
-            className="w-full bg-tonstores-green hover:bg-tonstores-darkblue transition-colors h-9 sm:h-10 text-sm sm:text-base"
+            className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue transition-colors h-9 sm:h-10 text-sm sm:text-base"
             disabled={isLoading || !captchaToken}
           >
             {isLoading ? "Processing..." : type === "login" ? "Login" : "Create Account"}
@@ -230,7 +249,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
 
             {type === "login" && (
               <div className="pt-3 text-center">
-                <Link to="/auth/recovery" className="text-sm text-tonstores-blue hover:underline">
+                <Link to="/auth/recovery" className="text-sm text-Tonstores-blue hover:underline">
                   Forgot your password?
                 </Link>
               </div>
@@ -241,11 +260,11 @@ const AuthForm = ({ type }: AuthFormProps) => {
           <p className="text-xs sm:text-sm text-gray-500">
           {type === "login" ? (
             <>
-                Don't have an account? <Link to="/register" className="text-tonstores-blue hover:underline font-medium">Sign up</Link>
+                Don't have an account? <Link to="/register" className="text-Tonstores-blue hover:underline font-medium">Sign up</Link>
             </>
           ) : (
             <>
-                Already have an account? <Link to="/login" className="text-tonstores-blue hover:underline font-medium">Login</Link>
+                Already have an account? <Link to="/login" className="text-Tonstores-blue hover:underline font-medium">Login</Link>
             </>
           )}
         </p>

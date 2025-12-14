@@ -5,7 +5,7 @@ const DEFAULT_CONTACTS = {
   email_support: "Creatorrichie@gmail",
   whatsapp_support: "+239038650178",
   twitter_handle: "RichieDbuilder",
-  instagram_handle: "tonstores",
+  instagram_handle: "Tonstores",
   facebook_handle: "Tonstore",
   tiktok_handle: "tonrichie",
 };

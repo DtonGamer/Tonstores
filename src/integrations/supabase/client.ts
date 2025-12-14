@@ -26,7 +26,7 @@ if (process.env.NODE_ENV === 'development') {
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: true,
-          storageKey: 'tonstores-auth-token',
+          storageKey: 'Tonstores-auth-token',
           storage: {
             getItem: (key: string) => {
               try {
@@ -74,7 +74,7 @@ if (process.env.NODE_ENV === 'development') {
         autoRefreshToken: false,  // Changed to false to prevent automatic session refresh issues
         persistSession: true,
         detectSessionInUrl: true,
-        storageKey: 'tonstores-auth-token',
+        storageKey: 'Tonstores-auth-token',
         storage: {
           getItem: (key: string) => {
             try {

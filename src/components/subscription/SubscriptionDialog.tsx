@@ -108,7 +108,7 @@ export function SubscriptionDialog({
   const handleEnterprisePlan = async () => {
     // Opening WhatsApp with a pre-filled message about Enterprise plan
     const whatsappMessage = encodeURIComponent(
-      "Hello, I'm interested in the Enterprise pricing plan for TonStores. Please provide more information about custom pricing and features."
+      "Hello, I'm interested in the Enterprise pricing plan for Tonstores. Please provide more information about custom pricing and features."
     );
     
     // Get admin WhatsApp number or use default
@@ -147,7 +147,7 @@ export function SubscriptionDialog({
           <div className="space-y-4 py-3 sm:py-4">
             <Button 
               onClick={handleFreePlanSignup}
-              className="w-full bg-tonstores-green text-white hover:bg-tonstores-green/90 py-2 sm:py-2.5 h-auto text-base"
+              className="w-full bg-Tonstores-green text-white hover:bg-Tonstores-green/90 py-2 sm:py-2.5 h-auto text-base"
             >
               Sign Up Now
             </Button>
@@ -171,7 +171,7 @@ export function SubscriptionDialog({
             <div className="pt-2 flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button 
                 onClick={handleEnterprisePlan}
-                className="w-full bg-tonstores-green text-white hover:bg-tonstores-green/90 py-2 sm:py-2.5 h-auto text-base"
+                className="w-full bg-Tonstores-green text-white hover:bg-Tonstores-green/90 py-2 sm:py-2.5 h-auto text-base"
               >
                 Contact Sales via WhatsApp
               </Button>
@@ -263,7 +263,7 @@ export function SubscriptionDialog({
                 <Button
                   onClick={initiateMonnifyPayment}
                   disabled={!monnifyConfig}
-                  className="w-full bg-tonstores-green text-white hover:bg-tonstores-green/90 py-2 sm:py-2.5 h-auto text-base"
+                  className="w-full bg-Tonstores-green text-white hover:bg-Tonstores-green/90 py-2 sm:py-2.5 h-auto text-base"
                 >
                   Pay Now
                 </Button>

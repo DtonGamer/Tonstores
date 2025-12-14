@@ -114,8 +114,8 @@ export const signInWithEmailAndPassword = async (email: string, password: string
 // Function to sign up with email and password
 export const signUpWithEmailAndPassword = async (
   email: string,
-  password: string, 
-  businessName: string, 
+  password: string,
+  businessName: string,
   captchaToken?: string | null
 ) => {
   return await supabase.auth.signUp({

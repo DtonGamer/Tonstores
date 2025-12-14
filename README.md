@@ -1,4 +1,4 @@
-# TonStores Catalog Hub
+# Tonstores Catalog Hub
 
 A modern e-commerce catalog management system built with React, Vite, and Supabase. Create and share beautiful product catalogs, manage orders, and process payments seamlessly.
 
@@ -34,8 +34,8 @@ A modern e-commerce catalog management system built with React, Vite, and Supaba
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/tonstores-catalog-hub.git
-cd tonstores-catalog-hub
+git clone https://github.com/yourusername/Tonstores-catalog-hub.git
+cd Tonstores-catalog-hub
 ```
 
 2. Install dependencies:
@@ -159,7 +159,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Admin Role System
 
-The TonStores Catalog Hub implements a comprehensive Admin Role system that allows designated administrators to manage the platform.
+The Tonstores Catalog Hub implements a comprehensive Admin Role system that allows designated administrators to manage the platform.
 
 ### Admin Capabilities
 
@@ -212,7 +212,7 @@ This applies to contact methods, payment settings, and other configurable values
 
 ## Payment Integration
 
-TonStores integrates with Monnify to provide a seamless payment experience for both sellers and buyers:
+Tonstores integrates with Monnify to provide a seamless payment experience for both sellers and buyers:
 
 ### For Sellers:
 - **KYC Onboarding**: Secure collection of identification and bank details
@@ -222,7 +222,7 @@ TonStores integrates with Monnify to provide a seamless payment experience for b
 - **Payment Dashboard**: Real-time tracking of sales, balance, and payout history
 
 ### For Buyers:
-- **Seamless Checkout**: Integrated payment experience within the TonStores platform
+- **Seamless Checkout**: Integrated payment experience within the Tonstores platform
 - **Multiple Payment Options**: Support for cards, bank transfers, and USSD
 - **Secure Transactions**: PCI-compliant payment processing
 
@@ -235,7 +235,7 @@ For detailed documentation, see [docs/payment-integration.md](docs/payment-integ
 
 ## Email Service
 
-TonStores integrates with Resend to provide reliable email delivery for:
+Tonstores integrates with Resend to provide reliable email delivery for:
 
 ### Email Features
 - **Verification Emails**: Secure account verification process
@@ -313,9 +313,9 @@ If subaccounts aren't being created in your Monnify account:
 
 4. **Network Issues**: Confirm there are no CORS or network connectivity problems with the Monnify API.
 
-# TonStores Payment Integration
+# Tonstores Payment Integration
 
-This project implements Monnify payment integration for TonStores, with robust order status handling for different payment outcomes.
+This project implements Monnify payment integration for Tonstores, with robust order status handling for different payment outcomes.
 
 ## Implementation Changes
 

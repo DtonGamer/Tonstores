@@ -131,7 +131,7 @@ const ProductCard = ({
         <CardContent className="p-4">
           <h3 className="font-semibold text-lg dark:text-white">{name}</h3>
           <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 h-10">{description}</p>
-          <p className="text-lg font-bold text-tonstores-darkblue dark:text-tonstores-blue mt-2">
+          <p className="text-lg font-bold text-Tonstores-darkblue dark:text-Tonstores-blue mt-2">
             ₦{(price / 100).toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2
@@ -146,14 +146,14 @@ const ProductCard = ({
         <CardFooter className="p-4 pt-0">
           {isEditable ? (
             <Button 
-              className="w-full bg-tonstores-blue hover:bg-blue-600" 
+              className="w-full bg-Tonstores-blue hover:bg-blue-600" 
               onClick={handleEdit}
             >
               Edit Product
             </Button>
           ) : inStock ? (
             <Button 
-              className="w-full bg-tonstores-green hover:bg-tonstores-darkblue" 
+              className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue" 
               onClick={handleAddToCart}
             >
               Add to Cart
@@ -245,7 +245,7 @@ const ProductCard = ({
                       <div 
                         key={index}
                         className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 cursor-pointer transition-all ${
-                          index === currentImageIndex ? 'border-tonstores-blue scale-105 shadow-md' : 'border-gray-200 hover:border-gray-300'
+                          index === currentImageIndex ? 'border-Tonstores-blue scale-105 shadow-md' : 'border-gray-200 hover:border-gray-300'
                         }`}
                         onClick={() => setCurrentImageIndex(index)}
                       >
@@ -269,7 +269,7 @@ const ProductCard = ({
               <div className="flex flex-col gap-6 mt-2">
                 {/* Price */}
                 <div className="text-center sm:text-left">
-                  <p className="text-2xl sm:text-3xl font-bold text-tonstores-darkblue dark:text-tonstores-blue">
+                  <p className="text-2xl sm:text-3xl font-bold text-Tonstores-darkblue dark:text-Tonstores-blue">
                     ₦{(price / 100).toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2
@@ -303,7 +303,7 @@ const ProductCard = ({
                     
                     {/* Add to cart button */}
                     <Button 
-                      className="w-full bg-tonstores-green hover:bg-tonstores-darkblue text-white py-6 text-lg"
+                      className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue text-white py-6 text-lg"
                       onClick={() => {
                         handleAddToCart();
                         setIsDetailOpen(false);

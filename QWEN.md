@@ -1,7 +1,7 @@
-# TonStores Catalog Hub - Project Context
+# Tonstores Catalog Hub - Project Context
 
 ## Overview
-TonStores Catalog Hub is a modern e-commerce catalog management system built with React, Vite, and Supabase. It enables users to create and share beautiful product catalogs, manage orders, and process payments seamlessly using Monnify integration. The platform also includes admin capabilities for managing users, catalogs, products, orders, and subscriptions.
+Tonstores Catalog Hub is a modern e-commerce catalog management system built with React, Vite, and Supabase. It enables users to create and share beautiful product catalogs, manage orders, and process payments seamlessly using Monnify integration. The platform also includes admin capabilities for managing users, catalogs, products, orders, and subscriptions.
 
 ## Tech Stack
 - **Frontend:** React + TypeScript + Vite
@@ -108,7 +108,7 @@ The build process involves:
 ## Payment Integration
 
 ### Monnify Implementation
-TonStores integrates with Monnify for payment processing with the following features:
+Tonstores integrates with Monnify for payment processing with the following features:
 - KYC onboarding for sellers
 - Automatic subaccount creation for direct payments
 - White-label payment experience
@@ -317,4 +317,4 @@ Supabase configuration handles API redirects to appropriate serverless functions
 - Supabase client for authentication and database operations
 - Context API for global state when needed
 
-This comprehensive overview provides the context needed for working with the TonStores project, including all key features, configuration requirements, and development workflow considerations.
+This comprehensive overview provides the context needed for working with the Tonstores project, including all key features, configuration requirements, and development workflow considerations.

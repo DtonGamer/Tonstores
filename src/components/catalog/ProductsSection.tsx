@@ -38,7 +38,7 @@ const ProductsSection = ({
         </div>
         <Button
           onClick={onAddProduct}
-          className="bg-tonstores-green hover:bg-tonstores-darkblue flex items-center gap-2"
+          className="bg-Tonstores-green hover:bg-Tonstores-darkblue flex items-center gap-2"
         >
           <PlusCircle size={16} />
           Add New Product
@@ -47,7 +47,7 @@ const ProductsSection = ({
 
       {isLoading ? (
         <div className="flex justify-center items-center p-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tonstores-green"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-Tonstores-green"></div>
         </div>
       ) : products.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 p-12 rounded-lg shadow-sm border dark:border-gray-700 text-center">
@@ -55,7 +55,7 @@ const ProductsSection = ({
           <p className="text-gray-600 dark:text-gray-400 mb-6">Add your first product to get started</p>
           <Button
             onClick={onAddProduct}
-            className="bg-tonstores-green hover:bg-tonstores-darkblue flex items-center gap-2"
+            className="bg-Tonstores-green hover:bg-Tonstores-darkblue flex items-center gap-2"
           >
             <PlusCircle size={16} />
             Add New Product

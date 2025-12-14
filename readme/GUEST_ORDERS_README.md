@@ -155,6 +155,6 @@ To test the guest order system:
 ## Troubleshooting
 
 - If you get "row violates row-level security policy" errors, ensure you're setting `app.guest_id` before database operations
-- Check the browser's localStorage for "tonstores-guest-id" to confirm the guest ID is being stored properly
+- Check the browser's localStorage for "Tonstores-guest-id" to confirm the guest ID is being stored properly
 - If orders aren't being created, check that the RLS policies are properly configured
 - For webhook issues, check that guest_id is being properly included in the payment metadata 

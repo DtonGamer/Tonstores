@@ -15,7 +15,7 @@
   
   <!-- Text -->
   <text x="150" y="90" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">Buyer</text>
-  <text x="450" y="90" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">TonStores Checkout</text>
+  <text x="450" y="90" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">Tonstores Checkout</text>
   <text x="700" y="90" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">Seller</text>
   
   <text x="400" y="240" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold">Paystack Payment Gateway</text>

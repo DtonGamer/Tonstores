@@ -26,7 +26,7 @@ export function useForceLightMode() {
           
           if (el.classList.contains('text-foreground')) {
             el.classList.remove('text-foreground');
-            el.classList.add('text-tonstores-darkblue');
+            el.classList.add('text-Tonstores-darkblue');
           }
           
           if (el.classList.contains('text-muted-foreground')) {

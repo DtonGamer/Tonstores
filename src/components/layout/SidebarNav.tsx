@@ -14,6 +14,7 @@ import {
   BarChart,
   Wallet,
   ArrowUpCircle,
+  Users,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
@@ -110,6 +111,11 @@ export default function SidebarNav() {
       href: "/analytics",
       icon: <BarChart className="h-5 w-5" />,
     },
+    {
+      name: "Affiliate",
+      href: "/affiliate",
+      icon: <Users className="h-5 w-5" />,
+    },
     ...(isBusinessUser ? [{
       name: "Finances",
       href: "/finances",
@@ -161,7 +167,7 @@ export default function SidebarNav() {
       <div className="lg:hidden fixed top-4 right-4 z-50">
         <button
           onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
-          className="mobile-menu-button flex items-center justify-center p-2.5 rounded-lg bg-tonstores-green text-white hover:bg-tonstores-darkblue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-tonstores-green shadow-lg"
+          className="mobile-menu-button flex items-center justify-center p-2.5 rounded-lg bg-Tonstores-green text-white hover:bg-Tonstores-darkblue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-Tonstores-green shadow-lg"
           aria-label="Toggle menu"
         >
           {isMobileNavOpen ? <X size={20} /> : <Menu size={20} />}
@@ -175,16 +181,16 @@ export default function SidebarNav() {
             <Link to="/" className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : ''}`}>
               {!isSidebarCollapsed && (
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-lg bg-tonstores-green flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-Tonstores-green flex items-center justify-center">
                     <span className="text-white font-bold text-lg">T</span>
                   </div>
-                  <span className="text-xl font-bold bg-gradient-to-r from-tonstores-green to-tonstores-darkblue bg-clip-text text-transparent">
-                    TonStores
+                  <span className="text-xl font-bold bg-gradient-to-r from-Tonstores-green to-Tonstores-darkblue bg-clip-text text-transparent">
+                onstores
                   </span>
                 </div>
               )}
               {isSidebarCollapsed && (
-                <div className="w-8 h-8 rounded-lg bg-tonstores-green flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-Tonstores-green flex items-center justify-center">
                   <span className="text-white font-bold">T</span>
                 </div>
               )}
@@ -207,10 +213,10 @@ export default function SidebarNav() {
                   key={item.name}
                   to={item.href}
                   onClick={() => handleNavClick(item.href)}
-                  className={`group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-tonstores-lightgray ${
+                  className={`group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-Tonstores-lightgray ${
                     location.pathname === item.href
-                      ? "bg-tonstores-lightgray text-tonstores-darkblue"
-                      : "text-tonstores-darkgray"
+                      ? "bg-Tonstores-lightgray text-Tonstores-darkblue"
+                      : "text-Tonstores-darkgray"
                   }`}
                 >
                   {item.icon}
@@ -226,7 +232,7 @@ export default function SidebarNav() {
             {!isSidebarCollapsed && (
               <Button
                 onClick={handleUpgradeClick}
-                className="w-full bg-tonstores-green hover:bg-tonstores-darkblue text-white flex items-center justify-center gap-2 py-5"
+                className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center justify-center gap-2 py-5"
                 disabled={!nextTierPlan}
               >
                 <ArrowUpCircle size={18} />
@@ -264,7 +270,7 @@ export default function SidebarNav() {
               <div className="flex flex-col items-center space-y-3">
                 <Button
                   onClick={handleUpgradeClick}
-                  className="w-10 h-10 p-0 rounded-full bg-tonstores-green hover:bg-tonstores-darkblue text-white flex items-center justify-center"
+                  className="w-10 h-10 p-0 rounded-full bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center justify-center"
                   disabled={!nextTierPlan}
                   title="Upgrade Subscription"
                 >
@@ -300,11 +306,11 @@ export default function SidebarNav() {
           <div className="flex items-center justify-between h-16 flex-shrink-0 px-4 border-b border-gray-200">
             <Link to="/" className="flex items-center">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-lg bg-tonstores-green flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-Tonstores-green flex items-center justify-center">
                   <span className="text-white font-bold text-lg">T</span>
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-tonstores-green to-tonstores-darkblue bg-clip-text text-transparent">
-                  TonStores
+                <span className="text-xl font-bold bg-gradient-to-r from-Tonstores-green to-Tonstores-darkblue bg-clip-text text-transparent">
+                  Tonstores
                 </span>
               </div>
             </Link>
@@ -316,10 +322,10 @@ export default function SidebarNav() {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`group flex items-center px-3 py-3 text-base font-medium rounded-md hover:bg-tonstores-lightgray dark:hover:bg-gray-800 ${
+                  className={`group flex items-center px-3 py-3 text-base font-medium rounded-md hover:bg-Tonstores-lightgray dark:hover:bg-gray-800 ${
                     location.pathname === item.href
-                      ? "bg-tonstores-lightgray dark:bg-gray-800 text-tonstores-darkblue dark:text-white"
-                      : "text-tonstores-darkgray dark:text-gray-300"
+                      ? "bg-Tonstores-lightgray dark:bg-gray-800 text-Tonstores-darkblue dark:text-white"
+                      : "text-Tonstores-darkgray dark:text-gray-300"
                   }`}
                   onClick={() => handleNavClick(item.href)}
                 >
@@ -335,7 +341,7 @@ export default function SidebarNav() {
             {/* Upgrade subscription button - Mobile */}
             <Button
               onClick={handleUpgradeClick}
-              className="w-full bg-tonstores-green hover:bg-tonstores-darkblue text-white flex items-center justify-center gap-2 py-5"
+              className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center justify-center gap-2 py-5"
               disabled={!nextTierPlan}
             >
               <ArrowUpCircle size={18} />

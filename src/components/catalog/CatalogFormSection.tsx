@@ -173,7 +173,7 @@ const CatalogFormSection = ({
 
           <Button
             type="submit"
-            className="bg-tonstores-green hover:bg-tonstores-darkblue"
+            className="bg-Tonstores-green hover:bg-Tonstores-darkblue"
             disabled={!isFormDirty}
           >
             Save Catalog Details

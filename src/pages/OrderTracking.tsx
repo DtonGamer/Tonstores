@@ -73,7 +73,7 @@ const OrderProgress = ({ status }: { status: string }) => {
               <div className={`
                 flex items-center justify-center h-12 w-12 rounded-full
                 ${isCompleted 
-                  ? "bg-tonstores-green text-white" 
+                  ? "bg-Tonstores-green text-white" 
                   : "bg-gray-200 text-gray-400"}
                 ${isActive ? "ring-4 ring-green-100" : ""}
               `}>
@@ -95,7 +95,7 @@ const OrderProgress = ({ status }: { status: string }) => {
             return (
               <div
                 key={step}
-                className={`h-1 flex-1 ${isCompleted ? "bg-tonstores-green" : "bg-gray-200"}`}
+                className={`h-1 flex-1 ${isCompleted ? "bg-Tonstores-green" : "bg-gray-200"}`}
               />
             );
           })}
@@ -212,7 +212,7 @@ const OrderTracking = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tonstores-green"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-Tonstores-green"></div>
       </div>
     );
   }

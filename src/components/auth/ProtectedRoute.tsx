@@ -112,7 +112,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     debugLog("🔄 Rendering loading spinner");
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tonstores-green"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-Tonstores-green"></div>
       </div>
     );
   }
@@ -149,7 +149,7 @@ export const PremiumRoute = ({ children }: PremiumRouteProps) => {
   if (isLoading || subscriptionLoading || hasPaidPlan === null) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tonstores-green"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-Tonstores-green"></div>
       </div>
     );
   }
@@ -166,7 +166,7 @@ export const PremiumRoute = ({ children }: PremiumRouteProps) => {
           </p>
           <Button 
             onClick={() => navigate("/pricing")}
-            className="bg-tonstores-green hover:bg-tonstores-darkblue text-white"
+            className="bg-Tonstores-green hover:bg-Tonstores-darkblue text-white"
           >
             View Pricing Plans
           </Button>

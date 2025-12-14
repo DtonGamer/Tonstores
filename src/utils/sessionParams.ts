@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 export const getGuestUserId = (): string => {
   if (typeof window === 'undefined') return generateUUID();
 
-  const storageKey = 'tonstores-guest-id';
+  const storageKey = 'Tonstores-guest-id';
   let guestId = localStorage.getItem(storageKey);
 
   if (!guestId) {
@@ -49,7 +49,7 @@ export const setupGuestIdInterceptor = async (): Promise<void> => {
 
     // Fall back to localStorage if not found in sessionStorage
     if (!guestId) {
-      guestId = localStorage.getItem('tonstores-guest-id') ?? undefined;
+      guestId = localStorage.getItem('Tonstores-guest-id') ?? undefined;
       // Keep sessionStorage in sync for the current tab
       if (guestId) {
         sessionStorage.setItem('current-guest-id', guestId);

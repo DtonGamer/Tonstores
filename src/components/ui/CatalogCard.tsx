@@ -47,7 +47,7 @@ const CatalogCard = ({ id, name, slug, productCount, createdAt, isActive }: Cata
           <Button 
             variant="ghost" 
             size="sm" 
-            className="ml-2 text-tonstores-blue dark:text-tonstores-lightblue dark:hover:text-tonstores-blue"
+            className="ml-2 text-Tonstores-blue dark:text-Tonstores-lightblue dark:hover:text-Tonstores-blue"
             onClick={copyLinkToClipboard}
           >
             <Share2 size={16} />
@@ -62,7 +62,7 @@ const CatalogCard = ({ id, name, slug, productCount, createdAt, isActive }: Cata
           </Button>
         </Link>
         <Link to={`/c/${slug}`} className="w-full">
-          <Button variant="default" className="w-full bg-tonstores-green hover:bg-tonstores-darkblue" size="sm">
+          <Button variant="default" className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue" size="sm">
             <ShoppingCart size={16} className="mr-1 sm:mr-2" />
             <span className="whitespace-nowrap">View</span>
           </Button>

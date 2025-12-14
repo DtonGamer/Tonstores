@@ -90,6 +90,6 @@ To test the guest order system:
 
 ## Troubleshooting
 
-- If guest orders aren't visible, check the localStorage key "tonstores-guest-id"
+- If guest orders aren't visible, check the localStorage key "Tonstores-guest-id"
 - Ensure the database function and RLS policies are properly configured
 - Check for errors in the webhook logs when processing guest orders

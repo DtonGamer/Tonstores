@@ -46,7 +46,7 @@ export const callSupabaseFunction = async (
   } else {
     // User is not authenticated, add guest ID header if available
     if (typeof window !== 'undefined') {
-      const guestId = localStorage.getItem('tonstores-guest-id');
+      const guestId = localStorage.getItem('Tonstores-guest-id');
       if (guestId) {
         headers['X-Guest-ID'] = guestId;
       }

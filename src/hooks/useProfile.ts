@@ -22,10 +22,10 @@ export type Profile = {
   business_address?: string;
   phone_number?: string;
   business_description?: string;
-  paystack_public_key?: string;
-  paystack_secret_key?: string;
-  paystack_subaccount_code?: string;
-  paystack_subaccount_id?: string;
+  monnify_api_key?: string;
+  monnify_secret_key?: string;
+  monnify_subaccount_code?: string;
+  monnify_subaccount_id?: string;
   email_support?: string;
   whatsapp_support?: string;
   twitter_handle?: string;
@@ -43,14 +43,22 @@ type ProfileUpdate = {
   business_address?: string;
   phone_number?: string;
   business_description?: string;
-  paystack_public_key?: string;
-  paystack_secret_key?: string;
+  monnify_api_key?: string;
+  monnify_secret_key?: string;
+  monnify_subaccount_code?: string;
+  monnify_subaccount_id?: string;
   email_support?: string;
   whatsapp_support?: string;
   twitter_handle?: string;
   instagram_handle?: string;
   facebook_handle?: string;
   tiktok_handle?: string;
+  is_affiliate?: boolean;
+  affiliate_status?: 'active' | 'pending' | 'inactive';
+  affiliate_commission_rate?: number;
+  affiliate_total_earnings?: number;
+  affiliate_total_referrals?: number;
+  referral_code?: string;
 };
 
 // Admin user ID

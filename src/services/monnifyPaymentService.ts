@@ -190,7 +190,7 @@ export const processMonnifySellerPayout = async (params: PayoutParams): Promise<
         destinationBankCode: bankCode,
         destinationAccountName: accountName,
         reference,
-        narration: narration || `TonStores payout ${reference}`,
+        narration: narration || `Tonstores payout ${reference}`,
         userId: user.id
       })
     });

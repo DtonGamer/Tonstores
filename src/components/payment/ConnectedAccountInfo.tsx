@@ -159,10 +159,10 @@ export default function ConnectedAccountInfo({ profile }: ConnectedAccountInfoPr
             <div>
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Account Balance</h3>
               <div className="flex items-center space-x-2">
-                <Wallet className="h-5 w-5 text-tonstores-green" />
+                <Wallet className="h-5 w-5 text-Tonstores-green" />
                 {isLoadingBalance ? (
                   <div className="flex items-center space-x-2">
-                    <Loader2 className="h-4 w-4 animate-spin text-tonstores-green" />
+                    <Loader2 className="h-4 w-4 animate-spin text-Tonstores-green" />
                     <span className="text-gray-500 dark:text-gray-400">Loading balance...</span>
                   </div>
                 ) : (

@@ -17,7 +17,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Get initial theme from localStorage or default to system
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('tonstores-theme');
+      const savedTheme = localStorage.getItem('Tonstores-theme');
       if (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'system') {
         return savedTheme;
       }
@@ -31,7 +31,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const setTheme = (newTheme: Theme) => {
     // Force light theme only - disable dark mode
     setThemeState('light');
-    localStorage.setItem('tonstores-theme', 'light');
+    localStorage.setItem('Tonstores-theme', 'light');
   };
 
   // Check if user is authenticated

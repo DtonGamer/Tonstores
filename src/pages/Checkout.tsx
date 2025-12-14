@@ -283,7 +283,7 @@ const Checkout = () => {
               <ArrowLeft className="mr-2" size={18} />
               Back to Catalog
             </Button>
-            <h1 className="text-2xl font-bold text-tonstores-darkblue">Checkout</h1>
+            <h1 className="text-2xl font-bold text-Tonstores-darkblue">Checkout</h1>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -308,7 +308,7 @@ const Checkout = () => {
                       <Button 
                         onClick={handleRetryPayment}
                         disabled={isSubmitting || isPaymentLoading}
-                        className="w-full bg-tonstores-green hover:bg-tonstores-darkblue flex items-center justify-center"
+                        className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue flex items-center justify-center"
                       >
                         <RefreshCw className="mr-2 h-4 w-4" />
                         {isSubmitting || isPaymentLoading ? "Processing..." : "Continue Payment"}

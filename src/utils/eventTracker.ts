@@ -66,7 +66,7 @@ const getCurrentUserId = async (): Promise<string | null> => {
 // Get guest ID if no user session
 const getGuestId = (): string => {
   if (typeof window === 'undefined') return '';
-  return localStorage.getItem('tonstores-guest-id') || '';
+  return localStorage.getItem('Tonstores-guest-id') || '';
 };
 
 class EventTracker {

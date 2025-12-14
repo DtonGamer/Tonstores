@@ -211,7 +211,7 @@ serve(async (req) => {
           
           <div class="footer">
             <p>Thank you for your purchase!</p>
-            <p>This is an automated receipt from TonStores.</p>
+            <p>This is an automated receipt from Tonstores.</p>
           </div>
         </div>
       </body>
@@ -220,7 +220,7 @@ serve(async (req) => {
 
     // Send customer receipt
     const customerEmailResponse = await resend.emails.send({
-      from: 'receipts@tonstores.com',
+      from: 'receipts@Tonstores.com',
       to: customerEmail,
       subject: `Payment Receipt - Order ${orderData.id}`,
       html: customerReceiptHtml,
@@ -287,7 +287,7 @@ serve(async (req) => {
           
           <div class="footer">
             <p>You made a sale! Check your Monnify dashboard for payment details.</p>
-            <p>This is an automated sales notification from TonStores.</p>
+            <p>This is an automated sales notification from Tonstores.</p>
           </div>
         </div>
       </body>
@@ -298,7 +298,7 @@ serve(async (req) => {
     let sellerEmailResponse = null;
     if (sellerEmail) {
       sellerEmailResponse = await resend.emails.send({
-        from: 'sales@tonstores.com',
+        from: 'sales@Tonstores.com',
         to: sellerEmail,
         subject: `New Sale - Order ${orderData.id}`,
         html: sellerReceiptHtml,

@@ -19,8 +19,8 @@ const PrivacyPolicy = () => {
     text: "text-muted-foreground",
     prose: "prose prose-blue max-w-none dark:prose-invert"
   } : {
-    heading: "text-tonstores-darkblue",
-    subheading: "text-tonstores-darkblue", 
+    heading: "text-Tonstores-darkblue",
+    subheading: "text-Tonstores-darkblue", 
     text: "text-gray-600",
     prose: "prose prose-blue max-w-none"
   };
@@ -53,7 +53,7 @@ const PrivacyPolicy = () => {
             <section className="mb-8">
               <h2 className={`text-2xl font-semibold mb-4 ${textClasses.subheading}`}>Introduction</h2>
               <p className={`mb-4 ${textClasses.text}`}>
-                At TonStores, we take your privacy seriously. This Privacy Policy explains how we collect,
+                At Tonstores, we take your privacy seriously. This Privacy Policy explains how we collect,
                 use, disclose, and safeguard your information when you use our service.
               </p>
             </section>

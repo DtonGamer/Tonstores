@@ -152,7 +152,7 @@ Thank you for your purchase! Your order is being processed. You can contact the 
       })}
 *Payment Reference:* ${order_details.payment_reference || 'N/A'}
 
-A customer has placed an order on your TonStores catalog. Please prepare for fulfillment.`
+A customer has placed an order on your Tonstores catalog. Please prepare for fulfillment.`
     };
 
     // Send WhatsApp messages using Aisensy API

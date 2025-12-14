@@ -19,8 +19,8 @@ const TermsOfService = () => {
     text: "text-muted-foreground",
     prose: "prose prose-blue max-w-none dark:prose-invert"
   } : {
-    heading: "text-tonstores-darkblue",
-    subheading: "text-tonstores-darkblue", 
+    heading: "text-Tonstores-darkblue",
+    subheading: "text-Tonstores-darkblue", 
     text: "text-gray-600",
     prose: "prose prose-blue max-w-none"
   };
@@ -54,7 +54,7 @@ const TermsOfService = () => {
             <section className="mb-8">
               <h2 className={`text-2xl font-semibold mb-4 ${textClasses.subheading}`}>1. Acceptance of Terms</h2>
               <p className={`mb-4 ${textClasses.text}`}>
-                By accessing and using TonStores, you accept and agree to be bound by the terms
+                By accessing and using Tonstores, you accept and agree to be bound by the terms
                 and provision of this agreement.
               </p>
             </section>
@@ -62,7 +62,7 @@ const TermsOfService = () => {
             <section className="mb-8">
               <h2 className={`text-2xl font-semibold mb-4 ${textClasses.subheading}`}>2. Description of Service</h2>
               <p className={`mb-4 ${textClasses.text}`}>
-                TonStores provides a platform for creating and managing digital catalogs and
+                Tonstores provides a platform for creating and managing digital catalogs and
                 processing orders. We reserve the right to modify, suspend, or discontinue any
                 aspect of the service at any time.
               </p>
@@ -102,7 +102,7 @@ const TermsOfService = () => {
             <section className="mb-8">
               <h2 className={`text-2xl font-semibold mb-4 ${textClasses.subheading}`}>6. Limitation of Liability</h2>
               <p className={`mb-4 ${textClasses.text}`}>
-                TonStores shall not be liable for any indirect, incidental, special,
+                Tonstores shall not be liable for any indirect, incidental, special,
                 consequential, or punitive damages resulting from your use of our services.
               </p>
             </section>

@@ -61,8 +61,8 @@ module.exports = {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// TonStores custom colors
-				tonstores: {
+				// Tonstores custom colors
+				Tonstores: {
 					green: '#25D366',
 					darkblue: '#075E54',
 					blue: '#34B7F1',

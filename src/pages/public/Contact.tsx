@@ -60,7 +60,7 @@ const DEFAULT_CONTACTS = {
   email_support: "Creatorrichie@gmail.com",
   whatsapp_support: "+2349038650178",
   twitter_handle: "RichieDBuilder",
-  instagram_handle: "tonstores",
+  instagram_handle: "Tonstores",
   facebook_handle: "TonStore",
   tiktok_handle: "tonrichie",
 };
@@ -233,7 +233,7 @@ const Contact = () => {
 
       {/* Hero Section */}
       <section className="relative py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-tonstores-darkblue via-purple-900 to-tonstores-green z-0"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-Tonstores-darkblue via-purple-900 to-Tonstores-green z-0"></div>
         <div className="absolute inset-0 z-0 opacity-10">
           <div className="absolute inset-0" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -257,7 +257,7 @@ const Contact = () => {
           <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
             {/* Contact Info Column */}
             <div className="md:col-span-1">
-              <h2 className="text-2xl md:text-3xl font-bold text-tonstores-darkblue mb-6">Contact Information</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-Tonstores-darkblue mb-6">Contact Information</h2>
               
               <div className="space-y-6">
                 {contactInfo.map((item, index) => (
@@ -270,14 +270,14 @@ const Contact = () => {
                       )}
                     </div>
                     <div>
-                      <h3 className="font-medium text-lg text-tonstores-darkblue">{item.title}</h3>
+                      <h3 className="font-medium text-lg text-Tonstores-darkblue">{item.title}</h3>
                       <p className="text-gray-600">{item.details}</p>
                     </div>
                   </a>
                 ))}
               </div>
               
-              <h3 className="text-xl font-bold text-tonstores-darkblue mt-12 mb-6">Follow Us</h3>
+              <h3 className="text-xl font-bold text-Tonstores-darkblue mt-12 mb-6">Follow Us</h3>
               <div className="flex space-x-3">
                 {socialMedia.map((platform, index) => (
                   <a 
@@ -299,7 +299,7 @@ const Contact = () => {
             {/* Contact Form Column */}
             <div className="md:col-span-2">
               <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-                <h2 className="text-2xl md:text-3xl font-bold text-tonstores-darkblue mb-2">Send a Message</h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-Tonstores-darkblue mb-2">Send a Message</h2>
                 <p className="text-gray-600 mb-6">We'll get back to you within 24 hours</p>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -313,7 +313,7 @@ const Contact = () => {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-tonstores-green focus:border-transparent"
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-Tonstores-green focus:border-transparent"
                         required
                       />
                     </div>
@@ -326,7 +326,7 @@ const Contact = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-tonstores-green focus:border-transparent"
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-Tonstores-green focus:border-transparent"
                         required
                       />
                     </div>
@@ -341,7 +341,7 @@ const Contact = () => {
                       name="subject"
                       value={formData.subject}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-tonstores-green focus:border-transparent"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-Tonstores-green focus:border-transparent"
                       required
                     />
                   </div>
@@ -355,7 +355,7 @@ const Contact = () => {
                       value={formData.message}
                       onChange={handleChange}
                       rows={6}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-tonstores-green focus:border-transparent"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-Tonstores-green focus:border-transparent"
                       required
                     ></textarea>
                   </div>
@@ -364,7 +364,7 @@ const Contact = () => {
                     <Button 
                       type="submit"
                       disabled={isSubmitting}
-                      className="px-8 py-6 bg-tonstores-green hover:bg-tonstores-darkblue text-white text-lg rounded-xl shadow-lg transform transition-all hover:scale-105 font-medium w-full sm:w-auto"
+                      className="px-8 py-6 bg-Tonstores-green hover:bg-Tonstores-darkblue text-white text-lg rounded-xl shadow-lg transform transition-all hover:scale-105 font-medium w-full sm:w-auto"
                     >
                       {isSubmitting ? (
                         <span className="flex items-center">
@@ -393,7 +393,7 @@ const Contact = () => {
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-tonstores-darkblue">Find Us</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-Tonstores-darkblue">Find Us</h2>
             <p className="text-gray-600 mt-2">Visit our office in Lagos, Nigeria</p>
           </div>
           
@@ -412,14 +412,14 @@ const Contact = () => {
       </section>
       
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-br from-tonstores-darkblue via-purple-900 to-tonstores-green">
+      <section className="py-16 bg-gradient-to-br from-Tonstores-darkblue via-purple-900 to-Tonstores-green">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Start Selling?</h2>
           <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
             Create your free account today and transform your social media presence into a powerful sales machine.
           </p>
           <Link to="/register">
-            <Button className="px-8 py-6 bg-white text-tonstores-darkblue hover:bg-tonstores-green hover:text-white text-lg rounded-xl shadow-lg transform transition-all hover:scale-105 font-medium">
+            <Button className="px-8 py-6 bg-white text-Tonstores-darkblue hover:bg-Tonstores-green hover:text-white text-lg rounded-xl shadow-lg transform transition-all hover:scale-105 font-medium">
               Create Free Account
               <ArrowRight className="ml-2" size={20} />
             </Button>

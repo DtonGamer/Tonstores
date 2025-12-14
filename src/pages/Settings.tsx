@@ -37,9 +37,11 @@ import {
   Link,
   Percent,
   Copy,
+  Download,
 } from "lucide-react";
 import PaymentSettings from "@/components/payment/PaymentSettings";
 import { VerificationEmailButton } from "@/components/auth/VerificationEmailButton";
+import CustomerExportForm from "@/components/export/CustomerExportForm";
 
 // TikTok icon component
 const TikTokIcon = ({ size = 16, className = "" }) => (
@@ -209,7 +211,7 @@ const Settings = () => {
   if (profileLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-tonstores-green" />
+        <Loader2 className="h-8 w-8 animate-spin text-Tonstores-green" />
       </div>
     );
   }
@@ -228,6 +230,7 @@ const Settings = () => {
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="account">Account</TabsTrigger>
           <TabsTrigger value="payment">Payment</TabsTrigger>
+          <TabsTrigger value="export">Data Export</TabsTrigger>
         </TabsList>
 
         {/* PROFILE */}
@@ -249,7 +252,7 @@ const Settings = () => {
       ) : (
         <>
           <AvatarImage src={profile?.avatar_url} />
-          <AvatarFallback className="text-2xl bg-tonstores-green text-white">
+          <AvatarFallback className="text-2xl bg-Tonstores-green text-white">
             {getInitials()}
           </AvatarFallback>
         </>
@@ -258,7 +261,7 @@ const Settings = () => {
 
                   <button 
                     type="button"
-                    className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-tonstores-darkblue text-white flex items-center justify-center shadow-md"
+                    className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-Tonstores-darkblue text-white flex items-center justify-center shadow-md"
                     onClick={triggerFileInput}
                     disabled={isUploading}
                   >
@@ -592,6 +595,29 @@ const Settings = () => {
     </Card>
   </div>
 </TabsContent>
+
+        {/* DATA EXPORT */}
+        <TabsContent value="export">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-medium">Export Customer Data</h3>
+              <p className="text-sm text-muted-foreground">
+                Download your customer information for record-keeping or analytics
+              </p>
+            </div>
+
+            <CustomerExportForm
+              onExportStart={() => console.log("Export started")}
+              onExportComplete={() => {
+                console.log("Export completed");
+                toast({
+                  title: "Export completed",
+                  description: "Your customer data has been exported successfully.",
+                });
+              }}
+            />
+          </div>
+        </TabsContent>
       </Tabs>
     </div>
   );

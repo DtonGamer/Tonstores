@@ -346,7 +346,7 @@ const OrderDetails = ({ order, onClose, onStatusUpdate }: OrderDetailsProps) => 
           
           {loading ? (
             <div className="flex justify-center p-6">
-              <Loader2 className="h-8 w-8 animate-spin text-tonstores-green" />
+              <Loader2 className="h-8 w-8 animate-spin text-Tonstores-green" />
             </div>
           ) : (
             <div className="space-y-4">

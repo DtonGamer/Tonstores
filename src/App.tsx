@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import React, { useEffect } from "react";
-import Index from "./pages/Index";
+import Index from "./pages/public/Index";
 import Dashboard from "./pages/Dashboard";
 import CatalogBuilder from "./pages/CatalogBuilder";
 import CatalogView from "./pages/CatalogView";
@@ -14,14 +14,15 @@ import OrderTracking from "./pages/OrderTracking";
 import OrderManagement from "./pages/OrderManagement";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
-import Features from "./pages/Features";
-import Pricing from "./pages/Pricing";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import HelpCenter from "./pages/HelpCenter";
-import Testimonials from "./pages/Testimonials";
+import Features from "./pages/public/Features";
+import Pricing from "./pages/public/Pricing";
+import OnboardingFlow from "./components/catalog/OnboardingFlow";
+import About from "./pages/public/About";
+import Contact from "./pages/public/Contact";
+import PrivacyPolicy from "./pages/public/PrivacyPolicy";
+import TermsOfService from "./pages/public/TermsOfService";
+import HelpCenter from "./pages/public/HelpCenter";
+import Testimonials from "./pages/public/Testimonials";
 import Finances from "./pages/Finances";
 import AuthForm from "./components/auth/AuthForm";
 import NotFound from "./pages/NotFound";
@@ -40,6 +41,9 @@ import UpdatePassword from "./pages/auth/UpdatePassword";
 import { ErrorBoundary } from "./components/layout/ErrorBoundary";
 import { initReconnectHandler } from "./utils/reconnectHandler";
 import { PageViewTracker } from "./components/analytics/PageViewTracker";
+import AffiliateDashboard from "./pages/AffiliateDashboard";
+import AffiliateToolsPage from "./pages/AffiliateToolsPage";
+import AffiliateTermsPage from "./pages/AffiliateTermsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -187,6 +191,10 @@ const App = () => {
       element: <DashboardRoute><Dashboard /></DashboardRoute>
     },
     {
+      path: "/onboarding",
+      element: <DashboardRoute><OnboardingFlow /></DashboardRoute>
+    },
+    {
       path: "/catalog/new",
       element: <DashboardRoute><CatalogBuilder /></DashboardRoute>
     },
@@ -224,11 +232,11 @@ const App = () => {
     },
     {
       path: "/login",
-      element: <AuthLayout><div className="min-h-screen bg-tonstores-lightgray flex items-center justify-center p-4"><AuthForm type="login" /></div></AuthLayout>
+      element: <AuthLayout><div className="min-h-screen bg-Tonstores-lightgray flex items-center justify-center p-4"><AuthForm type="login" /></div></AuthLayout>
     },
     {
       path: "/register",
-      element: <AuthLayout><div className="min-h-screen bg-tonstores-lightgray flex items-center justify-center p-4"><AuthForm type="register" /></div></AuthLayout>
+      element: <AuthLayout><div className="min-h-screen bg-Tonstores-lightgray flex items-center justify-center p-4"><AuthForm type="register" /></div></AuthLayout>
     },
     {
       path: "/auth/verify",
@@ -245,6 +253,18 @@ const App = () => {
     {
       path: "/finances",
       element: <DashboardRoute><PremiumRoute><Finances /></PremiumRoute></DashboardRoute>
+    },
+    {
+      path: "/affiliate",
+      element: <DashboardRoute><AffiliateDashboard /></DashboardRoute>
+    },
+    {
+      path: "/affiliate/tools",
+      element: <DashboardRoute><AffiliateToolsPage /></DashboardRoute>
+    },
+    {
+      path: "/affiliate/terms",
+      element: <DashboardRoute><AffiliateTermsPage /></DashboardRoute>
     },
     {
       path: "*",

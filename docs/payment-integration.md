@@ -1,6 +1,6 @@
-# TonStores Paystack Payment Integration
+# Tonstores Paystack Payment Integration
 
-This document explains the implementation of the Paystack payment integration for TonStores, enabling sellers to receive payments directly to their bank accounts.
+This document explains the implementation of the Paystack payment integration for Tonstores, enabling sellers to receive payments directly to their bank accounts.
 
 ## Architecture Overview
 

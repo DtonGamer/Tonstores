@@ -176,7 +176,7 @@ const OrderSuccess = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tonstores-green"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-Tonstores-green"></div>
       </div>
     );
   }
@@ -195,7 +195,7 @@ const OrderSuccess = () => {
               <div className="flex justify-center mb-6">
                 <CheckCircle size={64} className="text-green-500" />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-center text-tonstores-darkblue mb-2">
+              <h1 className="text-2xl md:text-3xl font-bold text-center text-Tonstores-darkblue mb-2">
                 Thank You For Your Order!
               </h1>
               <p className="text-center text-gray-600 mb-6">
@@ -203,7 +203,7 @@ const OrderSuccess = () => {
               </p>
               <Separator className="mb-6" />
               <div className="flex justify-center">
-                <Button className="bg-tonstores-green hover:bg-tonstores-darkblue" onClick={handleRedirect}>
+                <Button className="bg-Tonstores-green hover:bg-Tonstores-darkblue" onClick={handleRedirect}>
                   Continue Shopping
                 </Button>
               </div>
@@ -227,7 +227,7 @@ const OrderSuccess = () => {
             <div className="flex justify-center mb-6">
               <CheckCircle size={64} className="text-green-500" />
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-center text-tonstores-darkblue mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-center text-Tonstores-darkblue mb-2">
               Thank You For Your Order!
             </h1>
             <p className="text-center text-gray-600 mb-6">
@@ -270,7 +270,7 @@ const OrderSuccess = () => {
               )}
             </div>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button className="bg-tonstores-green hover:bg-tonstores-darkblue" onClick={() => navigate(`/order-tracking/${order.id}`)}>
+              <Button className="bg-Tonstores-green hover:bg-Tonstores-darkblue" onClick={() => navigate(`/order-tracking/${order.id}`)}>
                 <Eye className="mr-2" size={18} />
                 Track Your Order
               </Button>

@@ -146,7 +146,7 @@ function CustomerPieChart({ customerData, customerInsights }: CustomerPieChartPr
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
           <CardTitle className="flex items-center text-base sm:text-lg">
-            <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2 text-tonstores-blue" />
+            <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2 text-Tonstores-blue" />
             Customer Distribution
           </CardTitle>
           <CardDescription className="text-xs sm:text-sm">
@@ -237,24 +237,24 @@ function CustomerMetrics({ customerInsights }: CustomerInsightsProps) {
 
 function CustomerRecommendations({ customerInsights }: CustomerInsightsProps) {
   return (
-    <div className="mt-6 p-4 bg-tonstores-lightgray dark:bg-gray-800 rounded-lg">
+    <div className="mt-6 p-4 bg-Tonstores-lightgray dark:bg-gray-800 rounded-lg">
       <h4 className="font-medium mb-2 dark:text-white">Recommendations</h4>
       <ul className="space-y-2 text-sm dark:text-gray-300">
         <li className="flex items-start">
-          <div className="w-1.5 h-1.5 bg-tonstores-green rounded-full mt-1.5 mr-2" />
+          <div className="w-1.5 h-1.5 bg-Tonstores-green rounded-full mt-1.5 mr-2" />
           <span>
             Consider setting up a loyalty program to increase your returning customer rate.
           </span>
         </li>
         <li className="flex items-start">
-          <div className="w-1.5 h-1.5 bg-tonstores-green rounded-full mt-1.5 mr-2" />
+          <div className="w-1.5 h-1.5 bg-Tonstores-green rounded-full mt-1.5 mr-2" />
           <span>
             Your average items per order is {customerInsights?.averageItemsPerOrder.toFixed(1) || 0}. 
             Try bundling products to increase this metric.
           </span>
         </li>
         <li className="flex items-start">
-          <div className="w-1.5 h-1.5 bg-tonstores-green rounded-full mt-1.5 mr-2" />
+          <div className="w-1.5 h-1.5 bg-Tonstores-green rounded-full mt-1.5 mr-2" />
           <span>
             Send targeted emails to your {customerInsights?.totalCustomers || 0} customers 
             with personalized recommendations.

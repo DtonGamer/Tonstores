@@ -1,6 +1,6 @@
 # Paystack Transaction Receipt System
 
-This document explains the implementation of the transaction receipt system for TonStores, which sends receipts to both customers and sellers after successful payments.
+This document explains the implementation of the transaction receipt system for Tonstores, which sends receipts to both customers and sellers after successful payments.
 
 ## Overview
 
@@ -37,7 +37,7 @@ A dedicated API endpoint for manually triggering receipt sending for specific tr
 
 ### 3. Webhook Configuration Utility (`configure-webhook.js`)
 
-A utility to help sellers configure their Paystack account to use the TonStores webhook:
+A utility to help sellers configure their Paystack account to use the Tonstores webhook:
 
 - Programmatically sets up webhooks on the seller's Paystack account
 - Handles duplicate webhook detection

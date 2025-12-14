@@ -39,7 +39,7 @@ export function SubscriptionHeader() {
     <div className="bg-white dark:bg-gray-900 shadow-sm dark:shadow-gray-800 py-2 px-4 flex justify-end items-center border-b dark:border-gray-800">
       <Button 
         onClick={handleUpgradeClick}
-        className="bg-tonstores-green hover:bg-tonstores-darkblue text-white flex items-center gap-2"
+        className="bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center gap-2"
         disabled={!nextTierPlan}
       >
         <ArrowUpCircle size={18} />

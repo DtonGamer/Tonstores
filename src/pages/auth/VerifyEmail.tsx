@@ -77,7 +77,7 @@ export default function VerifyEmail() {
         <CardContent className="flex flex-col items-center justify-center p-6">
           {status === "loading" && (
             <div className="flex flex-col items-center space-y-4">
-              <Loader2 className="h-12 w-12 text-tonstores-green animate-spin" />
+              <Loader2 className="h-12 w-12 text-Tonstores-green animate-spin" />
               <p className="text-lg font-medium">Verifying your email...</p>
             </div>
           )}

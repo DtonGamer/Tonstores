@@ -26,7 +26,7 @@ const CatalogHeader = ({
 }: CatalogHeaderProps) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-      <Link to="/dashboard" className="inline-flex items-center text-tonstores-darkblue hover:text-tonstores-blue dark:text-white dark:hover:text-tonstores-lightblue mb-2 sm:mb-0">
+      <Link to="/dashboard" className="inline-flex items-center text-Tonstores-darkblue hover:text-Tonstores-blue dark:text-white dark:hover:text-Tonstores-lightblue mb-2 sm:mb-0">
         <ArrowLeft size={16} className="mr-1" />
         Back to Dashboard
       </Link>
@@ -68,7 +68,7 @@ const CatalogHeader = ({
 
         <Button
           onClick={onSave}
-          className="bg-tonstores-green hover:bg-tonstores-darkblue flex items-center gap-2 px-4 w-full sm:w-auto"
+          className="bg-Tonstores-green hover:bg-Tonstores-darkblue flex items-center gap-2 px-4 w-full sm:w-auto"
           size="default"
           disabled={isSaving}
         >

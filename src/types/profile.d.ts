@@ -23,6 +23,12 @@ export interface ProfileBase {
   business_description?: string;
   kyc_verified?: boolean;
   kyc_verified_at?: string;
+  is_affiliate?: boolean;
+  affiliate_status?: 'active' | 'pending' | 'inactive';
+  affiliate_commission_rate?: number;
+  affiliate_total_earnings?: number;
+  affiliate_total_referrals?: number;
+  referral_code?: string;
   created_at: string;
   updated_at: string;
 }

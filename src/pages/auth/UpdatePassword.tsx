@@ -147,7 +147,7 @@ const UpdatePassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-tonstores-lightgray flex items-center justify-center p-4">
+    <div className="min-h-screen bg-Tonstores-lightgray flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle>Update Your Password</CardTitle>
