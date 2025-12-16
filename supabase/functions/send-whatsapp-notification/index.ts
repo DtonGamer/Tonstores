@@ -214,7 +214,7 @@ A customer has placed an order on your Tonstores catalog. Please prepare for ful
         }
       });
     }
-  } catch (error: any) {
+  } catch (error) {
     return handleCommonError(error, "WhatsApp notification sending");
   }
 });

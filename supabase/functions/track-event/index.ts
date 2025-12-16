@@ -141,7 +141,7 @@ serve(async (req) => {
       success: true,
       message: "Event recorded successfully"
     });
-  } catch (error: any) {
+  } catch (error) {
     return handleCommonError(error, "Event tracking");
   }
 });

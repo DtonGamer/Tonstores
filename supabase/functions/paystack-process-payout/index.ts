@@ -198,7 +198,6 @@ serve(async (req) => {
         console.error("Error updating order status after transfer:", dbError);
         // Continue with response - transfer was successful, just DB update failed
       }
-    }
 
     return jsonResponse(200, {
       status: true,

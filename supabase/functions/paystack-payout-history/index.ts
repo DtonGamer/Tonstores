@@ -144,7 +144,7 @@ serve(async (req) => {
         total_net_amount: totalAmount - totalFees
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     return handleCommonError(error, "Paystack payout history processing");
   }
 });

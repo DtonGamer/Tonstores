@@ -166,8 +166,7 @@ serve(async (req) => {
         sent: true
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     return handleCommonError(error, "Paystack transaction receipt processing");
-  }
   }
 });

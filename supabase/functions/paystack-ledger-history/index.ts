@@ -131,7 +131,7 @@ serve(async (req) => {
         balance: balance
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     return handleCommonError(error, "Paystack ledger history processing");
   }
 });

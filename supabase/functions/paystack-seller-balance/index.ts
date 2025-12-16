@@ -107,8 +107,7 @@ serve(async (req) => {
         userId: userId
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     return handleCommonError(error, "Paystack seller balance retrieval");
-  }
   }
 });

@@ -259,8 +259,7 @@ serve(async (req) => {
       subaccount_code: subaccountCode,
       data: result.data
     });
-  } catch (error: any) {
+  } catch (error) {
     return handleCommonError(error, "Paystack subaccount creation");
-  }
   }
 });

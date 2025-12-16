@@ -288,7 +288,7 @@ serve(async (req) => {
         funds_destination: platformSubaccount ? "platform_escrow_account" : "standard_account"
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     return handleCommonError(error, "Paystack escrow transaction initialization");
   }
 });

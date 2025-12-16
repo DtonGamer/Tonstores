@@ -277,7 +277,7 @@ serve(async (req) => {
         ...(data.bvn && { bvn_associated: true })
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     return handleCommonError(error, "Paystack customer verification");
   }
 });

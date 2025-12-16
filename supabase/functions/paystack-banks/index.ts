@@ -303,8 +303,7 @@ serve(async (req) => {
       data: result.data,
       meta: result.meta
     });
-  } catch (error: any) {
+  } catch (error) {
     return handleCommonError(error, "Paystack banks retrieval");
-  }
   }
 });
