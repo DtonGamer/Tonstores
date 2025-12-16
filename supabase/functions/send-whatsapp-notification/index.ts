@@ -1,18 +1,12 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
-
-const jsonResponse = (statusCode: number, body: any) => {
-  return new Response(JSON.stringify(body), {
-    status: statusCode,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Pragma": "no-cache"
-    },
-  });
-};
+import {
+  jsonResponse,
+  handleCorsOptions,
+  createSupabaseClient,
+  handleCommonError,
+  isDevelopmentMode,
+  mapSnakeToCamel
+} from '../_shared/utils.ts';
 
 // Declare environment variables
 declare global {
@@ -40,14 +34,7 @@ interface WhatsAppNotificationData {
 serve(async (req) => {
   // Handle OPTIONS request for CORS
   if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma",
-        "Access-Control-Allow-Methods": "POST, OPTIONS"
-      }
-    });
+    return handleCorsOptions();
   }
 
   // Only allow POST
@@ -228,10 +215,6 @@ A customer has placed an order on your Tonstores catalog. Please prepare for ful
       });
     }
   } catch (error: any) {
-    console.error("Error sending WhatsApp notifications:", error);
-    return jsonResponse(500, {
-      error: error.message || "Internal server error",
-      details: error.stack || "No stack trace available"
-    });
+    return handleCommonError(error, "WhatsApp notification sending");
   }
 });

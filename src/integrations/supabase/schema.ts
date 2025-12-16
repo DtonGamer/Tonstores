@@ -34,9 +34,9 @@ export async function verifyDatabaseSchema(): Promise<string[]> {
           }
         }
 
-        // Additional check for specific Monnify-related columns
-        const monnifyColumns = ['monnify_subaccount_code', 'kyc_verified', 'kyc_verified_at'];
-        for (const column of monnifyColumns) {
+        // Additional check for specific Paystack-related columns
+        const paystackColumns = ['paystack_subaccount_code', 'kyc_verified', 'kyc_verified_at'];
+        for (const column of paystackColumns) {
           const { error: columnError } = await supabase
             .from('profiles')
             .select(column)

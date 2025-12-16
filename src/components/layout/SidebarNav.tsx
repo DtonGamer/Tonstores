@@ -24,14 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { SubscriptionDialog } from "../subscription/SubscriptionDialog";
 import { usePricingPlans } from "@/hooks/usePricingPlans";
 
-// Debug flag for logging
-const DEBUG = false;
-
-const debugLog = (...args: any[]) => {
-  if (DEBUG) {
-    // console.log("[SidebarNav]", ...args);
-  }
-};
+import { debugLog } from "@/utils/debug";
 
 type NavItem = {
   name: string;

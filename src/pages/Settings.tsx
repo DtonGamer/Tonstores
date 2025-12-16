@@ -585,7 +585,7 @@ const Settings = () => {
                 Payment Integration
               </h4>
               <p className="text-xs text-blue-600 mt-1">
-                Your payment gateway is powered by Monnify. To change advanced settings,
+                Your payment gateway is powered by Paystack. To change advanced settings,
                 please contact support.
               </p>
             </div>

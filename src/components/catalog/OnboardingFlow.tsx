@@ -15,7 +15,7 @@ import useAuth from "@/contexts/AuthContext";
 import { toast } from "@/components/ui/use-toast";
 import SimpleProductForm from "@/components/catalog/SimpleProductForm";
 import { useEventTracker } from "@/hooks/useEventTracker";
-import { trackEvent } from "@/utils/eventTracker";
+import { safeTrackEvent } from "@/utils/eventTracker";
 
 // Form schema for catalog
 const catalogSchema = z.object({
@@ -43,7 +43,7 @@ const OnboardingFlow = () => {
 
   // Track onboarding started
   useEffect(() => {
-    trackEvent('onboarding_started').catch(console.error);
+    safeTrackEvent('onboarding_started');
   }, []);
 
   const catalogForm = useForm<CatalogFormValues>({
@@ -121,13 +121,13 @@ const OnboardingFlow = () => {
       setCurrentStep("product");
 
       // Track catalog creation event
-      trackEvent('catalog_created', { catalog_id: newCatalog.id }).catch(console.error);
+      safeTrackEvent('catalog_created', { catalog_id: newCatalog.id });
 
       // Track that user completed step 1 (create catalog)
-      trackEvent('onboarding_step_completed', {
+      safeTrackEvent('onboarding_step_completed', {
         step: 'create_catalog',
         catalog_id: newCatalog.id
-      }).catch(console.error);
+      });
     } catch (error: any) {
       toast({
         title: "Error creating catalog",
@@ -170,23 +170,23 @@ const OnboardingFlow = () => {
       setCurrentStep("complete");
 
       // Track product creation event
-      trackEvent('product_created', {
+      safeTrackEvent('product_created', {
         product_id: newProduct.id,
         catalog_id: catalog.id
-      }).catch(console.error);
+      });
 
       // Track first product creation for metric
-      trackEvent('first_product_created', {
+      safeTrackEvent('first_product_created', {
         catalog_id: catalog.id,
         product_id: newProduct.id
-      }).catch(console.error);
+      });
 
       // Track that user completed step 2 (create product)
-      trackEvent('onboarding_step_completed', {
+      safeTrackEvent('onboarding_step_completed', {
         step: 'create_product',
         catalog_id: catalog.id,
         product_id: newProduct.id
-      }).catch(console.error);
+      });
     } catch (error: any) {
       toast({
         title: "Error creating product",
@@ -207,22 +207,22 @@ const OnboardingFlow = () => {
       });
 
       // Track share event
-      trackEvent('catalog_shared', {
+      safeTrackEvent('catalog_shared', {
         catalog_id: catalog?.id,
         share_method: 'copy_link'
-      }).catch(console.error);
+      });
 
       // Track that user completed step 3 (share catalog)
-      trackEvent('onboarding_step_completed', {
+      safeTrackEvent('onboarding_step_completed', {
         step: 'share_catalog',
         catalog_id: catalog?.id
-      }).catch(console.error);
+      });
 
       // Track that user completed the full onboarding
-      trackEvent('onboarding_completed', {
+      safeTrackEvent('onboarding_completed', {
         catalog_id: catalog?.id,
         product_id: product?.id
-      }).catch(console.error);
+      });
     }
   };
 
@@ -422,10 +422,10 @@ const OnboardingFlow = () => {
                     onClick={() => {
                       window.open(shareableLink, '_blank');
                       // Track preview event as a type of sharing
-                      trackEvent('catalog_shared', {
+                      safeTrackEvent('catalog_shared', {
                         catalog_id: catalog?.id,
                         share_method: 'preview'
-                      }).catch(console.error);
+                      });
                     }}
                     variant="outline"
                     className="w-full sm:w-auto"

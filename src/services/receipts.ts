@@ -23,7 +23,7 @@ export const sendTransactionReceipts = async (params: SendReceiptProps): Promise
   
   try {
     const apiBaseUrl = paymentConfig.apiBaseUrl();
-    const response = await fetch(`${apiBaseUrl}/api/monnify-transaction-receipt`, {
+    const response = await fetch(`${apiBaseUrl}/api/paystack-transaction-receipt`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -78,62 +78,6 @@ interface ConfigureWebhookProps {
   webhookUrl?: string;
 }
 
-/**
- * Configure Paystack webhook for a seller
- * @param params - The webhook configuration parameters
- * @returns Promise with the result
- */
-export const configurePaystackWebhook = async (params: ConfigureWebhookProps): Promise<{ success: boolean; message: string }> => {
-  const { sellerId, webhookUrl } = params;
-  
-  try {
-    const apiBaseUrl = paymentConfig.apiBaseUrl();
-    // Use the default webhook URL if not provided
-    const finalWebhookUrl = webhookUrl || `${apiBaseUrl}/.netlify/functions/paystack-webhook`;
-    
-    const response = await fetch(`${apiBaseUrl}/.netlify/functions/configure-webhook`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        seller_id: sellerId,
-        webhook_url: finalWebhookUrl,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || data.paystack_message || 'Failed to configure webhook');
-    }
-
-    return {
-      success: true,
-      message: data.message || 'Webhook configured successfully',
-    };
-  } catch (error) {
-    console.error('Error configuring webhook:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    
-    return {
-      success: false,
-      message: errorMessage,
-    };
-  }
-};
-
-/**
- * Configure Paystack webhook with UI feedback (toast notifications)
- * @param params - The webhook configuration parameters
- */
-export const configurePaystackWebhookWithToast = async (params: ConfigureWebhookProps): Promise<void> => {
-  toast.promise(
-    configurePaystackWebhook(params),
-    {
-      loading: 'Configuring webhook...',
-      success: (data) => data.message || 'Webhook configured successfully',
-      error: (err) => err.message || 'Failed to configure webhook',
-    }
-  );
-}; 
+// Note: Paystack webhook configuration is typically done in the Paystack dashboard
+// and not programmatically per seller. The application's webhook endpoint is already
+// configured to handle all Paystack events.

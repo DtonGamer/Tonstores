@@ -24,31 +24,15 @@ function getEnv(key: string): string | undefined {
  * Payment configuration
  */
 export const paymentConfig = {
-  // Monnify configuration
-  monnify: {
-    apiKey: () => {
+  // Paystack configuration
+  paystack: {
+    publicKey: () => {
       // In production, only use VITE_ prefixed variables
       if (environment.isProduction()) {
-        return getEnv('VITE_MONNIFY_API_KEY');
+        return getEnv('VITE_PAYSTACK_PUBLIC_KEY');
       }
       // In development, fall back to non-prefixed variables if needed
-      return getEnv('VITE_MONNIFY_API_KEY') || getEnv('MONNIFY_API_KEY');
-    },
-    secretKey: () => {
-      // In production, only use VITE_ prefixed variables
-      if (environment.isProduction()) {
-        return getEnv('VITE_MONNIFY_SECRET_KEY');
-      }
-      // In development, fall back to non-prefixed variables if needed
-      return getEnv('VITE_MONNIFY_SECRET_KEY') || getEnv('MONNIFY_SECRET_KEY');
-    },
-    contractCode: () => {
-      // In production, only use VITE_ prefixed variables
-      if (environment.isProduction()) {
-        return getEnv('VITE_MONNIFY_CONTRACT_CODE');
-      }
-      // In development, fall back to non-prefixed variables if needed
-      return getEnv('VITE_MONNIFY_CONTRACT_CODE') || getEnv('MONNIFY_CONTRACT_CODE');
+      return getEnv('VITE_PAYSTACK_PUBLIC_KEY') || getEnv('PAYSTACK_PUBLIC_KEY');
     },
     percentageFee: 0.015, // 1.5% fee
   },

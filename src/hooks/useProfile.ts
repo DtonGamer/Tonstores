@@ -4,14 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import type { ProfileBase } from "@/types/profile";
 
-// Debug flag for logging
-const DEBUG = false;
-
-const debugLog = (...args: any[]) => {
-  if (DEBUG) {
-    // console.log("[useProfile]", ...args);
-  }
-};
+import { debugLog } from "@/utils/debug";
 
 export type Role = 'user' | 'admin';
 
@@ -22,10 +15,7 @@ export type Profile = {
   business_address?: string;
   phone_number?: string;
   business_description?: string;
-  monnify_api_key?: string;
-  monnify_secret_key?: string;
-  monnify_subaccount_code?: string;
-  monnify_subaccount_id?: string;
+  paystack_subaccount_code?: string;
   email_support?: string;
   whatsapp_support?: string;
   twitter_handle?: string;
@@ -43,14 +33,11 @@ type ProfileUpdate = {
   business_address?: string;
   phone_number?: string;
   business_description?: string;
-  monnify_api_key?: string;
-  monnify_secret_key?: string;
-  monnify_subaccount_code?: string;
-  monnify_subaccount_id?: string;
-  monnify_bvn?: string;
-  monnify_kyc_status?: string;
-  monnify_kyc_submitted_at?: string;
-  monnify_percentage_charge?: number;
+  paystack_subaccount_code?: string;
+  paystack_bvn?: string;
+  paystack_kyc_status?: string;
+  paystack_kyc_submitted_at?: string;
+  paystack_percentage_charge?: number;
   kyc_verified?: boolean;
   kyc_verified_at?: string;
   email_support?: string;

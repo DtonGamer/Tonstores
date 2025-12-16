@@ -1,5 +1,12 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import {
+  jsonResponse,
+  handleCorsOptions,
+  createSupabaseClient,
+  handleCommonError,
+  isDevelopmentMode,
+  mapSnakeToCamel
+} from '../_shared/utils.ts';
 
 interface UpdateStockRequest {
   orderId: string;
@@ -14,32 +21,6 @@ interface ResponseBody {
   success: boolean;
   error?: string;
   data?: any;
-}
-
-function jsonResponse(status: number, body: ResponseBody) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Client-Source, X-Guest-ID, apikey, cache-control, pragma",
-      "Pragma": "no-cache"
-    },
-  });
-}
-
-// Handle CORS preflight requests
-function handleOptions() {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Client-Source, X-Guest-ID, apikey, cache-control, pragma",
-      "Pragma": "no-cache"
-    },
-  });
 }
 
 // Function to decrease product stock
@@ -88,7 +69,7 @@ serve(async (req) => {
   try {
     // Handle CORS preflight
     if (req.method === "OPTIONS") {
-      return handleOptions();
+      return handleCorsOptions();
     }
 
     // Only allow POST requests
@@ -96,16 +77,11 @@ serve(async (req) => {
       return jsonResponse(405, { success: false, error: "Method not allowed" });
     }
 
-    // Get Supabase credentials from environment
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-
-    if (!supabaseUrl || !supabaseServiceKey) {
+    // Initialize Supabase client using shared utility
+    const supabase = createSupabaseClient();
+    if (!supabase) {
       return jsonResponse(500, { error: "Supabase configuration is missing", success: false });
     }
-
-    // Initialize Supabase client with service role key to bypass RLS
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Parse request body
     const requestData = await req.json();
@@ -139,25 +115,20 @@ serve(async (req) => {
 
       console.log(`[StockService] Completed stock update for order: ${requestData.orderId}`);
       return jsonResponse(200, { success: true });
-    } 
+    }
     // If we have productId and quantity, update a single product
     else if (requestData.productId && requestData.quantity !== undefined && requestData.quantity !== null) {
       await decreaseProductStock(supabase, requestData.productId, requestData.quantity);
       return jsonResponse(200, { success: true });
     }
     else {
-      return jsonResponse(400, { 
-        success: false, 
-        error: "Missing required parameters: either orderId or both productId and quantity" 
+      return jsonResponse(400, {
+        success: false,
+        error: "Missing required parameters: either orderId or both productId and quantity"
       });
     }
 
   } catch (error) {
-    console.error("Unexpected error in update-stock function:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    return jsonResponse(500, {
-      success: false,
-      error: `Unexpected error: ${errorMessage}`
-    });
+    return handleCommonError(error, "Stock update");
   }
 });

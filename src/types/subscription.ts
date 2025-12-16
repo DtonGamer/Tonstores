@@ -8,7 +8,7 @@ export interface Subscription {
   current_period_start: string | null;
   current_period_end: string | null;
   cancel_at_period_end: boolean;
-  payment_provider: 'monnify' | null;
+  payment_provider: 'paystack' | null;
   payment_provider_subscription_id: string | null;
   created_at: string;
   updated_at: string;

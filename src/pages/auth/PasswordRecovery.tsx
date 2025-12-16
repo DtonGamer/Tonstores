@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useEventTracker } from '@/hooks/useEventTracker';
+import { safeTrack } from '@/utils/errorHandling';
 
 const PasswordRecovery = () => {
   const [email, setEmail] = useState('');
@@ -32,7 +33,7 @@ const PasswordRecovery = () => {
       }
 
       // Track the password recovery request event
-      trackAuthEvent('password_recovery_requested', 'email').catch(console.error);
+      safeTrack(trackAuthEvent('password_recovery_requested', 'email'));
       
       setMessage({
         type: 'success',
@@ -41,7 +42,7 @@ const PasswordRecovery = () => {
       setIsEmailSent(true);
     } catch (error: any) {
       console.error('Error sending password recovery email:', error);
-      trackError(error, 'PasswordRecovery', 'handleSubmit').catch(console.error);
+      safeTrack(trackError(error, 'PasswordRecovery', 'handleSubmit'));
       
       setMessage({
         type: 'error',

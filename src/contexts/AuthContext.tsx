@@ -19,15 +19,8 @@ import { trackAuthEvent, trackError } from "@/utils/eventTracker";
 import { supabase } from "@/integrations/supabase/client";
 
 
-// Debug flag - set to true to enable detailed logging
-const DEBUG = false;
-
-// Debug logger function
-const debugLog = (...args: any[]) => {
-  if (DEBUG) {
-    // console.log("[AuthContext]", ...args);
-  }
-};
+import { debugLog } from "@/utils/debug";
+import { safeTrack } from "@/utils/errorHandling";
 
 type AuthContextType = {
   user: User | null;
@@ -318,10 +311,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         toast({ title: "Success", description: "You've been successfully logged in" });
 
         // Track successful login
-        trackAuthEvent('login', 'email').catch(console.error);
+        safeTrack(trackAuthEvent('login', 'email'));
       } catch (error: any) {
         debugLog("Sign in error:", error);
-        trackError(error, 'AuthContext', 'signIn').catch(console.error);
+        safeTrack(trackError(error, 'AuthContext', 'signIn'));
 
         toast({
           title: "Login failed",
@@ -375,7 +368,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           debugLog("User created successfully:", data.user.id);
 
           // Track successful signup
-          trackAuthEvent('signup', 'email').catch(console.error);
+          safeTrack(trackAuthEvent('signup', 'email'));
 
           // Send welcome email
           try {
@@ -439,7 +432,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (error: any) {
         debugLog("Sign up error:", error);
-        trackError(error, 'AuthContext', 'signUp').catch(console.error);
+        safeTrack(trackError(error, 'AuthContext', 'signUp'));
 
         toast({
           title: "Registration failed",
@@ -481,10 +474,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         resetAuthInit();
 
         debugLog("Sign out successful");
-        trackAuthEvent('logout', 'manual').catch(console.error);
+        safeTrack(trackAuthEvent('logout', 'manual'));
       } catch (error: any) {
         debugLog("Sign out error:", error);
-        trackError(error, 'AuthContext', 'signOut').catch(console.error);
+        safeTrack(trackError(error, 'AuthContext', 'signOut'));
 
         toast({
           title: "Sign out failed",

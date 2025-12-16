@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useSimpleForm } from "@/hooks/useSimpleForm";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
@@ -72,13 +73,12 @@ const Contact = () => {
   // Use the custom hook to force light mode for logged-out users
   useForceLightMode();
 
-  const [formData, setFormData] = useState({
+  const { formData, handleChange, resetForm } = useSimpleForm({
     name: "",
     email: "",
     subject: "",
     message: ""
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [adminProfile, setAdminProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -126,10 +126,8 @@ const Contact = () => {
   const getTikTokLink = (handle: string) =>
     handle.startsWith('http') ? handle : `https://tiktok.com/@${handle.replace(/^@/, '')}`;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,7 +138,7 @@ const Contact = () => {
         title: "Message Sent",
         description: "Thank you for reaching out. We'll get back to you shortly!",
       });
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      resetForm();
       setIsSubmitting(false);
     }, 1500);
   };

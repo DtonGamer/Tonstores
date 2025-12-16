@@ -11,9 +11,10 @@ import { useToast } from '@/components/ui/use-toast';
 import { useProfile } from '@/hooks/useProfile';
 import { Loader2 } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
-import { monnifyApi } from '@/services/monnifyApi';
+import { paystackApi } from '@/services/PaystackApi';
 import { useEventTracker } from '@/hooks/useEventTracker';
 import { paymentConfig } from '@/lib/config';
+import { safeTrack } from '@/utils/errorHandling';
 
 // Define bank interface
 interface Bank {
@@ -64,10 +65,10 @@ export default function KYCForm() {
   // Track when KYC form is viewed
   useEffect(() => {
     if (profile?.id) {
-      trackKYCEvent('kyc_form_viewed', {
+      safeTrack(trackKYCEvent('kyc_form_viewed', {
         profile_id: profile.id,
         kyc_status: profile.kyc_verified ? 'verified' : 'not_verified'
-      }).catch(console.error);
+      }));
     }
   }, [profile?.id, profile?.kyc_verified]);
 
@@ -92,7 +93,7 @@ export default function KYCForm() {
     try {
       // console.log(`Verifying account: ${accountNumber} with bank code: ${bankCode}`);
 
-      const result = await monnifyApi.verifyAccount({
+      const result = await paystackApi.verifyAccount({
         account_number: accountNumber,
         bank_code: bankCode,
         dev_mode: import.meta.env.MODE === 'development' || import.meta.env.DEV_MODE === 'true'
@@ -136,7 +137,7 @@ export default function KYCForm() {
     }
   };
 
-  // Load banks from Monnify API via Supabase function
+  // Load banks from Paystack API via Supabase function
   useEffect(() => {
     const fetchBanks = async () => {
       try {
@@ -147,8 +148,8 @@ export default function KYCForm() {
           setIsLoadingBanks(false);
           return;
         }
-        
-        const data = await monnifyApi.getBanks({ dev_mode: import.meta.env.MODE === 'development' || import.meta.env.DEV_MODE === 'true' });
+
+        const data = await paystackApi.getBanks({ dev_mode: import.meta.env.MODE === 'development' || import.meta.env.DEV_MODE === 'true' });
         if (data && data.data && Array.isArray(data.data)) {
           setBanks(data.data);
           // Cache for future use
@@ -218,7 +219,7 @@ export default function KYCForm() {
         description: "You need to be logged in to complete KYC",
         variant: "destructive"
       });
-      trackError(new Error("User not authenticated for KYC"), 'KYCForm', 'onSubmit').catch(console.error);
+      safeTrack(trackError(new Error("User not authenticated for KYC"), 'KYCForm', 'onSubmit'));
       return;
     }
 
@@ -228,24 +229,22 @@ export default function KYCForm() {
       hasAccountNumber: !!values.accountNumber,
       hasAccountName: !!values.accountName,
       hasIdNumber: !!values.idNumber
-    }, 'KYCForm').catch(console.error);
+    }, 'KYCForm');
 
     setIsSubmitting(true);
     try {
       let subaccountCode: string | undefined;
 
       try {
-        const result = await monnifyApi.createSubaccount({
+        const result = await paystackApi.createSubaccount({
           userId: profile.id,
-          accountName: profile.business_name,
-          bankCode: values.bankName,
-          accountNumber: values.accountNumber,
-          currencyCode: "NGN", // Required field
-          percentageCharge: profile.monnify_percentage_charge || (paymentConfig.monnify.percentageFee * 100), // Required field - Use user-specific percentage or default
-          contactEmail: profile.email_support || profile.contact_email || "",
-          contactName: values.accountName,
-          contactPhone: profile.phone_number || "00000000000",
-          additionalInformation: `Subaccount for ${profile.business_name}`,
+          business_name: profile.business_name,
+          account_number: values.accountNumber,
+          bank_code: values.bankName,
+          percentage_charge: profile.paystack_percentage_charge || (paymentConfig.paystack.percentageFee * 100), // Use user-specific percentage or default
+          contact_email: profile.email_support || profile.contact_email || "",
+          contact_name: values.accountName,
+          contact_phone: profile.phone_number || "00000000000",
           bvn: values.idNumber // Add BVN to the payload
         });
 
@@ -254,26 +253,24 @@ export default function KYCForm() {
         // Fix the response validation to check for either status or success
         if (result.status !== true && result.success !== true) {
           console.error('Error creating subaccount:', result);
-          throw new Error(result.responseMessage || 'Failed to create subaccount. Invalid response received.');
+          throw new Error(result.message || 'Failed to create subaccount. Invalid response received.');
         }
 
-        // Properly extract all fields from the response (Monnify format)
+        // Extract subaccount code from Paystack response
         const subaccountData = result.data || {};
-        subaccountCode = subaccountData.subaccountCode || result.subaccountCode;
-        const bankDetails = subaccountData.bank || {};
-        const bankName = bankDetails.name || banks.find(bank => bank.code === values.bankName)?.name || 'Unknown Bank';
+        subaccountCode = result.data?.subaccount_code || result.data?.subaccount?.subaccount_code || subaccountData.subaccount_code;
 
         // Current timestamp for verification date
         const verificationDate = new Date().toISOString();
 
-        // Update local profile state with Monnify subaccount code and KYC status
+        // Update local profile state with Paystack subaccount code and KYC status
         await updateProfile({
           // @ts-ignore - These fields are declared in the module augmentation
-          monnify_subaccount_code: subaccountCode,
-          monnify_bvn: values.idNumber,            // Store the BVN provided by the user
-          monnify_kyc_status: 'pending',          // Set KYC status to pending initially
-          monnify_kyc_submitted_at: verificationDate, // Store when KYC was submitted
-          kyc_verified: false,                    // Set to false initially, will update after Monnify verification
+          paystack_subaccount_code: subaccountCode,
+          paystack_bvn: values.idNumber,            // Store the BVN provided by the user
+          paystack_kyc_status: 'pending',          // Set KYC status to pending initially
+          paystack_kyc_submitted_at: verificationDate, // Store when KYC was submitted
+          kyc_verified: false,                    // Set to false initially, will update after Paystack verification
           kyc_verified_at: null                   // Set to null initially
         });
 
@@ -282,10 +279,10 @@ export default function KYCForm() {
         throw new Error(`Failed to create subaccount: ${subaccountError.message || 'Unknown error'}`);
       }
 
-      // Perform Monnify customer verification only if subaccount was created successfully
+      // Perform Paystack customer verification only if subaccount was created successfully
       if (subaccountCode) {
         try {
-          const verificationResult = await monnifyApi.customerVerification({
+          const verificationResult = await paystackApi.customerVerification({
             userId: profile.id,
             firstName: profile.business_name, // Using business name as first name
             lastName: 'Merchant',             // Using 'Merchant' as last name
@@ -297,7 +294,7 @@ export default function KYCForm() {
 
           console.log("Customer verification result:", verificationResult);
 
-          // Update KYC status based on Monnify response
+          // Update KYC status based on Paystack response
           let kycStatus = 'pending';
           let kycVerified = false;
           let kycVerifiedAt: string | null = null;
@@ -307,23 +304,23 @@ export default function KYCForm() {
             kycVerified = true;
             kycVerifiedAt = new Date().toISOString();
           } else if (verificationResult.status === 'failed' || verificationResult.status === 'rejected') {
-            kycStatus = verificationResult.status;
+            kycStatus = verificationResult.message || 'failed';
           }
 
           // Update profile with final KYC status
           await updateProfile({
             // @ts-ignore - These fields are declared in the module augmentation
-            monnify_kyc_status: kycStatus,
+            paystack_kyc_status: kycStatus,
             kyc_verified: kycVerified,
             kyc_verified_at: kycVerifiedAt
           });
 
         } catch (verificationError: any) {
           console.error("Customer verification error:", verificationError);
-          // Even if Monnify verification fails, we still store the KYC information locally
+          // Even if Paystack verification fails, we still store the KYC information locally
           await updateProfile({
             // @ts-ignore - These fields are declared in the module augmentation
-            monnify_kyc_status: 'failed',
+            paystack_kyc_status: 'failed',
             kyc_verified: false
           });
 
@@ -342,7 +339,7 @@ export default function KYCForm() {
         subaccount_code: subaccountCode,
         success: true,
         bvn_provided: !!values.idNumber
-      }).catch(console.error);
+      });
 
       // Also save bank details to payment_accounts table
       try {
@@ -402,11 +399,11 @@ export default function KYCForm() {
       });
     } catch (error: any) {
       console.error('Error in KYC submission:', error);
-      trackError(error, 'KYCForm', 'onSubmit').catch(console.error);
+      safeTrack(trackError(error, 'KYCForm', 'onSubmit'));
       trackKYCEvent('kyc_failed', {
         profile_id: profile?.id,
         error_message: error.message
-      }).catch(console.error);
+      });
 
       toast({
         title: "Error",
@@ -434,15 +431,15 @@ export default function KYCForm() {
       <CardHeader>
         <CardTitle className="text-xl">KYC Verification</CardTitle>
         {/* Show KYC status if already verified */}
-        {profile?.monnify_kyc_status && (
+        {profile?.paystack_kyc_status && (
           <div className={`text-sm p-2 rounded-md ${
-            profile.monnify_kyc_status === 'verified' ? 'bg-green-100 text-green-800' :
-            profile.monnify_kyc_status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+            profile.paystack_kyc_status === 'verified' ? 'bg-green-100 text-green-800' :
+            profile.paystack_kyc_status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
             'bg-red-100 text-red-800'
           }`}>
-            KYC Status: <span className="font-semibold">{profile.monnify_kyc_status}</span>
-            {profile.monnify_kyc_submitted_at && (
-              <div className="text-xs mt-1">Submitted: {new Date(profile.monnify_kyc_submitted_at).toLocaleDateString()}</div>
+            KYC Status: <span className="font-semibold">{profile.paystack_kyc_status}</span>
+            {profile.paystack_kyc_submitted_at && (
+              <div className="text-xs mt-1">Submitted: {new Date(profile.paystack_kyc_submitted_at).toLocaleDateString()}</div>
             )}
           </div>
         )}
@@ -565,14 +562,14 @@ export default function KYCForm() {
             <Button
               type="submit"
               className="w-full"
-              disabled={isSubmitting || isVerifyingAccount || (profile?.kyc_verified && profile?.monnify_kyc_status === 'verified')}
+              disabled={isSubmitting || isVerifyingAccount || (profile?.kyc_verified && profile?.paystack_kyc_status === 'verified')}
             >
               {isSubmitting ? (
                 <div className="flex items-center">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   <span>Processing...</span>
                 </div>
-              ) : (profile?.kyc_verified && profile?.monnify_kyc_status === 'verified') ? (
+              ) : (profile?.kyc_verified && profile?.paystack_kyc_status === 'verified') ? (
                 "KYC Already Verified"
               ) : (
                 "Verify Account"

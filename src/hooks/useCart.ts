@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { handleError } from "@/utils/errorHandling";
 
 export type CartItem = {
   id: string;
@@ -22,7 +23,10 @@ export const useCart = (catalogId: string) => {
         const parsedCart = JSON.parse(savedCart);
         setItems(parsedCart);
       } catch (error) {
-        console.error("Failed to parse saved cart", error);
+        handleError(error, {
+          notificationMessage: "Failed to load cart data",
+          context: "useCart hook - localStorage parsing"
+        });
         localStorage.removeItem(`cart-${catalogId}`);
       }
     }

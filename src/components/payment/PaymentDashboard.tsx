@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, ArrowRight, Calendar, DollarSign, Wallet, ArrowDown, ArrowUp, AlertCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useProfile } from "@/hooks/useProfile";
-import { getMonnifySellerBalance, getMonnifySellerLedgerHistory, MonnifyLedgerEntry, getMonnifySellerPayoutHistory, MonnifyPayoutHistoryResponse } from "@/services/monnifyPaymentService";
+import { getPaystackSellerBalance, getPaystackSellerLedgerHistory, PaystackLedgerEntry, getPaystackSellerPayoutHistory, PaystackPayoutHistoryResponse } from "@/services/PaystackPaymentService";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,9 +24,9 @@ export function PaymentDashboard() {
   const { toast } = useToast();
   const [balance, setBalance] = useState<number | null>(null);
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
-  const [payoutHistory, setPayoutHistory] = useState<MonnifyPayoutHistoryResponse['payouts']>([]);
+  const [payoutHistory, setPayoutHistory] = useState<PaystackPayoutHistoryResponse['payouts']>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [ledgerHistory, setLedgerHistory] = useState<MonnifyLedgerEntry[]>([]);
+  const [ledgerHistory, setLedgerHistory] = useState<PaystackLedgerEntry[]>([]);
   const [isLoadingLedger, setIsLoadingLedger] = useState(false);
   const [ledgerError, setLedgerError] = useState<string | null>(null);
   const [ledgerSummary, setLedgerSummary] = useState({
@@ -43,7 +43,7 @@ export function PaymentDashboard() {
       try {
         setIsLoadingBalance(true);
         console.log("Loading balance for user ID:", profile.id);
-        const sellerBalance = await getMonnifySellerBalance(profile.id);
+        const sellerBalance = await getPaystackSellerBalance(profile.id);
         console.log("Balance received:", sellerBalance);
         setBalance(sellerBalance);
       } catch (error: any) {
@@ -70,7 +70,7 @@ export function PaymentDashboard() {
         setIsLoadingHistory(true);
         
         console.log("Loading payout history for user ID:", profile.id);
-        const payoutData = await getMonnifySellerPayoutHistory(profile.id, 10, 0);
+        const payoutData = await getPaystackSellerPayoutHistory(profile.id, 10, 0);
         console.log("Payout history received:", payoutData);
 
         if (payoutData.payouts) {
@@ -100,7 +100,7 @@ export function PaymentDashboard() {
       try {
         setIsLoadingLedger(true);
         setLedgerError(null);
-        const ledgerData = await getMonnifySellerLedgerHistory(profile.id, 20, 0);
+        const ledgerData = await getPaystackSellerLedgerHistory(profile.id, 20, 0);
         console.log("Ledger data received:", ledgerData);
 
         if (!ledgerData.entries || ledgerData.entries.length === 0) {

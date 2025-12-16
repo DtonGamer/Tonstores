@@ -8,10 +8,7 @@ import { ErrorBoundary } from "../layout/ErrorBoundary"; // <-- import it
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
-const DEBUG = false;
-const debugLog = (...args: any[]) => {
-  if (DEBUG) console.log("[DashboardLayout]", ...args);
-};
+import { debugLog } from "@/utils/debug";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;

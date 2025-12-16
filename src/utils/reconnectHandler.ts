@@ -2,20 +2,12 @@
 import { refreshCurrentSession } from "@/integrations/supabase/authManager";
 import { toast } from "@/components/ui/use-toast";
 
-// Set this to true to enable debug logging
-const DEBUG = false;
-
-// Debug logger function
-const debugLog = (...args: any[]) => {
-  if (DEBUG) {
-    console.log("[ReconnectHandler]", ...args);
-  }
-};
+import { debugLog } from "@/utils/debug";
 
 // Track visibility changes
 let wasHidden = false;
 let lastVisibleTime = Date.now();
-const INACTIVITY_THRESHOLD = 15 * 60 * 1000; // 15 minutes in milliseconds
+const INACTIVITY_THRESHOLD = 30 * 60 * 1000; // 30 minutes in milliseconds
 
 /**
  * Initialize reconnection handler for Supabase

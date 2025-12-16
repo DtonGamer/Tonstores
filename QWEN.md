@@ -1,13 +1,13 @@
 # Tonstores Catalog Hub - Project Context
 
 ## Overview
-Tonstores Catalog Hub is a modern e-commerce catalog management system built with React, Vite, and Supabase. It enables users to create and share beautiful product catalogs, manage orders, and process payments seamlessly using Monnify integration. The platform also includes admin capabilities for managing users, catalogs, products, orders, and subscriptions.
+Tonstores Catalog Hub is a modern e-commerce catalog management system built with React, Vite, and Supabase. It enables users to create and share beautiful product catalogs, manage orders, and process payments seamlessly using Paystack integration. The platform also includes admin capabilities for managing users, catalogs, products, orders, and subscriptions.
 
 ## Tech Stack
 - **Frontend:** React + TypeScript + Vite
 - **UI Components:** Shadcn/ui + Tailwind CSS + Lucide React
 - **Backend:** Supabase (PostgreSQL database with Row Level Security)
-- **Payment Processing:** Monnify
+- **Payment Processing:** Paystack
 - **Email Service:** Resend
 - **Hosting:** Vercel
 - **Build System:** Vite with TypeScript
@@ -29,7 +29,7 @@ src/
 ### Key Features
 - Product catalog creation and management
 - Shopping cart functionality
-- Secure payment processing with Monnify
+- Secure payment processing with Paystack
 - User authentication with Supabase
 - Admin role system for platform management
 - Order management with status tracking
@@ -46,7 +46,7 @@ src/
 - npm or yarn
 - Git
 - Supabase account
-- Monnify account
+- Paystack account
 - Resend account
 
 ### Installation
@@ -59,10 +59,10 @@ src/
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    VITE_SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-   # Monnify Configuration
-   VITE_MONNIFY_API_KEY=your_monnify_api_key
-   VITE_MONNIFY_SECRET_KEY=your_monnify_secret_key
-   VITE_MONNIFY_CONTRACT_CODE=your_monnify_contract_code
+   # Paystack Configuration
+   VITE_PAYSTACK_PUBLIC_KEY=your_paystack_public_key
+   VITE_PAYSTACK_SECRET_KEY=your_paystack_secret_key
+
 
    # Resend Configuration
    VITE_RESEND_API_KEY=your_resend_api_key
@@ -107,8 +107,8 @@ The build process involves:
 
 ## Payment Integration
 
-### Monnify Implementation
-Tonstores integrates with Monnify for payment processing with the following features:
+### Paystack Implementation
+Tonstores integrates with Paystack for payment processing with the following features:
 - KYC onboarding for sellers
 - Automatic subaccount creation for direct payments
 - White-label payment experience
@@ -274,7 +274,7 @@ Common events tracked include:
 
 ### Common Issues
 1. **Supabase Signup 500 Errors:** Check `emailRedirectTo` configuration and use service role key
-2. **Monnify Subaccount Creation:** Verify API keys and bank information format
+2. **Paystack Subaccount Creation:** Verify API keys and bank information format
 3. **Order Status Updates:** Ensure RLS policies are correctly applied
 4. **Supabase Functions:** Check function logs for processing errors
 
@@ -295,7 +295,7 @@ Ensure all required environment variables are correctly set for development and 
 
 ### Backend Services
 - Supabase for database and authentication
-- Monnify for payment processing
+- Paystack for payment processing
 - Resend for email delivery
 - Supabase Functions for server-side logic
 

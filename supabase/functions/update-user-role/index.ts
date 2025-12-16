@@ -2,7 +2,14 @@
 // https://deno.land/manual/examples/supabase_functions
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  jsonResponse,
+  handleCorsOptions,
+  createSupabaseClient,
+  handleCommonError,
+  isDevelopmentMode,
+  mapSnakeToCamel
+} from '../_shared/utils.ts';
 
 type Role = 'user' | 'admin';
 
@@ -14,15 +21,7 @@ interface UpdateRoleRequest {
 serve(async (req) => {
   // Handle OPTIONS request for CORS
   if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Pragma": "no-cache"
-      }
-    });
+    return handleCorsOptions();
   }
 
   // Parse request body to check for dev_mode
@@ -30,19 +29,7 @@ serve(async (req) => {
   try {
     requestData = await req.json();
   } catch (e) {
-    return new Response(
-      JSON.stringify({ error: 'Invalid JSON body' }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
-          'Pragma': 'no-cache'
-        },
-        status: 400
-      }
-    );
+    return jsonResponse(400, { error: 'Invalid JSON body' });
   }
 
   // Check for development mode
@@ -54,36 +41,12 @@ serve(async (req) => {
 
     // Validate inputs
     if (!target_user_id || !new_role) {
-      return new Response(
-        JSON.stringify({ error: 'Missing required fields' }),
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Pragma': 'no-cache'
-          },
-          status: 400
-        }
-      );
+      return jsonResponse(400, { error: 'Missing required fields' });
     }
 
     // Verify if role is valid
     if (new_role !== 'user' && new_role !== 'admin') {
-      return new Response(
-        JSON.stringify({ error: 'Invalid role specified' }),
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Pragma': 'no-cache'
-          },
-          status: 400
-        }
-      );
+      return jsonResponse(400, { error: 'Invalid role specified' });
     }
 
     // Return mock success response
@@ -111,30 +74,17 @@ serve(async (req) => {
 
   // Create a Supabase client with the Auth context of the logged in user
   const authorization = req.headers.get('Authorization')!;
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-    { global: { headers: { Authorization: authorization } } }
-  );
+  const supabaseClient = createSupabaseClient();
+  if (!supabaseClient) {
+    return jsonResponse(500, { error: "Supabase configuration is missing" });
+  }
 
   // Get the JWT token from the request
   const token = authorization.replace('Bearer ', '');
 
   // Verify the request method
   if (req.method !== 'POST') {
-    return new Response(
-      JSON.stringify({ error: 'Method not allowed' }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
-          'Pragma': 'no-cache'
-        },
-        status: 405
-      }
-    );
+    return jsonResponse(405, { error: 'Method not allowed' });
   }
 
   try {
@@ -142,36 +92,12 @@ serve(async (req) => {
 
     // Validate inputs
     if (!target_user_id || !new_role) {
-      return new Response(
-        JSON.stringify({ error: 'Missing required fields' }),
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Pragma': 'no-cache'
-          },
-          status: 400
-        }
-      );
+      return jsonResponse(400, { error: 'Missing required fields' });
     }
 
     // Verify if role is valid
     if (new_role !== 'user' && new_role !== 'admin') {
-      return new Response(
-        JSON.stringify({ error: 'Invalid role specified' }),
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Pragma': 'no-cache'
-          },
-          status: 400
-        }
-      );
+      return jsonResponse(400, { error: 'Invalid role specified' });
     }
 
     // Get the current user
@@ -277,18 +203,6 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: 'Internal server error', details: error.message }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
-          'Pragma': 'no-cache'
-        },
-        status: 500
-      }
-    );
+    return handleCommonError(error, "User role update");
   }
 });

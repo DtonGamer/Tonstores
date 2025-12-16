@@ -191,7 +191,7 @@ export interface Database {
           paystack_secret_key?: string
           paystack_subaccount_id?: string
           paystack_subaccount_code?: string
-          monnify_subaccount_code?: string
+          paystack_subaccount_code?: string
           email_support?: string
           whatsapp_support?: string
           twitter_handle?: string
@@ -208,7 +208,7 @@ export interface Database {
           paystack_secret_key?: string
           paystack_subaccount_id?: string
           paystack_subaccount_code?: string
-          monnify_subaccount_code?: string
+          paystack_subaccount_code?: string
           email_support?: string
           whatsapp_support?: string
           twitter_handle?: string
@@ -225,7 +225,7 @@ export interface Database {
           paystack_secret_key?: string
           paystack_subaccount_id?: string
           paystack_subaccount_code?: string
-          monnify_subaccount_code?: string
+          paystack_subaccount_code?: string
           email_support?: string
           whatsapp_support?: string
           twitter_handle?: string
@@ -295,7 +295,7 @@ export interface Database {
           current_period_start: string | null
           current_period_end: string | null
           cancel_at_period_end: boolean
-          payment_provider: 'paystack' | 'monnify' | null
+          payment_provider: 'paystack' | null
           payment_provider_subscription_id: string | null
           created_at: string
           updated_at: string
@@ -308,7 +308,7 @@ export interface Database {
           current_period_start?: string | null
           current_period_end?: string | null
           cancel_at_period_end?: boolean
-          payment_provider?: 'monnify' | null
+          payment_provider?: 'paystack' | null
           payment_provider_subscription_id?: string | null
           created_at?: string
           updated_at?: string
@@ -321,7 +321,7 @@ export interface Database {
           current_period_start?: string | null
           current_period_end?: string | null
           cancel_at_period_end?: boolean
-          payment_provider?: 'monnify' | null
+          payment_provider?: 'paystack' | null
           payment_provider_subscription_id?: string | null
           created_at?: string
           updated_at?: string

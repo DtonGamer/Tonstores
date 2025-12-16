@@ -7,32 +7,20 @@ import { supabase } from '@/integrations/supabase/client';
 export const PaymentConfigService = {
 
   /**
-   * Get the Monnify API key to use
+   * Get the Paystack public key to use
    * @param userId Optional user ID if using seller-specific key
-   * @returns The appropriate Monnify API key
+   * @returns The appropriate Paystack public key
    */
-  async getMonnifyApiKey(userId?: string): Promise<string> {
+  async getPaystackPublicKey(userId?: string): Promise<string> {
     // Use environment variable only
-    const envKey = paymentConfig.monnify.apiKey();
+    const envKey = paymentConfig.paystack.publicKey();
     if (!envKey) {
-      throw new Error('Monnify API key not configured in environment variables');
+      throw new Error('Paystack public key not configured in environment variables');
     }
 
     return envKey;
   },
 
-  /**
-   * Get the Monnify secret key for server-side operations
-   * @returns The Monnify secret key
-   */
-  async getMonnifySecretKey(): Promise<string> {
-    const envKey = paymentConfig.monnify.secretKey();
-    if (!envKey) {
-      throw new Error('Monnify secret key not configured in environment variables');
-    }
-
-    return envKey;
-  },
 
   /**
    * Get API base URL for payment endpoints
@@ -43,56 +31,57 @@ export const PaymentConfigService = {
   },
 
   /**
-   * Get seller's Monnify subaccount code
+   * Get seller's Paystack subaccount code
    * @param sellerId The seller ID to fetch subaccount for
    * @returns The subaccount code or null if not found
    */
-  async getSellerMonnifySubaccountCode(sellerId: string): Promise<string | null> {
+  async getSellerPaystackSubaccountCode(sellerId: string): Promise<string | null> {
     if (!sellerId) return null;
 
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('monnify_subaccount_code')
+        .select('paystack_subaccount_code')
         .eq('id', sellerId)
         .single();
 
-      if (error || !data?.monnify_subaccount_code) {
+      if (error || !data?.paystack_subaccount_code) {
         return null;
       }
 
-      return data.monnify_subaccount_code;
+      return data.paystack_subaccount_code;
     } catch (error) {
-      console.error('Error fetching seller Monnify subaccount code:', error);
+      console.error('Error fetching seller Paystack subaccount code:', error);
       return null;
     }
   },
 
+
   /**
-   * Ensure Monnify script is loaded in the browser
+   * Ensure Paystack script is loaded in the browser
    * @returns Promise that resolves to true when script is loaded
    */
-  ensureMonnifyScriptLoaded(): Promise<boolean> {
+  ensurePaystackScriptLoaded(): Promise<boolean> {
     return new Promise((resolve) => {
       // Check if script is already loaded
-      if (typeof window !== 'undefined' && (window as any).Monnify) {
+      if (typeof window !== 'undefined' && (window as any).PaystackPop) {
         resolve(true);
         return;
       }
 
-      // Create script element for Monnify
+      // Create script element for Paystack
       const script = document.createElement('script');
-      script.src = 'https://sdk.monnify.com/plugin/monnify.js';
+      script.src = 'https://js.paystack.co/v2/inline.js';
       script.async = true;
 
       // Set up event handlers
       script.onload = () => {
-        console.log("Monnify script loaded successfully");
+        console.log("Paystack script loaded successfully");
         resolve(true);
       };
 
       script.onerror = () => {
-        console.error('Failed to load Monnify script');
+        console.error('Failed to load Paystack script');
         resolve(false);
       };
 
@@ -102,11 +91,11 @@ export const PaymentConfigService = {
   }
 };
 
-// For TypeScript to recognize the Monnify object on window
+// For TypeScript to recognize the Paystack object on window
 declare global {
   interface Window {
-    Monnify: {
-      initialize: (config: any) => any;
+    PaystackPop: {
+      setup: (config: any) => any;
     }
   }
 }

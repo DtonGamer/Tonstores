@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { PricingPlan } from "@/hooks/usePricingPlans";
 import { useSubscription } from "@/hooks/useSubscription";
 import useAuth from "@/contexts/AuthContext";
-import { createMonnifyConfig } from "@/services/monnifyPayment";
-import { monnifyApi } from "@/services/monnifyApi";
+import { createPaystackConfig } from "@/services/PaystackPayment";
+import { paystackApi } from "@/services/PaystackApi";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -30,7 +30,7 @@ export function SubscriptionDialog({
   const { createSubscription, updateSubscription } = useSubscription();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [monnifyConfig, setMonnifyConfig] = useState<any>(null);
+  const [paystackConfig, setPaystackConfig] = useState<any>(null);
   const [configLoading, setConfigLoading] = useState(true);
 
   // Define handlePaymentSuccess before it's used in useEffect
@@ -49,7 +49,7 @@ export function SubscriptionDialog({
       // Update subscription with payment details
       await updateSubscription({
         status: "active",
-        payment_provider: "monnify",
+        payment_provider: "paystack",
         payment_provider_subscription_id: transactionId,
         current_period_start: now.toISOString(),
         current_period_end: periodEnd.toISOString(),
@@ -74,22 +74,22 @@ export function SubscriptionDialog({
   };
 
   useEffect(() => {
-    // Load Monnify config when dialog opens and plan/user is available
-    const loadMonnifyConfig = async () => {
+    // Load Paystack config when dialog opens and plan/user is available
+    const loadPaystackConfig = async () => {
       if (!isOpen || !user || !plan) return;
 
       try {
         setConfigLoading(true);
-        const config = await createMonnifyConfig({
+        const config = await createPaystackConfig({
           plan,
           user,
           billingCycle,
           onSuccess: handlePaymentSuccess,
           onClose,
         });
-        setMonnifyConfig(config);
+        setPaystackConfig(config);
       } catch (error: any) {
-        console.error("Error creating Monnify config:", error);
+        console.error("Error creating Paystack config:", error);
         toast.error(error.message || "Payment configuration failed. Please try again.");
         onClose();
       } finally {
@@ -97,8 +97,8 @@ export function SubscriptionDialog({
       }
     };
 
-    loadMonnifyConfig();
-  }, [isOpen, plan, user, billingCycle]);
+    loadPaystackConfig();
+  }, [isOpen, plan, user, billingCycle, handlePaymentSuccess, onClose]);
 
   const handleFreePlanSignup = () => {
     navigate("/auth/signup");
@@ -193,32 +193,57 @@ export function SubscriptionDialog({
     return null;
   }
 
-  const initiateMonnifyPayment = async () => {
-    if (!monnifyConfig) return;
+  const initiatePaystackPayment = async () => {
+    if (!paystackConfig) return;
 
     try {
-      // Prepare Monnify transaction data
-      const monnifyTransactionData = {
-        amount: monnifyConfig.amount / 100, // Convert from kobo to naira
-        currencyCode: monnifyConfig.currency,
-        customerName: monnifyConfig.customerName,
-        customerEmail: monnifyConfig.customerEmail,
-        paymentReference: monnifyConfig.reference,
-        description: monnifyConfig.description,
-        callbackUrl: monnifyConfig.callbackUrl,
-        metadata: monnifyConfig.metadata
+      // Prepare Paystack transaction data
+      const paystackTransactionData = {
+        amount: paystackConfig.amount, // Amount in kobo for Paystack
+        email: paystackConfig.customerEmail,
+        currency: paystackConfig.currency,
+        reference: paystackConfig.reference,
+        callbackUrl: paystackConfig.callbackUrl,
+        metadata: paystackConfig.metadata
       };
 
-      const transactionData = await monnifyApi.initializeDirectTransaction(monnifyTransactionData);
+      const transactionData = await paystackApi.initializeTransaction(paystackTransactionData);
 
-      if (transactionData.status && transactionData.data?.checkoutUrl) {
-        // Open the Monnify checkout page in the same window
-        window.location.href = transactionData.data.checkoutUrl;
+      if (transactionData.status && transactionData.data?.authorization_url) {
+        // Open the Paystack checkout page in the same window
+        window.location.href = transactionData.data.authorization_url;
+      } else if (transactionData.status && transactionData.data?.access_code) {
+        // If using inline checkout with an access code
+        const PaystackPop = (window as any).PaystackPop;
+        if (!PaystackPop) {
+          console.error("Paystack script not loaded");
+          toast.error("Payment system is not ready, please try again");
+          return;
+        }
+
+        // Initialize Paystack inline checkout
+        const handler = PaystackPop.setup({
+          key: paystackConfig.publicKey,
+          email: paystackConfig.customerEmail,
+          amount: paystackConfig.amount,
+          currency: paystackConfig.currency,
+          ref: paystackConfig.reference,
+          metadata: paystackConfig.metadata,
+          channels: ['card', 'bank', 'ussd'],
+          onSuccess: (transaction: any) => {
+            handlePaymentSuccess(transaction.reference);
+          },
+          onClose: () => {
+            console.log("Payment window closed by user");
+          },
+        });
+
+        handler.openIframe();
       } else {
-        throw new Error(transactionData.message || 'Failed to get checkout URL from Monnify');
+        throw new Error(transactionData.message || 'Failed to get checkout URL from Paystack');
       }
     } catch (error: any) {
-      console.error("Failed to initialize Monnify transaction:", error);
+      console.error("Failed to initialize Paystack transaction:", error);
       toast.error("Payment initialization failed: " + (error.message || "Unknown error"));
     }
   };
@@ -261,8 +286,8 @@ export function SubscriptionDialog({
             ) : (
               <>
                 <Button
-                  onClick={initiateMonnifyPayment}
-                  disabled={!monnifyConfig}
+                  onClick={initiatePaystackPayment}
+                  disabled={!paystackConfig}
                   className="w-full bg-Tonstores-green text-white hover:bg-Tonstores-green/90 py-2 sm:py-2.5 h-auto text-base"
                 >
                   Pay Now

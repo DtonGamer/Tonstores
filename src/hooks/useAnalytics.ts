@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import useAuth from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { SocialMediaStats } from "@/components/analytics/SocialMediaInsights";
+import { calculatePercentChange } from "@/utils/math";
 
 export type SalesSummary = {
   totalSales: number;
@@ -128,12 +129,6 @@ export const useAnalytics = () => {
       const previousTotalSales = previousPeriodOrders.reduce((sum, order) => sum + order.total_amount, 0) / 100;
       const previousTotalOrders = previousPeriodOrders.length;
       const previousAvgOrderValue = previousTotalOrders > 0 ? previousTotalSales / previousTotalOrders : 0;
-
-      // Calculate percentage changes
-      const calculatePercentChange = (current: number, previous: number) => {
-        if (previous === 0) return current > 0 ? 100 : 0;
-        return ((current - previous) / previous) * 100;
-      };
 
       const percentChanges = {
         sales: calculatePercentChange(currentTotalSales, previousTotalSales),
@@ -453,12 +448,6 @@ export const useAnalytics = () => {
       const previousAvgItemsPerOrder = previousPeriodOrders.length > 0 
         ? previousOrderItems.reduce((sum, item) => sum + item.quantity, 0) / previousPeriodOrders.length 
         : 0;
-
-      // Calculate percentage changes
-      const calculatePercentChange = (current: number, previous: number) => {
-        if (previous === 0) return current > 0 ? 100 : 0;
-        return ((current - previous) / previous) * 100;
-      };
 
       const percentChanges = {
         totalCustomers: calculatePercentChange(currentTotalCustomers, previousTotalCustomers),

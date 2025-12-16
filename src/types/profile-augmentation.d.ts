@@ -6,15 +6,12 @@ declare module "@/types/profile" {
     kyc_verified?: boolean;
     kyc_verified_at?: string;
     role: Role;
-    monnify_api_key?: string;
-    monnify_secret_key?: string;
-    monnify_subaccount_code?: string;
-    monnify_subaccount_id?: string;
-    monnify_account_number?: string;
-    monnify_bvn?: string;
-    monnify_kyc_status?: string;
-    monnify_kyc_submitted_at?: string;
-    monnify_percentage_charge?: number;
+    paystack_subaccount_code?: string;
+    paystack_account_number?: string;
+    paystack_bvn?: string;
+    paystack_kyc_status?: string;
+    paystack_kyc_submitted_at?: string;
+    paystack_percentage_charge?: number;
   }
 }
 
@@ -24,14 +21,11 @@ declare module '@/hooks/useProfile' {
     kyc_verified?: boolean;
     kyc_verified_at?: string;
     role?: Role;
-    monnify_api_key?: string;
-    monnify_secret_key?: string;
-    monnify_subaccount_code?: string;
-    monnify_subaccount_id?: string;
-    monnify_account_number?: string;
-    monnify_bvn?: string;
-    monnify_kyc_status?: string;
-    monnify_kyc_submitted_at?: string;
-    monnify_percentage_charge?: number;
+    paystack_subaccount_code?: string;
+    paystack_account_number?: string;
+    paystack_bvn?: string;
+    paystack_kyc_status?: string;
+    paystack_kyc_submitted_at?: string;
+    paystack_percentage_charge?: number;
   }
 } 

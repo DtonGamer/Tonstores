@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/useCart";
 import { useCatalog } from "@/hooks/useCatalog";
 import { useOrders, OrderFormData } from "@/hooks/useOrders";
-import { useMonnifyPayment } from "@/hooks/useMonnifyPayment";
+import { usePaystackPayment } from "@/hooks/usePaystackPayment";
 import { toast } from "@/components/ui/use-toast";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,7 +34,7 @@ const Checkout = () => {
     handleCancelDeny,
     paymentRetryAvailable,
     currentOrderId
-  } = useMonnifyPayment();
+  } = usePaystackPayment();
   
   // Get catalog and cart
   const [catalog, setCatalog] = useState<any>(null);

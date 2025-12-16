@@ -1,22 +1,12 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
-
-// Helper function to return standardized JSON responses
-const jsonResponse = (statusCode: number, body: any) => {
-  return new Response(JSON.stringify(body), {
-    status: statusCode,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-      "Pragma": "no-cache",
-      "Expires": "0",
-      "Surrogate-Control": "no-store"
-    },
-  });
-};
+import {
+  jsonResponse,
+  handleCorsOptions,
+  createSupabaseClient,
+  handleCommonError,
+  isDevelopmentMode,
+  mapSnakeToCamel
+} from '../_shared/utils.ts';
 
 interface TrackEventPayload {
   event_type: string;
@@ -38,7 +28,7 @@ const corsHeaders = {
 };
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: corsHeaders });
+    return handleCorsOptions();
   }
 
   try {
@@ -110,16 +100,11 @@ serve(async (req) => {
     // Get custom guest ID from headers (similar to your guest session system)
     const guestIdFromHeader = req.headers.get("X-Guest-ID");
 
-    // Get Supabase credentials from environment
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-
-    if (!supabaseUrl || !supabaseServiceKey) {
+    // Initialize Supabase client with service role key to bypass RLS using shared utility
+    const supabase = createSupabaseClient();
+    if (!supabase) {
       return jsonResponse(500, { error: "Supabase configuration is missing" });
     }
-
-    // Initialize Supabase client with service role key to bypass RLS
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Prepare the event record with guest_id column
     const eventRecord = {
@@ -157,9 +142,6 @@ serve(async (req) => {
       message: "Event recorded successfully"
     });
   } catch (error: any) {
-    console.error("Error in event tracking function:", error);
-    return jsonResponse(500, {
-      error: error.message || "Internal server error"
-    });
+    return handleCommonError(error, "Event tracking");
   }
 });

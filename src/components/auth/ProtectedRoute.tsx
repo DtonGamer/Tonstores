@@ -7,14 +7,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { Button } from "@/components/ui/button";
 import { LockIcon } from "lucide-react";
 
-// Turn on debugging
-const DEBUG = false;
-
-const debugLog = (...args: any[]) => {
-  if (DEBUG) {
-    // console.log("[ProtectedRoute]", ...args);
-  }
-};
+import { debugLog } from "@/utils/debug";
 
 type ProtectedRouteProps = {
   children: ReactNode;

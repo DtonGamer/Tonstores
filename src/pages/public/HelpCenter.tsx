@@ -78,7 +78,7 @@ const faqs = [
     questions: [
       {
         question: "How do I get paid?",
-        answer: "Customers complete orders through your catalog, then pay via bank transfer to your account (you provide account details). We integrated Monnify for smooth payment processing, but YOU receive the money directly—not us, not a platform."
+        answer: "Customers complete orders through your catalog, then pay via bank transfer to your account (you provide account details). We integrated Paystack for smooth payment processing, but YOU receive the money directly—not us, not a platform."
       },
       {
         question: "Do I need a merchant account from a bank?",

@@ -1,0 +1,75 @@
+Duplicate Code Analysis in Supabase Functions
+I've analyzed all TypeScript files in the supabase/functions directory and identified several instances of duplicate code. Here are the key findings with locations, snippets, and refactoring suggestions:
+1. jsonResponse Helper Function
+Duplicated in 14 files: paystack-customer-verification, paystack-verify-account, paystack-subaccount, paystack-seller-balance, paystack-payout-history, paystack-ledger-history, paystack-process-payout, paystack-initialize-escrow-transaction, paystack-transaction-receipt, paystack-release-escrow-funds, paystack-webhook, paystack-verify-transaction, paystack-initialize-transaction, track-event
+Snippet:
+const jsonResponse = (statusCode: number, body: any) => {
+  return new Response(JSON.stringify(body), {
+    status: statusCode,
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0",
+      "Surrogate-Control": "no-store"
+    },
+  });
+};
+Refactoring: Create supabase/functions/_shared/utils.ts with this function and import it everywhere.
+2. CORS OPTIONS Handling
+Duplicated in most Paystack files (except paystack-banks, send-whatsapp-notification, update-user-role, update-stock)
+Snippet:
+if (req.method === "OPTIONS") {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma",
+      "Access-Control-Allow-Methods": "POST, OPTIONS"
+    }
+  });
+}
+Refactoring: Add handleCorsOptions function to shared utils.
+3. Supabase Client Initialization
+Duplicated in 12+ files (paystack-customer-verification, paystack-subaccount, paystack-payout-history, etc.)
+Snippet:
+const supabaseUrl = Deno.env.get("SUPABASE_URL");
+const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+if (!supabaseUrl || !supabaseServiceKey) {
+  return jsonResponse(500, { error: "Supabase configuration is missing" });
+}
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+Refactoring: Create createSupabaseClient() function in shared utils.
+4. Timeout Error Handling
+Duplicated in 12 files (most Paystack functions)
+Snippet:
+} catch (error: any) {
+  console.error("Error ...:", error);
+  if (error.name === "AbortError") {
+    return jsonResponse(504, { error: "API request timed out" });
+  }
+  return jsonResponse(500, {
+    error: error.message || "Internal server error"
+  });
+}
+Refactoring: Create shared error handling wrapper utility.
+5. Development Mode Logic
+Duplicated across all files with similar isDevelopmentMode checks and mock responses.
+Refactoring: Create development mode utility with callback for mock responses.
+6. Paystack API Call Pattern
+Duplicated in API-calling files with timeout controllers and fetch patterns.
+Refactoring: Create callPaystackApi wrapper function.
+7. Field Name Mapping
+Duplicated in 3 files (paystack-customer-verification, paystack-subaccount, paystack-initialize-escrow-transaction)
+Snippet:
+if (data.field_name && !data.fieldName) {
+  data.fieldName = data.field_name;
+}
+Refactoring: Create field mapping utility function.
+Recommended Plan
+1. Create supabase/functions/_shared/utils.ts with all shared functions
+2. Update each function file to import and use shared utilities
+3. This would eliminate ~500+ lines of duplicated code

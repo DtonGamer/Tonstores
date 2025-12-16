@@ -4,7 +4,7 @@ import { CheckCircle2, Loader2, AlertCircle, Wallet, CreditCard, Building, Dolla
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { ProfileBase } from "@/types/profile";
-import { getMonnifySellerBalance, getMonnifySellerLedgerHistory } from "@/services/monnifyPaymentService";
+import { getPaystackSellerBalance, getPaystackSellerLedgerHistory } from "@/services/PaystackPaymentService";
 import { formatCurrency } from "@/utils/format";
 
 interface BankAccount {
@@ -85,13 +85,13 @@ export default function ConnectedAccountInfo({ profile }: ConnectedAccountInfoPr
         await new Promise(resolve => setTimeout(resolve, 500));
         
         // Fetch both the traditional balance and the ledger balance
-        const sellerBalance = await getMonnifySellerBalance(profile.id);
+        const sellerBalance = await getPaystackSellerBalance(profile.id);
         setBalance(sellerBalance);
         console.log("Traditional balance loaded:", sellerBalance);
 
         // Get the ledger balance if available
         try {
-          const ledgerData = await getMonnifySellerLedgerHistory(profile.id, 1, 0);
+          const ledgerData = await getPaystackSellerLedgerHistory(profile.id, 1, 0);
           console.log("Ledger balance loaded:", ledgerData.summary.balance);
           setLedgerBalance(ledgerData.summary.balance);
         } catch (ledgerError) {
@@ -219,7 +219,7 @@ export default function ConnectedAccountInfo({ profile }: ConnectedAccountInfoPr
       
       <CardFooter>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          Your payment account is managed by Monnify. Payouts are automatically processed to your bank account.
+          Your payment account is managed by Paystack. Payouts are automatically processed to your bank account.
         </p>
       </CardFooter>
     </Card>

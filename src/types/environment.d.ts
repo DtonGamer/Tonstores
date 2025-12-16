@@ -4,8 +4,6 @@ interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL: string;
   readonly VITE_SUPABASE_ANON_KEY: string;
   readonly VITE_RESEND_API_KEY: string;
-  readonly VITE_MONNIFY_API_KEY: string;
-  readonly VITE_MONNIFY_CONTRACT_CODE: string;
   readonly VITE_ENABLE_EVENT_TRACKING: string;
 }
 

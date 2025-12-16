@@ -1,0 +1,125 @@
+# Prioritized Code Duplication List for Tonstores Catalog Hub
+
+## Priority Levels:
+- 🔴 CRITICAL: High impact, high frequency, easy to fix
+- 🟠 HIGH: Medium to high impact, medium to high frequency
+- 🟡 MEDIUM: Lower impact but still worth addressing
+- 🟢 LOW: Minor duplications, address if time permits
+
+---
+
+## 🔴 CRITICAL Priority
+
+### 1. debugLog Function Duplication
+- **Instances:** 6 files
+- **Files:** 
+  - src/hooks/useProfile.ts:10
+  - src/utils/reconnectHandler.ts:9
+  - src/components/layout/SidebarNav.tsx:30
+  - src/components/layout/DashboardLayout.tsx:12
+  - src/contexts/AuthContext.tsx:26
+  - src/components/auth/ProtectedRoute.tsx:13
+- **Lines per instance:** ~3 lines
+- **Total duplicated lines:** ~18 lines
+- **Impact:** Centralizing this ensures consistent debug logging across the app
+- **Fix effort:** Low (create utility file, replace imports)
+- **Risk:** Very low
+
+### 2. .catch(console.error) Pattern
+- **Instances:** 26+ files (estimated 50-100+ actual instances)
+- **Lines per instance:** 1 line
+- **Total duplicated lines:** 50-100+ lines
+- **Impact:** High frequency across the application
+- **Fix effort:** Low to medium (create utility function)
+- **Risk:** Low, but important for error tracking consistency
+
+---
+
+## 🟠 HIGH Priority
+
+### 3. calculatePercentChange Function
+- **Instances:** 2 (in same file - src/hooks/useAnalytics.ts:133, 458)
+- **Lines per instance:** ~4 lines
+- **Total duplicated lines:** 8 lines
+- **Impact:** Mathematical logic duplication - one source of truth needed
+- **Fix effort:** Low (move to shared utility)
+- **Risk:** Low
+
+### 4. try/catch Error Handling Patterns
+- **Instances:** 300+ functions across multiple files
+- **Lines per instance:** 4-6 lines per block
+- **Total duplicated lines:** 1000+ lines (estimated)
+- **Impact:** Very high - standardization would improve consistency
+- **Fix effort:** Medium (create utility functions)
+- **Risk:** Medium (would affect most API calls)
+
+### 5. Event Tracking Patterns
+- **Instances:** 25+ locations
+- **Lines per instance:** 1-2 lines
+- **Total duplicated lines:** 25+ lines
+- **Impact:** High - important for consistent analytics
+- **Fix effort:** Medium (create standardized tracking utilities)
+- **Risk:** Low
+
+---
+
+## 🟡 MEDIUM Priority
+
+### 6. Form Handler Functions (handleSubmit, handleChange, etc.)
+- **Instances:** 15+ components
+- **Lines per instance:** 5-20 lines per function
+- **Total duplicated lines:** 100-200+ lines
+- **Impact:** Medium - code reuse opportunity
+- **Fix effort:** Medium to high (create generic form hook)
+- **Risk:** Medium (would affect multiple forms)
+
+### 7. Loading/Error State Management
+- **Instances:** Many components likely have similar patterns
+- **Lines per instance:** 10-30 lines per component
+- **Total duplicated lines:** 200-500+ lines
+- **Impact:** Medium - consistency improvement
+- **Fix effort:** Medium to high (create reusable components/hooks)
+- **Risk:** Medium
+
+---
+
+## 🟢 LOW Priority
+
+### 8. Component Structure Similarities
+- **Instances:** Multiple similar components
+- **Lines per instance:** Varies widely
+- **Total duplicated lines:** Hard to quantify
+- **Impact:** Low to medium - may not be worth changing if components are different
+- **Fix effort:** High (significant refactoring)
+- **Risk:** High (could break existing functionality)
+
+---
+
+## Recommended Implementation Order:
+
+### Phase 1 (Immediate - CRITICAL):
+1. Extract debugLog to shared utility
+2. Create safe tracking utilities for .catch(console.error) pattern
+3. Extract calculatePercentChange to shared utility
+
+### Phase 2 (Short-term - HIGH):
+1. Create standardized error handling utilities
+2. Create standardized event tracking utilities
+3. Address try/catch patterns with new utilities
+
+### Phase 3 (Medium-term - MEDIUM):
+1. Create generic form handling hook
+2. Create reusable loading/error state components
+
+### Phase 4 (Long-term - LOW):
+1. Address component structure similarities (if needed)
+2. Further abstraction of shared logic
+
+---
+
+## Expected Impact:
+- **Lines of code reduction:** ~1000-1500+ lines
+- **Improved maintainability:** Centralized common functionality
+- **Better consistency:** Standardized patterns across the application
+- **Reduced risk:** Single point of change for common functions
+- **Performance:** Potential optimization opportunities in shared utilities

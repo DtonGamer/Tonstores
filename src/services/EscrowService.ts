@@ -57,10 +57,10 @@ export const EscrowService = {
         return { success: false, error: "Seller information not available" };
       }
 
-      // Get seller's profile to retrieve their Monnify subaccount code
+      // Get seller's profile to retrieve their Paystack subaccount code
       const { data: sellerProfile, error: profileError } = await supabase
         .from('profiles')
-        .select('monnify_subaccount_code')
+        .select('paystack_subaccount_code')
         .eq('id', order.catalogs.user_id)
         .single();
 
@@ -69,8 +69,8 @@ export const EscrowService = {
         return { success: false, error: "Seller account information not available" };
       }
 
-      if (!sellerProfile.monnify_subaccount_code) {
-        console.error("Seller does not have a Monnify subaccount:", order.catalogs.user_id);
+      if (!sellerProfile.paystack_subaccount_code) {
+        console.error("Seller does not have a Paystack subaccount:", order.catalogs.user_id);
         return { success: false, error: "Seller has not set up payment account" };
       }
 
@@ -99,15 +99,15 @@ export const EscrowService = {
         return { success: false, error: error.message };
       }
 
-      // In a complete implementation, you would call Monnify's disbursement API here
+      // In a complete implementation, you would call Paystack's disbursement API here
       // to transfer the funds to the seller's account
-      // Note: For true escrow functionality with Monnify, you would need to:
+      // Note: For true escrow functionality with Paystack, you would need to:
       // 1. Initially route payments to a platform account using incomeSplitConfig
       // 2. Hold the funds in the platform account until delivery confirmation
       // 3. On delivery confirmation, process a disbursement to the seller's account
       // For now, we're tracking this in the database status and in a real implementation,
-      // you would execute the disbursement via Monnify's API
-      await this.releaseFundsToSeller(orderId, sellerProfile.monnify_subaccount_code);
+      // you would execute the disbursement via Paystack's API
+      await this.releaseFundsToSeller(orderId, sellerProfile.paystack_subaccount_code);
 
       console.log(`Successfully confirmed delivery and released funds for order ${orderId}`, updatedOrder);
 
@@ -217,7 +217,8 @@ export const EscrowService = {
   },
 
   /**
-   * Actually release funds to seller using Monnify disbursement API
+   * Actually release funds to seller using Paystack transfer API
+   * Note: Paystack doesn't have native escrow, so this assumes funds were held separately
    */
   async releaseFundsToSeller(orderId: string, subAccountCode: string) {
     try {
@@ -233,32 +234,32 @@ export const EscrowService = {
         throw new Error("Could not fetch order details for fund release");
       }
 
-      // Call the Supabase function to release funds from escrow to the seller
+      // Note: Paystack doesn't have native escrow functionality
+      // In a Paystack implementation, you would typically:
+      // 1. Hold the funds manually in your platform account (if using subaccounts)
+      // 2. Release funds via transfers when delivery is confirmed
+      // For now, we'll call the Paystack release escrow funds function
       const releaseData = {
         orderId: orderId,
-        releaseToSubaccountCode: subAccountCode,
+        recipientSubaccountCode: subAccountCode,
         amount: order.total_amount, // Optional - if not provided, will use order total
-        dev_mode: process.env.NODE_ENV === 'development' // Pass development mode flag
+        reason: `Payment for order ${orderId}`,
+        dev_mode: import.meta.env.MODE === 'development' || import.meta.env.DEV_MODE === 'true' // Pass development mode flag
       };
 
-      const response = await fetch('/api/monnify-release-escrow-funds', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(releaseData)
+      // Call the Supabase function to process the payout
+      const { data, error } = await supabase.functions.invoke('paystack-release-escrow-funds', {
+        body: releaseData
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error releasing funds to seller:", errorData);
-        throw new Error(errorData.error || "Failed to release funds to seller");
+      if (error) {
+        console.error("Error releasing funds to seller:", error);
+        throw new Error(error.message || "Failed to release funds to seller");
       }
 
-      const result = await response.json();
-      console.log("Fund release result:", result);
+      console.log("Fund release result:", data);
 
-      return { success: true, result };
+      return { success: true, result: data };
     } catch (error) {
       console.error("Error in releaseFundsToSeller:", error);
       return { success: false, error };

@@ -9,10 +9,9 @@ export interface ProfileBase {
   contact_email?: string;
   phone_number?: string;
   role?: 'user' | 'admin';
-  monnify_api_key?: string;
-  monnify_secret_key?: string;
-  monnify_subaccount_code?: string;
-  monnify_subaccount_id?: string;
+  paystack_subaccount_code?: string;
+  paystack_api_key?: string;
+  paystack_secret_key?: string;
   email_support?: string;
   whatsapp_support?: string;
   twitter_handle?: string;

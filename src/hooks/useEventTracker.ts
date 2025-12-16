@@ -108,7 +108,7 @@ export const usePageViewTracker = () => {
   useEffect(() => {
     const pagePath = location.pathname + location.search;
     const pageTitle = typeof document !== 'undefined' ? document.title : '';
-    
+
     trackPageView(pagePath, pageTitle).catch(error => {
       console.error('Failed to track page view:', error);
     });

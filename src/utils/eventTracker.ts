@@ -356,6 +356,23 @@ export const trackEvent = async (
 };
 
 /**
+ * Track an event safely, with error handling to prevent tracking issues from affecting core functionality
+ * @param eventType The type of event being tracked
+ * @param eventData Additional data about the event
+ * @param source Where the event originated (default: 'frontend')
+ */
+export const safeTrackEvent = (
+  eventType: EventType,
+  eventData: EventData = {},
+  source: 'frontend' | 'backend' | 'system' = 'frontend'
+): void => {
+  // Execute tracking in the background without awaiting
+  trackEvent(eventType, eventData, source).catch(error => {
+    console.error('Error in safeTrackEvent:', error);
+  });
+};
+
+/**
  * Track a page view event
  * @param pageUrl The URL of the page being viewed
  * @param pageTitle Optional page title

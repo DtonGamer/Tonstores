@@ -21,7 +21,7 @@ export const LedgerService = {
    */
   async createLedgerEntry(params: CreateLedgerEntryParams) {
     try {
-      const response = await callSupabaseFunction('monnify-create-ledger-entry', { params });
+      const response = await callSupabaseFunction('paystack-create-ledger-entry', { params });
 
       if (!response.success) {
         console.error('Error creating ledger entry:', response.error);

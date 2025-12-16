@@ -10,6 +10,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Turnstile } from '@marsidev/react-turnstile';
 import { TURNSTILE_SITE_KEY } from "@/utils/env";
 import { AffiliateService } from "@/services/AffiliateService";
+import { handleChange } from "@/utils/formUtils";
 
 type AuthFormProps = {
   type: "login" | "register";
