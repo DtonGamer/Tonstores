@@ -46,6 +46,8 @@ interface PaystackConfig {
     order_id: string;
     customer_name: string;
     guest_id?: string;
+    subaccount?: string;
+    percentage_charge?: number;
     custom_fields: Array<{
       display_name: string;
       variable_name: string;

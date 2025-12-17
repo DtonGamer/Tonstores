@@ -191,7 +191,6 @@ export interface Database {
           paystack_secret_key?: string
           paystack_subaccount_id?: string
           paystack_subaccount_code?: string
-          paystack_subaccount_code?: string
           email_support?: string
           whatsapp_support?: string
           twitter_handle?: string
@@ -208,7 +207,6 @@ export interface Database {
           paystack_secret_key?: string
           paystack_subaccount_id?: string
           paystack_subaccount_code?: string
-          paystack_subaccount_code?: string
           email_support?: string
           whatsapp_support?: string
           twitter_handle?: string
@@ -224,7 +222,6 @@ export interface Database {
           paystack_public_key?: string
           paystack_secret_key?: string
           paystack_subaccount_id?: string
-          paystack_subaccount_code?: string
           paystack_subaccount_code?: string
           email_support?: string
           whatsapp_support?: string
