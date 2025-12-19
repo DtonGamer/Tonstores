@@ -97,13 +97,14 @@ serve(async (req) => {
     // Success: return balance details
     const balanceData = Array.isArray(result.data) ? result.data[0] : result.data;
     const balanceInKobo = balanceData.balance; // Paystack returns balance in kobo
+    const camelCaseBalanceData = mapSnakeToCamel(balanceData);
 
     return jsonResponse(200, {
       status: true,
       message: "Balance retrieved successfully",
       data: {
         balance: balanceInKobo,
-        currency: balanceData.currency || "NGN",
+        currency: camelCaseBalanceData.currency || "NGN",
         userId: userId
       }
     });

@@ -57,17 +57,19 @@ serve(async (req) => {
     const testAccountNumber = accountNumber || "0000000000";
     const testBankCode = bankCode || "057";
 
-    // Create mock account verification response
+    // Create mock account verification response with camelCase
+    const devData = mapSnakeToCamel({
+      account_number: testAccountNumber,
+      bank_code: testBankCode,
+      account_name: "Test Account Name",
+      bank_name: "Test Bank Name"
+    });
+
     return jsonResponse(200, {
       status: true,
       message: "Account verified (Development Mode)",
       dev_mode: true,
-      data: {
-        account_number: testAccountNumber,
-        bank_code: testBankCode,
-        account_name: "Test Account Name",
-        bank_name: "Test Bank Name"
-      },
+      data: devData,
       request_data: {
         account_number: testAccountNumber,
         bank_code: testBankCode
@@ -128,11 +130,14 @@ serve(async (req) => {
       });
     }
 
+    // Convert Paystack response data from snake_case to camelCase
+    const camelCaseData = mapSnakeToCamel(result.data);
+
     // Success: return account verification details
     return jsonResponse(200, {
       status: true,
       message: "Account verified",
-      data: result.data
+      data: camelCaseData
     });
   } catch (error: any) {
     console.error("Error verifying account:", error);

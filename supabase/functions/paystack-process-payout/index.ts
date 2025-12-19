@@ -202,9 +202,7 @@ serve(async (req) => {
     return jsonResponse(200, {
       status: true,
       message: "Transfer initiated",
-      data: {
-        ...result.data
-      }
+      data: mapSnakeToCamel(result.data)
     });
   } catch (error) {
     return handleCommonError(error, "Paystack payout processing");

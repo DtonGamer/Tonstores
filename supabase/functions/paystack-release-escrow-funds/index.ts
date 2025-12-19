@@ -147,9 +147,7 @@ serve(async (req) => {
     return jsonResponse(200, {
       status: true,
       message: "Transfer initiated",
-      data: {
-        ...result.data
-      }
+      data: mapSnakeToCamel(result.data)
     });
   } catch (error: any) {
     return handleCommonError(error, "Paystack escrow funds release");

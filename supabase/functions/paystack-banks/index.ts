@@ -296,11 +296,16 @@ serve(async (req) => {
       });
     }
 
+    // Convert Paystack response data from snake_case to camelCase
+    const camelCaseData = Array.isArray(result.data)
+      ? result.data.map(item => mapSnakeToCamel(item))
+      : mapSnakeToCamel(result.data);
+
     // Success: return banks list
     return jsonResponse(200, {
       status: true,
       message: "Banks retrieved",
-      data: result.data,
+      data: camelCaseData,
       meta: result.meta
     });
   } catch (error) {

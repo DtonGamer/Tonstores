@@ -226,6 +226,9 @@ serve(async (req) => {
     const subaccountCode = result.data?.subaccount_code;
     const subaccountId = result.data?.id;
 
+    // Convert Paystack response data from snake_case to camelCase
+    const camelCaseData = mapSnakeToCamel(result.data);
+
     // Store account info in database if supabase is available
     if (supabase) {
       try {
@@ -257,7 +260,7 @@ serve(async (req) => {
       status: true,
       message: "Subaccount created",
       subaccount_code: subaccountCode,
-      data: result.data
+      data: camelCaseData
     });
   } catch (error) {
     return handleCommonError(error, "Paystack subaccount creation");

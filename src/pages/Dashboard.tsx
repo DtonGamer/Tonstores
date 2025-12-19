@@ -331,44 +331,44 @@ const Dashboard = () => {
       )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-  <Card className="flex flex-row items-center p-6 bg-gradient-to-br from-Tonstores-lightgreen to-Tonstores-green shadow-sm dark:from-Tonstores-green/80 dark:to-Tonstores-darkgreen">
-    <div className="text-black dark:text-white flex-1">
-      <h2 className="text-lg font-semibold mb-1">New Catalog</h2>
-      <p className="text-black dark:text-white/80 text-sm opacity-90">Create a product catalog</p>
+  <Card className="flex flex-col sm:flex-row items-center p-4 sm:p-6 bg-gradient-to-br from-Tonstores-lightgreen to-Tonstores-green shadow-sm dark:from-Tonstores-green/80 dark:to-Tonstores-darkgreen">
+    <div className="text-black dark:text-white flex-1 text-center sm:text-left mb-3 sm:mb-0">
+      <h2 className="text-base sm:text-lg font-semibold mb-1">New Catalog</h2>
+      <p className="text-black dark:text-white/80 text-xs sm:text-sm opacity-90">Create a product catalog</p>
     </div>
-    <div className="flex gap-2">
-      <Link to="/onboarding">
+    <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 w-full sm:w-auto">
+      <Link to="/onboarding" className="w-full sm:w-auto">
         <Button
-          className="bg-white text-Tonstores-darkgreen hover:bg-gray-100 dark:bg-gray-800 dark:text-Tonstores-green dark:hover:bg-gray-700 flex items-center h-10 px-4"
+          className="bg-white text-Tonstores-darkgreen hover:bg-gray-100 dark:bg-gray-800 dark:text-Tonstores-green dark:hover:bg-gray-700 flex items-center justify-center h-10 px-3 w-full"
           disabled={subscriptionLimits && !subscriptionLimits.canCreateCatalog}
         >
           <Plus size={14} className="mr-1" />
-          <span className="text-sm">Quick Start</span>
+          <span className="text-xs sm:text-sm whitespace-nowrap">Quick Start</span>
         </Button>
       </Link>
-      <Link to="/catalog/new">
+      <Link to="/catalog/new" className="w-full sm:w-auto">
         <Button
           variant="outline"
-          className="text-Tonstores-darkgreen hover:bg-Tonstores-lightgreen dark:text-Tonstores-green dark:hover:bg-gray-700 border dark:border-gray-600 h-10 px-4"
+          className="text-Tonstores-darkgreen hover:bg-Tonstores-lightgreen dark:text-Tonstores-green dark:hover:bg-gray-700 border dark:border-gray-600 h-10 px-3 w-full"
           disabled={subscriptionLimits && !subscriptionLimits.canCreateCatalog}
         >
-          <span className="text-sm">Advanced</span>
+          <span className="text-xs sm:text-sm whitespace-nowrap">Advanced</span>
         </Button>
       </Link>
     </div>
   </Card>
 
-  <Card className="flex flex-row items-center p-6 bg-gradient-to-br from-Tonstores-lightblue to-Tonstores-blue shadow-sm dark:from-Tonstores-blue/80 dark:to-Tonstores-darkblue">
-    <div className="text-black dark:text-white flex-1">
-      <h2 className="text-lg font-semibold mb-1">Orders</h2>
-      <p className="text-black dark:text-white/80 text-sm opacity-90">
+  <Card className="flex flex-col sm:flex-row items-center p-4 sm:p-6 bg-gradient-to-br from-Tonstores-lightblue to-Tonstores-blue shadow-sm dark:from-Tonstores-blue/80 dark:to-Tonstores-darkblue">
+    <div className="text-black dark:text-white flex-1 text-center sm:text-left mb-3 sm:mb-0">
+      <h2 className="text-base sm:text-lg font-semibold mb-1">Orders</h2>
+      <p className="text-black dark:text-white/80 text-xs sm:text-sm opacity-90 text-center sm:text-left">
         You have {orderCount === null ? "..." : orderCount} order{orderCount !== 1 ? "s" : ""}
       </p>
     </div>
-    <Link to="/orders">
-      <Button className="bg-white text-Tonstores-darkblue hover:bg-gray-100 dark:bg-gray-800 dark:text-Tonstores-lightblue dark:hover:bg-gray-700 flex items-center h-10 px-4">
+    <Link to="/orders" className="w-full sm:w-auto">
+      <Button className="bg-white text-Tonstores-darkblue hover:bg-gray-100 dark:bg-gray-800 dark:text-Tonstores-lightblue dark:hover:bg-gray-700 flex items-center justify-center h-10 px-3 w-full">
         <ListCheck size={14} className="mr-1" />
-        <span className="text-sm">View</span>
+        <span className="text-xs sm:text-sm whitespace-nowrap">View</span>
       </Button>
     </Link>
   </Card>
@@ -382,19 +382,19 @@ const Dashboard = () => {
           <Loader2 className="h-8 w-8 animate-spin text-Tonstores-green" />
         </div>
       ) : catalogs.length === 0 ? (
-        <Card className="p-12 text-center dark:bg-gray-800 dark:border-gray-700">
-          <h3 className="text-lg font-medium mb-2 dark:text-white">No catalogs yet</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">Create your first catalog to get started</p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link to="/onboarding">
-              <Button className="bg-Tonstores-green hover:bg-Tonstores-darkblue flex items-center gap-2">
-                <Plus size={18} />
-                Start Quick Setup
+        <Card className="p-6 sm:p-12 text-center dark:bg-gray-800 dark:border-gray-700">
+          <h3 className="text-base sm:text-lg font-medium mb-2 dark:text-white">No catalogs yet</h3>
+          <p className="text-gray-600 dark:text-gray-400 text-sm sm:mb-6 mb-4">Create your first catalog to get started</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+            <Link to="/onboarding" className="w-full sm:w-auto">
+              <Button className="bg-Tonstores-green hover:bg-Tonstores-darkblue flex items-center gap-2 w-full sm:w-auto">
+                <Plus size={16} className="sm:size-5" />
+                <span className="text-xs sm:text-sm">Quick Setup</span>
               </Button>
             </Link>
-            <Link to="/catalog/new">
-              <Button variant="outline" className="dark:border-gray-600">
-                Create Advanced Catalog
+            <Link to="/catalog/new" className="w-full sm:w-auto">
+              <Button variant="outline" className="dark:border-gray-600 w-full sm:w-auto">
+                <span className="text-xs sm:text-sm">Advanced</span>
               </Button>
             </Link>
           </div>

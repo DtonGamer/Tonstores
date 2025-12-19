@@ -109,13 +109,25 @@ export default function KYCForm() {
           title: "Account Verified",
           description: `Account name: ${result.data.accountName}`,
         });
-      } else if (result && result.accountName) {
-        // Handle response format if present
-        form.setValue("accountName", result.accountName);
-        toast({
-          title: "Account Verified",
-          description: `Account name: ${result.accountName}`,
-        });
+      } else if (result && result.data) {
+        // Handle response format if accountName is in the data field but with different casing
+        // Try to get account name from various possible field names
+        const accountName = result.data.accountName || result.data.account_name || result.data.accountname;
+        if (accountName) {
+          form.setValue("accountName", accountName);
+          toast({
+            title: "Account Verified",
+            description: `Account name: ${accountName}`,
+          });
+        } else {
+          // If API response doesn't have the expected structure
+          console.warn("Unexpected response structure:", result);
+          toast({
+            title: "Could not verify account",
+            description: "Please enter account name manually",
+            variant: "destructive",
+          });
+        }
       } else {
         // If API response doesn't have the expected structure
         console.warn("Unexpected response structure:", result);

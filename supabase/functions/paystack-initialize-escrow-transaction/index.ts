@@ -281,7 +281,7 @@ serve(async (req) => {
       status: true,
       message: "Escrow transaction initialized",
       data: {
-        ...result.data,
+        ...mapSnakeToCamel(result.data),
         escrow_status: "held",
         escrow_account_code: platformSubaccount,
         original_transaction_split: incomeSplitConfig, // Include original split for reference

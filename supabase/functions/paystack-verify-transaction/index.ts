@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
-import { jsonResponse, handleCorsOptions, createSupabaseClient, handleCommonError, isDevelopmentMode } from "../_shared/utils.ts";
+import { jsonResponse, handleCorsOptions, createSupabaseClient, handleCommonError, isDevelopmentMode, mapSnakeToCamel } from "../_shared/utils.ts";
 
 serve(async (req) => {
   // Handle OPTIONS request for CORS
@@ -144,9 +144,7 @@ serve(async (req) => {
     return jsonResponse(200, {
       status: true,
       message: "Verification successful",
-      data: {
-        ...result.data
-      }
+      data: mapSnakeToCamel(result.data)
     });
   } catch (error: any) {
     return handleCommonError(error, "verify-transaction");

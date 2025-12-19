@@ -101,8 +101,8 @@ serve(async (req) => {
       });
     }
 
-    // Extract transaction details
-    const transaction = result.data;
+    // Extract transaction details and convert to camelCase
+    const transaction = mapSnakeToCamel(result.data);
 
     // In a real implementation, you would send receipts via email here
     // For now, we'll return the transaction details as if the receipt was sent
@@ -136,7 +136,7 @@ serve(async (req) => {
             // Update the order status
             await supabase
               .from('orders')
-              .update({ 
+              .update({
                 status: newStatus,
                 payment_status: newPaymentStatus,
                 updated_at: new Date().toISOString()
@@ -158,7 +158,7 @@ serve(async (req) => {
         receipt_url: `https://paystack.com/receipt/${transaction.reference}`,
         customer: {
           email: transaction.customer?.email,
-          name: transaction.customer?.first_name + ' ' + transaction.customer?.last_name
+          name: transaction.customer?.firstName + ' ' + transaction.customer?.lastName
         },
         amount: transaction.amount,
         status: transaction.status,

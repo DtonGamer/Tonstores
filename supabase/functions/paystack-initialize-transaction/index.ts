@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
-import { jsonResponse, handleCorsOptions, createSupabaseClient, handleCommonError, isDevelopmentMode } from "../_shared/utils.ts";
+import { jsonResponse, handleCorsOptions, createSupabaseClient, handleCommonError, isDevelopmentMode, mapSnakeToCamel } from "../_shared/utils.ts";
 
 serve(async (req) => {
   // Handle OPTIONS request for CORS
@@ -137,6 +137,15 @@ serve(async (req) => {
       });
     }
 
+    // Convert Paystack response data from snake_case to camelCase
+    const camelCaseData = {
+      ...mapSnakeToCamel(result.data),
+      amount: amount,
+      currency: currency,
+      email: email,
+      reference: reference
+    };
+
     // Success: return transaction details
     const transactionReference = result.data.reference;
     const authorizationUrl = result.data.authorization_url;
@@ -165,7 +174,7 @@ serve(async (req) => {
           if (orderId) {
             await supabase
               .from('orders')
-              .update({ 
+              .update({
                 payment_gateway: 'paystack',
                 payment_reference: transactionReference
               })
@@ -181,13 +190,7 @@ serve(async (req) => {
     return jsonResponse(200, {
       status: true,
       message: "Transaction initialized",
-      data: {
-        ...result.data,
-        amount: amount,
-        currency: currency,
-        email: email,
-        reference: reference
-      }
+      data: camelCaseData
     });
   } catch (error: any) {
     return handleCommonError(error, "initialize-transaction");

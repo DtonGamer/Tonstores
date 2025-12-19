@@ -204,7 +204,8 @@ export function SubscriptionDialog({
         currency: paystackConfig.currency,
         reference: paystackConfig.reference,
         callbackUrl: paystackConfig.callbackUrl,
-        metadata: paystackConfig.metadata
+        metadata: paystackConfig.metadata,
+        dev_mode: true
       };
 
       const transactionData = await paystackApi.initializeTransaction(paystackTransactionData);
