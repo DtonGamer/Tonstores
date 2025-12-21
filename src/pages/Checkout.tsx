@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/useCart";
 import { useCatalog } from "@/hooks/useCatalog";
 import { useOrders, OrderFormData } from "@/hooks/useOrders";
-import { usePaystackPayment } from "@/hooks/usePaystackPayment";
+import { useSimplifiedPaystackPayment } from "@/hooks/useSimplifiedPaystackPayment";
 import { toast } from "@/components/ui/use-toast";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import { Card, CardContent } from "@/components/ui/card";
