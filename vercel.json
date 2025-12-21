@@ -12,6 +12,11 @@
   ],
   "routes": [
     {
+      "src": "/api/paystack-webhook",
+      "dest": "https://hhxpuadernawdgdrdnok.supabase.co/functions/v1/paystack-webhook",
+      "methods": ["POST", "GET"]
+    },
+    {
       "handle": "filesystem"
     },
     {

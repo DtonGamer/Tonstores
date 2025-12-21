@@ -77,14 +77,48 @@ serve(async (req) => {
       return jsonResponse(405, { success: false, error: "Method not allowed" });
     }
 
+    // Parse request body
+    const requestData = await req.json();
+
+    // Check for development mode
+    const devMode = requestData.dev_mode === true || isDevelopmentMode();
+
+    // Handle development mode
+    if (devMode) {
+      console.log("Development mode - simulating stock update operation");
+
+      // Simulate the stock update operation without actually connecting to Supabase
+      if (requestData.orderId) {
+        console.log(`[StockService] Simulating stock update for order: ${requestData.orderId}`);
+        // In dev mode, we just log that we would update the stock
+        return jsonResponse(200, {
+          success: true,
+          message: "Stock update simulated in development mode",
+          dev_mode: true,
+          simulated_order_id: requestData.orderId
+        });
+      } else if (requestData.productId && requestData.quantity !== undefined && requestData.quantity !== null) {
+        console.log(`[StockService] Simulating stock update for product: ${requestData.productId}, quantity: ${requestData.quantity}`);
+        return jsonResponse(200, {
+          success: true,
+          message: "Stock update simulated in development mode",
+          dev_mode: true,
+          simulated_product_id: requestData.productId,
+          simulated_quantity: requestData.quantity
+        });
+      } else {
+        return jsonResponse(400, {
+          success: false,
+          error: "Missing required parameters: either orderId or both productId and quantity"
+        });
+      }
+    }
+
     // Initialize Supabase client using shared utility
     const supabase = createSupabaseClient();
     if (!supabase) {
       return jsonResponse(500, { error: "Supabase configuration is missing", success: false });
     }
-
-    // Parse request body
-    const requestData = await req.json();
 
     // If we have an orderId, update stock for the entire order
     if (requestData.orderId) {

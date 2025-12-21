@@ -1,5 +1,5 @@
 {
-  "name": "Tonstore",
+  "name": "tonstore",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -16,6 +16,7 @@
     "process-payouts": "node scripts/process-payouts.js",
     "vercel-build": "npm run build",
     "deploy-functions": "supabase functions deploy",
+    "test-dev-mode-with-env": "deno run --allow-env --allow-net --allow-read test_dev_mode_with_env.ts",
     "postinstall": "tailwindcss -i ./src/index.css -o ./src/tailwind.output.css"
   },
   "dependencies": {

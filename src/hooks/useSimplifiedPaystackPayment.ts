@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from 'react-hot-toast';
 import { supabase } from "@/integrations/supabase/client";
 import { Order } from "./useOrders";
@@ -7,8 +7,7 @@ import { getGuestUserId, setGuestSessionParam } from "@/utils/sessionParams";
 import useWithSession from "@/utils/useWithSession";
 import { PaymentStatusService } from "@/services/PaymentStatusService";
 import { PaymentConfigService } from "@/services/PaymentConfigService";
-import { StockService } from "@/services/StockService";
-import { paystackApi } from "@/services/PaystackApi";
+import { unifiedPaystackService } from "@/services/UnifiedPaystackService";
 
 // Define payment provider types
 export type PaymentProvider = "paystack" | "moniepoint" | "opay";
@@ -60,45 +59,13 @@ interface PaystackConfig {
   onClose: () => void;
 }
 
-export const usePaystackPayment = () => {
+export const useSimplifiedPaystackPayment = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const [paymentRetryAvailable, setPaymentRetryAvailable] = useState(false);
   const { user } = useAuth();
   const { withSession } = useWithSession();
-
-  // Debug logging for tracking the order ID
-  useEffect(() => {
-    if (currentOrderId) {
-      // console.log("Current order ID set:", currentOrderId);
-    }
-  }, [currentOrderId]);
-
-  // Helper function to check if an order exists and is accessible
-  const checkOrderExists = async (orderId: string): Promise<boolean> => {
-    if (!orderId) return false;
-
-    try {
-      return withSession(async () => {
-        const { data, error } = await supabase
-          .from('orders')
-          .select('id')
-          .eq('id', orderId)
-          .limit(1);
-
-        if (error) {
-          console.error("Error checking order existence:", error);
-          return false;
-        }
-
-        return data && data.length > 0;
-      })();
-    } catch (error) {
-      console.error("Exception checking order existence:", error);
-      return false;
-    }
-  };
 
   // Helper function to update order status
   const updateOrderStatus = async (orderId: string, status: 'paid' | 'cancelled' | 'failed', paymentStatus: 'paid' | 'failed' | 'cancelled', escrowStatus?: 'held' | 'released' | 'refunded') => {
@@ -108,13 +75,6 @@ export const usePaystackPayment = () => {
     }
 
     try {
-      // First check if the order exists and is accessible
-      const exists = await checkOrderExists(orderId);
-      if (!exists) {
-        console.error(`Order with ID ${orderId} not found or not accessible`);
-        return false;
-      }
-
       // Use the PaymentStatusService for updating order status
       return await PaymentStatusService.updateOrderStatusClient(
         orderId,
@@ -162,16 +122,6 @@ export const usePaystackPayment = () => {
     }
 
     try {
-      // Check if the order exists and is accessible
-      const orderExists = await checkOrderExists(order.id);
-      if (!orderExists) {
-        console.error("Order not accessible:", order.id);
-        toast.error("Order not found or not accessible. Please try again.");
-        setIsLoading(false);
-        onClose();
-        return;
-      }
-
       // Get the Paystack public key
       let publicKey;
       try {
@@ -319,9 +269,9 @@ export const usePaystackPayment = () => {
         metadata: paymentConfig.metadata
       };
 
-      // Call the paystackApi service to initialize the escrow transaction
+      // Call the unified paystack service to initialize the escrow transaction
       // For escrow, we route the payment through a platform account initially
-      const transactionData = await paystackApi.initializeEscrowTransaction({
+      const transactionData = await unifiedPaystackService.initializeEscrowTransaction({
         ...paystackTransactionData,
         incomeSplitConfig: paymentConfig.metadata.subaccount ? [{
           subAccountCode: paymentConfig.metadata.subaccount,

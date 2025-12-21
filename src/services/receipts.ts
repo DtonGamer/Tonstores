@@ -1,5 +1,6 @@
 import { toast } from 'react-hot-toast';
 import { paymentConfig } from '@/lib/config';
+import { unifiedPaystackService } from './UnifiedPaystackService';
 
 /**
  * Service functions for handling transaction receipts
@@ -22,32 +23,19 @@ export const sendTransactionReceipts = async (params: SendReceiptProps): Promise
   const { reference, sellerId } = params;
   
   try {
-    const apiBaseUrl = paymentConfig.apiBaseUrl();
-    const response = await fetch(`${apiBaseUrl}/api/paystack-transaction-receipt`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        reference,
-        seller_id: sellerId,
-      }),
+    const result = await unifiedPaystackService.sendTransactionReceipt({
+      reference,
+      seller_id: sellerId,
     });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Failed to send receipts');
-    }
 
     return {
       success: true,
-      message: data.message || 'Receipts sent successfully',
+      message: result.message || 'Receipts sent successfully',
     };
   } catch (error) {
     console.error('Error sending transaction receipts:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    
+
     return {
       success: false,
       message: errorMessage,

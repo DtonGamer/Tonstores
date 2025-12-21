@@ -51,7 +51,7 @@ serve(async (req) => {
   }
 
   // Check for development mode
-  const isDevelopmentMode = data.dev_mode === true || Deno.env.get("DEV_MODE") === "true";
+  const devMode = data.dev_mode === true || Deno.env.get("DEV_MODE") === "true" || isDevelopmentMode();
 
   // Map snake_case field names to camelCase if they exist
   if (data.user_id && !data.userId) {

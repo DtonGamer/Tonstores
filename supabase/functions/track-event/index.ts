@@ -86,9 +86,9 @@ serve(async (req) => {
     }
 
     // Check for development mode
-    const isDevelopmentMode = data.source === "development" || Deno.env.get("DEV_MODE") === "true";
+    const devMode = data.source === "development" || Deno.env.get("DEV_MODE") === "true" || isDevelopmentMode();
 
-    if (isDevelopmentMode) {
+    if (devMode) {
       console.log("Event tracking in development mode:", data);
       return jsonResponse(200, {
         success: true,

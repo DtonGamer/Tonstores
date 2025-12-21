@@ -47,10 +47,10 @@ serve(async (req) => {
     const { order_id, customer_phone, seller_phone, order_details, dev_mode } = data;
 
     // Check for development mode
-    const isDevelopmentMode = dev_mode || Deno.env.get("DEV_MODE") === "true";
+    const devMode = dev_mode || Deno.env.get("DEV_MODE") === "true" || isDevelopmentMode();
 
     // Handle development mode
-    if (isDevelopmentMode) {
+    if (devMode) {
       console.log("Development Mode: Simulating WhatsApp notifications", {
         orderId: order_id,
         customerPhone: customer_phone,

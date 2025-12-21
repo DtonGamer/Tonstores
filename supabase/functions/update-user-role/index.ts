@@ -33,10 +33,10 @@ serve(async (req) => {
   }
 
   // Check for development mode
-  const isDevelopmentMode = requestData.dev_mode === true || Deno.env.get("DEV_MODE") === "true";
+  const devMode = requestData.dev_mode === true || Deno.env.get("DEV_MODE") === "true" || isDevelopmentMode();
 
   // Handle development mode
-  if (isDevelopmentMode) {
+  if (devMode) {
     const { target_user_id, new_role } = requestData as UpdateRoleRequest;
 
     // Validate inputs

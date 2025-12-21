@@ -44,6 +44,36 @@ serve(async (req) => {
   // Get the raw request body
   const rawBody = await req.text();
 
+  // Check for development mode - in dev mode, we don't require a signature
+  const devMode = isDevelopmentMode();
+
+  // Handle development mode
+  if (devMode) {
+    console.log("Development mode - processing webhook without signature verification");
+
+    try {
+      // Parse the JSON body
+      const payload = JSON.parse(rawBody);
+      console.log("Processing webhook payload in development mode:", payload);
+
+      // Simulate processing the webhook
+      if (payload.event) {
+        console.log(`Processing simulated ${payload.event} event in development mode`);
+
+        // Return success response
+        return jsonResponse(200, {
+          message: "Webhook received and processed (Development Mode)",
+          dev_mode: true,
+          event: payload.event
+        });
+      } else {
+        return jsonResponse(400, { error: "No event provided in development mode" });
+      }
+    } catch (error) {
+      return handleCommonError(error, "Development mode Paystack webhook processing");
+    }
+  }
+
   // Verify webhook signature
   const PAYSTACK_SECRET_KEY = Deno.env.get("PAYSTACK_SECRET_KEY");
   if (!PAYSTACK_SECRET_KEY) {

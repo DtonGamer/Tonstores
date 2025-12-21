@@ -21,10 +21,10 @@ serve(async (req) => {
 
   // Check for development mode
   const url = new URL(req.url);
-  const isDevelopmentMode = url.searchParams.get("dev_mode") === "true" || Deno.env.get("DEV_MODE") === "true";
+  const devMode = url.searchParams.get("dev_mode") === "true" || Deno.env.get("DEV_MODE") === "true" || isDevelopmentMode();
 
   // Handle development mode with test data
-  if (isDevelopmentMode) {
+  if (devMode) {
     // Return mock banks data
     const mockBanks = [
       {

@@ -9,8 +9,8 @@ export const jsonResponse = (statusCode: number, body: any) => {
     headers: {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma, x-client-info, x-requested-with",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
       "Pragma": "no-cache",
       "Expires": "0",
@@ -27,8 +27,8 @@ export const handleCorsOptions = () => {
     status: 204,
     headers: {
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma",
-      "Access-Control-Allow-Methods": "POST, OPTIONS"
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma, x-client-info, x-requested-with",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS"
     }
   });
 };
@@ -64,7 +64,7 @@ export const handleCommonError = (error: any, operationName: string) => {
  * Checks if we're in development mode
  */
 export const isDevelopmentMode = () => {
-  return Deno.env.get("ENV") === "development";
+  return Deno.env.get("DEV_MODE") === "true" || Deno.env.get("ENV") === "development";
 };
 
 /**

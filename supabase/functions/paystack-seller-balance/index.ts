@@ -32,10 +32,10 @@ serve(async (req) => {
   }
 
   // Check for development mode
-  const isDevelopmentMode = url.searchParams.get('dev_mode') === 'true' || Deno.env.get("DEV_MODE") === "true";
+  const devMode = url.searchParams.get('dev_mode') === 'true' || Deno.env.get("DEV_MODE") === "true" || isDevelopmentMode();
 
   // Handle development mode
-  if (isDevelopmentMode) {
+  if (devMode) {
     console.log("Development mode - returning mock Paystack seller balance");
 
     // Generate a random balance between 0 and 100,000 (in kobo)

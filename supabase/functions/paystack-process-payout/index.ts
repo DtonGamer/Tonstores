@@ -29,7 +29,7 @@ serve(async (req) => {
   }
 
   // Check for development mode
-  const isDevelopmentMode = data.dev_mode === true || Deno.env.get("DEV_MODE") === "true";
+  const devMode = data.dev_mode === true || Deno.env.get("DEV_MODE") === "true" || isDevelopmentMode();
 
   // Destructure required fields
   const {
@@ -44,7 +44,7 @@ serve(async (req) => {
   } = data;
 
   // Handle development mode
-  if (isDevelopmentMode) {
+  if (devMode) {
     console.log("Development mode - returning mock Paystack payout operation");
 
     // Generate a mock response similar to Paystack transfer

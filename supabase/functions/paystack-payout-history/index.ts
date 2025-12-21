@@ -34,10 +34,10 @@ serve(async (req) => {
   }
 
   // Check for development mode
-  const isDevelopmentMode = url.searchParams.get('dev_mode') === 'true' || Deno.env.get("DEV_MODE") === "true";
+  const devMode = url.searchParams.get('dev_mode') === 'true' || Deno.env.get("DEV_MODE") === "true" || isDevelopmentMode();
 
   // Handle development mode
-  if (isDevelopmentMode) {
+  if (devMode) {
     console.log("Development mode - returning mock Paystack payout history");
 
     // Generate mock payout records

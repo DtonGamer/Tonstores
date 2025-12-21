@@ -11,14 +11,7 @@ import {
 serve(async (req) => {
   // Handle OPTIONS request for CORS
   if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Guest-ID, apikey, cache-control, pragma",
-        "Access-Control-Allow-Methods": "POST, OPTIONS"
-      }
-    });
+    return handleCorsOptions();
   }
 
   // Only allow POST
@@ -35,7 +28,7 @@ serve(async (req) => {
   }
 
   // Check for development mode
-  const isDevelopmentMode = data.dev_mode === true || Deno.env.get("DEV_MODE") === "true";
+  const devMode = data.dev_mode === true || Deno.env.get("DEV_MODE") === "true" || isDevelopmentMode();
 
   // Map snake_case field names to camelCase if they exist
   if (data.account_number && !data.accountNumber) {
@@ -52,7 +45,7 @@ serve(async (req) => {
   } = data;
 
   // Handle development mode with test data
-  if (isDevelopmentMode) {
+  if (devMode) {
     // Use provided data or defaults for testing
     const testAccountNumber = accountNumber || "0000000000";
     const testBankCode = bankCode || "057";
