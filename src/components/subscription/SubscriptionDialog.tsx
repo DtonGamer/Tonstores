@@ -5,7 +5,7 @@ import { PricingPlan } from "@/hooks/usePricingPlans";
 import { useSubscription } from "@/hooks/useSubscription";
 import useAuth from "@/contexts/AuthContext";
 import { createPaystackConfig } from "@/services/PaystackPayment";
-import { paystackApi } from "@/services/PaystackApi";
+import { UnifiedPaystackService } from "@/services/UnifiedPaystackService";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
