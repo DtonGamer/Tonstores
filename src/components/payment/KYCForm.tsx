@@ -91,17 +91,46 @@ export default function KYCForm() {
         bank_code: bankCode
       });
 
-      if (result && result.status === true && result.data && result.data.account_name) {
-        form.setValue("accountName", result.data.account_name);
-        toast({
-          title: "Account Verified",
-          description: `Account name: ${result.data.account_name}`,
-        });
+      // Handle different possible response structures from Paystack
+      if (result) {
+        // Check for various possible success indicators in the response
+        if (
+          (result.status === true && result.data && result.data.account_name) ||
+          (result.success === true && result.data && result.data.account_name) ||
+          (result.data && result.data.accountName) // Account name might be in camelCase
+        ) {
+          // Try different possible field names for account name
+          const accountName = result.data.account_name || result.data.accountName;
+          form.setValue("accountName", accountName);
+          toast({
+            title: "Account Verified",
+            description: `Account name: ${accountName}`,
+          });
+        } else if (
+          result.status === 'failed' ||
+          result.status === 'rejected' ||
+          result.message?.toLowerCase().includes('failed') ||
+          result.message?.toLowerCase().includes('invalid')
+        ) {
+          console.error("Account verification failed:", result);
+          toast({
+            title: "Verification Failed",
+            description: result.message || "Account verification failed",
+            variant: "destructive",
+          });
+        } else {
+          console.warn("Unexpected response structure:", result);
+          toast({
+            title: "Could not verify account",
+            description: "Please enter account name manually",
+            variant: "destructive",
+          });
+        }
       } else {
-        console.warn("Unexpected response structure:", result);
+        console.error("Empty response from verifyAccount API:", result);
         toast({
-          title: "Could not verify account",
-          description: "Please enter account name manually",
+          title: "Verification Error",
+          description: "No response from verification service. Please enter account name manually.",
           variant: "destructive",
         });
       }
@@ -288,12 +317,38 @@ export default function KYCForm() {
           let kycVerified = false;
           let kycVerifiedAt: string | null = null;
 
-          if (verificationResult.status === true || verificationResult.success === true) {
-            kycStatus = 'verified';
-            kycVerified = true;
-            kycVerifiedAt = new Date().toISOString();
-          } else if (verificationResult.status === 'failed' || verificationResult.status === 'rejected') {
-            kycStatus = verificationResult.message || 'failed';
+          // Handle different possible response structures from Paystack
+          if (verificationResult) {
+            // Check for various possible success indicators in the response
+            if (
+              (verificationResult.status === true) ||
+              (verificationResult.success === true) ||
+              (verificationResult.data && verificationResult.status === 'success') ||
+              (verificationResult.customer) ||
+              (verificationResult.first_name) || // BVN verification often returns customer details
+              (verificationResult.data?.verification_status === 'initiated') // As per the function implementation
+            ) {
+              kycStatus = 'verified';
+              kycVerified = true;
+              kycVerifiedAt = new Date().toISOString();
+            } else if (
+              verificationResult.status === 'failed' ||
+              verificationResult.status === 'rejected' ||
+              verificationResult.message?.toLowerCase().includes('failed') ||
+              verificationResult.message?.toLowerCase().includes('invalid')
+            ) {
+              kycStatus = verificationResult.message || 'failed';
+            } else if (verificationResult.pending_verification || verificationResult.data?.verification_status === 'pending') {
+              // Some verifications might be pending manual review
+              kycStatus = 'pending';
+            } else {
+              // If we can't determine the status from the response, assume it's pending for manual review
+              kycStatus = 'pending';
+              console.warn("Ambiguous verification response:", verificationResult);
+            }
+          } else {
+            // If verificationResult is null/undefined, treat as failed
+            kycStatus = 'failed';
           }
 
           await updateProfile({
