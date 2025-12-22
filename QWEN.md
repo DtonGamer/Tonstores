@@ -1,5 +1,12 @@
 # Tonstores Catalog Hub - Project Context
 
+
+
+VITE_PAYSTACK_PUBLIC_KEY=pk_test_078374e0b0fa2b0d195e2f07df321d096c7a31e2
+VITE_PAYSTACK_SECRET_KEY=sk_test_352a6778a3936cc2cca75ea6d958ceddc497be7e
+
+
+
 ## Overview
 Tonstores Catalog Hub is a modern e-commerce catalog management system built with React, Vite, and Supabase. It enables users to create and share beautiful product catalogs, manage orders, and process payments seamlessly using Paystack integration. The platform also includes admin capabilities for managing users, catalogs, products, orders, and subscriptions.
 

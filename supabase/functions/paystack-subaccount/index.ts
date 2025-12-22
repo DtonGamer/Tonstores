@@ -99,7 +99,7 @@ serve(async (req) => {
   } = data;
 
   // Handle development mode with test data
-  if (isDevelopmentMode) {
+  if (devMode) {
     // Use provided data or defaults for testing
     const testName = businessName || "Test Business";
     const testBankCode = bankCode || "057";
@@ -174,7 +174,7 @@ serve(async (req) => {
 
   // Prepare payload for Paystack according to their API documentation
   const payload: PaystackSubaccountPayload = {
-    business_name,
+    business_name: businessName,
     account_number: accountNumber,
     bank_code: bankCode,
     percentage_charge: Number(percentageCharge),

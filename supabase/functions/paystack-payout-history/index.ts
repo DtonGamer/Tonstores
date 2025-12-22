@@ -93,44 +93,51 @@ serve(async (req) => {
   }
 
   try {
-    // First, check if the payouts table exists by trying a simple query
+    // First, check if the payouts table exists by attempting to query the information schema
     let tableExists = true;
-    let data = [];
-    let error = null;
 
     try {
-      // Check if the payouts table exists by attempting a count query
-      const { count, error: checkError } = await supabase
-        .from('payouts')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId);
+      // Check if the payouts table exists in the database
+      const { data: tableCheck, error: tableCheckError } = await supabase
+        .from('information_schema.tables')
+        .select('table_name')
+        .eq('table_name', 'payouts')
+        .eq('table_schema', 'public');
 
-      if (checkError && checkError.code === '42P01') { // Undefined table error code
+      if (tableCheckError || !tableCheck || tableCheck.length === 0) {
         tableExists = false;
-      } else if (checkError) {
-        console.error("Error checking if payouts table exists:", checkError);
-        // If there's a different error, we'll handle it later
+        console.log("Payouts table does not exist in database");
+      } else {
+        console.log("Payouts table exists in database");
       }
-    } catch (checkError) {
-      console.error("Exception checking if payouts table exists:", checkError);
+    } catch (tableCheckError) {
+      console.error("Error checking if payouts table exists:", tableCheckError);
       tableExists = false;
     }
 
+    let data = [];
     if (tableExists) {
       // Query payout history for the user from the payouts table
+      // Note: Your table uses 'seller_id' instead of 'user_id'
       const queryResult = await supabase
         .from('payouts')
         .select('*')
-        .eq('user_id', userId)
+        .eq('seller_id', userId)
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
 
       if (queryResult.error) {
         console.error("Error fetching payout history:", queryResult.error);
-        return jsonResponse(500, { error: queryResult.error.message });
+        // If it's a column doesn't exist error or table doesn't exist error, treat as if table doesn't exist
+        if (queryResult.error.code === '42703' || queryResult.error.code === '42P01') {
+          tableExists = false;
+          data = []; // Return empty data
+        } else {
+          return jsonResponse(500, { error: queryResult.error.message });
+        }
+      } else {
+        data = queryResult.data;
       }
-
-      data = queryResult.data;
     } else {
       // If the payouts table doesn't exist, return empty results
       // This prevents the 500 error while indicating the feature isn't implemented yet
@@ -143,7 +150,7 @@ serve(async (req) => {
 
     // Get total count for pagination if the table exists
     let totalCount = data.length;
-    if (tableExists) {
+    if (tableExists && data.length > 0) {
       const { count, error: countError } = await supabase
         .from('payouts')
         .select('*', { count: 'exact', head: true })
@@ -167,12 +174,12 @@ serve(async (req) => {
         status: payout.status,
         created_at: payout.created_at,
         reference: payout.reference,
-        userId: payout.user_id,
+        userId: payout.seller_id, // Using correct column name from your table
         destinationAccount: {
-          accountNumber: payout.destination_account_number,
-          accountName: payout.destination_account_name,
-          bankName: payout.destination_bank_name,
-          bankCode: payout.destination_bank_code
+          accountNumber: payout.account_number, // Using correct column name from your table
+          accountName: payout.account_name, // Using correct column name from your table
+          bankName: payout.bank_name, // Using correct column name from your table
+          bankCode: payout.bank_code || payout.bank_name // Using correct column name from your table
         }
       })),
       pagination: {

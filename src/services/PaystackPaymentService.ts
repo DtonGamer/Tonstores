@@ -105,11 +105,12 @@ export const createPaystackSubaccount = async (params: PaystackSubaccountParams)
   });
 
   // Return the subaccount code
-  if (!responseData.subaccountCode) {
+  const subaccountCode = responseData.subaccount_code || responseData.data?.subaccount_code || responseData.data?.subaccount?.subaccount_code;
+  if (!subaccountCode) {
     throw new Error("No subaccount code returned");
   }
 
-  return responseData.subaccountCode;
+  return subaccountCode;
 };
 
 /**

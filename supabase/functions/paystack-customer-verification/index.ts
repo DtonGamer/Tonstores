@@ -80,7 +80,7 @@ serve(async (req) => {
   }
 
   // Handle development mode with test data
-  if (isDevelopmentMode) {
+  if (devMode) {
     // Use provided data or defaults for testing
     const testUserId = data.userId || "test-user-123";
 

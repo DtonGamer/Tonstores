@@ -281,7 +281,7 @@ export default function KYCForm() {
         }
 
         const subaccountData = result.data || {};
-        subaccountCode = result.data?.subaccount_code || result.data?.subaccount?.subaccount_code || subaccountData.subaccount_code;
+        subaccountCode = result.subaccount_code || result.data?.subaccount_code || result.data?.subaccount?.subaccount_code || subaccountData.subaccount_code;
 
         const verificationDate = new Date().toISOString();
 
