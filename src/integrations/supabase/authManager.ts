@@ -100,28 +100,72 @@ export const refreshCurrentSession = async () => {
   }
 };
 
-// Function to sign in with email and password
+// Function to sign in with email and password with timeout
 export const signInWithEmailAndPassword = async (email: string, password: string) => {
-  return await supabase.auth.signInWithPassword({
-    email,
-    password
+  // Create a timeout promise
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error('Authentication request timed out. Please check your internet connection and try again.'));
+    }, 15000); // 15 second timeout
   });
+
+  // Race the Supabase auth request against the timeout
+  try {
+    const authPromise = supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    // Wait for either the auth response or the timeout
+    const response = await Promise.race([authPromise, timeoutPromise]);
+    return response;
+  } catch (error) {
+    // If it's our timeout error, throw it
+    if (error instanceof Error && error.message.includes('timed out')) {
+      throw error;
+    }
+
+    // Otherwise, re-throw the original error
+    throw error;
+  }
 };
 
-// Function to sign up with email and password
+// Function to sign up with email and password with timeout
 export const signUpWithEmailAndPassword = async (
   email: string,
   password: string,
   businessName: string
 ) => {
-  return await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: null, // Disable email verification
-      data: { business_name: businessName }
-    }
+  // Create a timeout promise
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error('Registration request timed out. Please check your internet connection and try again.'));
+    }, 15000); // 15 second timeout
   });
+
+  // Race the Supabase auth request against the timeout
+  try {
+    const authPromise = supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: null, // Disable email verification
+        data: { business_name: businessName }
+      }
+    });
+
+    // Wait for either the auth response or the timeout
+    const response = await Promise.race([authPromise, timeoutPromise]);
+    return response;
+  } catch (error) {
+    // If it's our timeout error, throw it
+    if (error instanceof Error && error.message.includes('timed out')) {
+      throw error;
+    }
+
+    // Otherwise, re-throw the original error
+    throw error;
+  }
 };
 
 // Function to sign out the current user
