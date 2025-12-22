@@ -11,7 +11,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useProfile } from '@/hooks/useProfile';
 import { Loader2 } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
-import { unifiedPaystackService } from '@/services/unifiedPaystackService';
+import { unifiedPaystackService } from '@/services/UnifiedPaystackService';
 import { useEventTracker } from '@/hooks/useEventTracker';
 import { paymentConfig } from '@/lib/config';
 import { safeTrack } from '@/utils/errorHandling';

@@ -92,3 +92,6 @@
 
   The issue was that some services were still making direct HTTP calls to /api/paystack-* endpoints instead of using the Supabase functions. Let 
    me check if there are any remaining services that still have this issue:
+
+
+ qwen --resume 14142910-7194-4aee-9dc5-87f9ce8fc347

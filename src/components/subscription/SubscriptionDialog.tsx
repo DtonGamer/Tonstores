@@ -5,7 +5,7 @@ import { PricingPlan } from "@/hooks/usePricingPlans";
 import { useSubscription } from "@/hooks/useSubscription";
 import useAuth from "@/contexts/AuthContext";
 import { createPaystackConfig } from "@/services/PaystackPayment";
-import { UnifiedPaystackService } from "@/services/UnifiedPaystackService";
+import { unifiedPaystackService } from "@/services/UnifiedPaystackService";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -208,7 +208,7 @@ export function SubscriptionDialog({
         dev_mode: true
       };
 
-      const transactionData = await paystackApi.initializeTransaction(paystackTransactionData);
+      const transactionData = await unifiedPaystackService.initializeTransaction(paystackTransactionData);
 
       if (transactionData.status && transactionData.data?.authorization_url) {
         // Open the Paystack checkout page in the same window

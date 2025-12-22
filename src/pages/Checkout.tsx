@@ -34,7 +34,7 @@ const Checkout = () => {
     handleCancelDeny,
     paymentRetryAvailable,
     currentOrderId
-  } = usePaystackPayment();
+  } = useSimplifiedPaystackPayment();
   
   // Get catalog and cart
   const [catalog, setCatalog] = useState<any>(null);
