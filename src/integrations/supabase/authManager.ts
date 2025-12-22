@@ -101,13 +101,10 @@ export const refreshCurrentSession = async () => {
 };
 
 // Function to sign in with email and password
-export const signInWithEmailAndPassword = async (email: string, password: string, captchaToken?: string | null) => {
+export const signInWithEmailAndPassword = async (email: string, password: string) => {
   return await supabase.auth.signInWithPassword({
     email,
-    password,
-    options: {
-      captchaToken: captchaToken || undefined
-    }
+    password
   });
 };
 
@@ -115,16 +112,14 @@ export const signInWithEmailAndPassword = async (email: string, password: string
 export const signUpWithEmailAndPassword = async (
   email: string,
   password: string,
-  businessName: string,
-  captchaToken?: string | null
+  businessName: string
 ) => {
   return await supabase.auth.signUp({
     email,
     password,
     options: {
       emailRedirectTo: null, // Disable email verification
-      data: { business_name: businessName },
-      captchaToken: captchaToken || undefined
+      data: { business_name: businessName }
     }
   });
 };

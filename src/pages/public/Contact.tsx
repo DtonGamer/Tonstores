@@ -58,7 +58,7 @@ const WhatsAppIcon = ({ size = 24, className = "" }) => (
 
 // Default admin contact information as last-resort fallback
 const DEFAULT_CONTACTS = {
-  email_support: "Creatorrichie@gmail.com",
+  email_support: "tonshopdev@proton.me",
   whatsapp_support: "+2349038650178",
   twitter_handle: "RichieDBuilder",
   instagram_handle: "Tonstores",

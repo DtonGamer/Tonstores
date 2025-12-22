@@ -29,8 +29,8 @@ type AuthContextType = {
   profile: Profile | null;
   isAdmin: boolean;
   authInitialized: boolean;
-  signIn: (email: string, password: string, captchaToken?: string | null) => Promise<void>;
-  signUp: (email: string, password: string, businessName: string, captchaToken?: string | null) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, businessName: string) => Promise<void>;
   processReferralAfterSignup: (referralCode?: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -272,7 +272,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile,
     isAdmin,
     authInitialized,
-    signIn: async (email: string, password: string, captchaToken: string | null = null) => {
+    signIn: async (email: string, password: string) => {
       debugLog("Starting sign in process for email:", email);
       try {
         setIsLoading(true);
@@ -282,14 +282,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           throw new Error("Email and password are required");
         }
 
-        if (!captchaToken) {
-          throw new Error("Security verification is required");
-        }
-
         // Log the authentication attempt (without sensitive data)
-        debugLog("Attempting authentication with Supabase", { email, hasCaptcha: !!captchaToken });
+        debugLog("Attempting authentication with Supabase", { email });
 
-        const { error, data } = await signInWithEmailAndPassword(email, password, captchaToken);
+        const { error, data } = await signInWithEmailAndPassword(email, password);
 
         if (error) {
           debugLog("Authentication error details:", error);
@@ -299,9 +295,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             throw new Error("Invalid email or password");
           } else if (error.message.includes("Email not confirmed")) {
             throw new Error("Please verify your email address before logging in");
-          } else if (error.message.includes("captcha") || error.message.includes("CAPTCHA") || error.message.includes("invalid-input-response")) {
-            // Security verification error handling
-            throw new Error("Security verification failed. Please try again");
           } else {
             throw error;
           }
@@ -326,7 +319,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
       }
     },
-    signUp: async (email: string, password: string, businessName: string, captchaToken: string | null = null) => {
+    signUp: async (email: string, password: string, businessName: string) => {
       debugLog("Starting sign up process for email:", email);
       try {
         setIsLoading(true);
@@ -340,23 +333,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           throw new Error("Business name is required");
         }
 
-        if (!captchaToken) {
-          throw new Error("Security verification is required");
-        }
-
         // Log the signup attempt (without sensitive data)
-        debugLog("Attempting signup with Supabase", { email, businessName: businessName, hasCaptcha: !!captchaToken });
+        debugLog("Attempting signup with Supabase", { email, businessName: businessName });
 
         // Create the user - the database trigger will handle profile creation
-        const { error, data } = await signUpWithEmailAndPassword(email, password, businessName, captchaToken);
+        const { error, data } = await signUpWithEmailAndPassword(email, password, businessName);
 
         if (error) {
           debugLog("Signup error details:", error);
 
           // Handle specific error cases
-          if (error.message.includes("captcha") || error.message.includes("CAPTCHA") || error.message.includes("invalid-input-response")) {
-            throw new Error("Security verification failed. Please refresh and try again");
-          } else if (error.message.includes("User already registered")) {
+          if (error.message.includes("User already registered")) {
             throw new Error("This email is already registered. Please use a different email or try logging in");
           } else {
             throw error;

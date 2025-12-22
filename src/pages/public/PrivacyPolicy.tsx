@@ -111,7 +111,7 @@ const PrivacyPolicy = () => {
                 If you have any questions about this Privacy Policy, please contact us at:
               </p>
               <ul className={`list-disc pl-6 ${textClasses.text} space-y-2`}>
-                <li>Email: Creatorrichie@gmail.com</li>
+                <li>Email: tonshopdev@proton.me</li>
                 <li>Phone: +2349038650178</li>
               </ul>
             </section>

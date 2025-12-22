@@ -87,7 +87,7 @@ export function Footer() {
                 <Github size={18} />
               </a>
               <a
-                href="mailto:Creatorrichie@gmail.com"
+                href="mailto:tonshopdev@proton.me"
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Email"
               >
@@ -168,8 +168,8 @@ export function Footer() {
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
                 <Mail size={16} className="text-Tonstores-green" />
-                <a href="mailto:Creatorrichie@gmail.com" className="text-gray-300 hover:text-white transition-colors">
-                  Creatorrichie@gmail.com
+                <a href="mailto:tonshopdev@proton.me" className="text-gray-300 hover:text-white transition-colors">
+                  tonshopdev@proton.me
                 </a>
               </li>
               <li className="flex items-center gap-2">

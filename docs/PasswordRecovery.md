@@ -47,7 +47,6 @@ This document describes the implementation of the password recovery system for t
 - New passwords must be at least 6 characters long
 - Password confirmation is required
 - Session must be valid to access update password page
-- Integration with Cloudflare Turnstile for bot protection
 
 ### Event Tracking
 

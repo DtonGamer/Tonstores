@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,8 +7,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import useAuth from "@/contexts/AuthContext";
 import { toast } from "@/components/ui/use-toast";
-import { Turnstile } from '@marsidev/react-turnstile';
-import { TURNSTILE_SITE_KEY } from "@/utils/env";
 import { AffiliateService } from "@/services/AffiliateService";
 import { handleChange } from "@/utils/formUtils";
 
@@ -23,18 +21,9 @@ const AuthForm = ({ type }: AuthFormProps) => {
   const [referralCode, setReferralCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const navigate = useNavigate();
   const { signIn, signUp } = useAuth();
   const location = useLocation();
-  const turnstileRef = useRef<any>(null);
-
-  const resetCaptcha = () => {
-    if (turnstileRef.current?.reset) {
-      turnstileRef.current.reset();
-      setCaptchaToken(null);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,35 +41,23 @@ const AuthForm = ({ type }: AuthFormProps) => {
         return;
       }
 
-      if (!captchaToken) {
-        toast({
-          title: "Verification Required",
-          description: "Please complete the security verification",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
       if (type === "login") {
         try {
-          await signIn(email, password, captchaToken);
-          
+          await signIn(email, password);
+
           // Get redirect path from location state or sessionStorage, or default to dashboard
-          const from = 
-            location.state?.from || 
-            sessionStorage.getItem("redirectAfterLogin") || 
+          const from =
+            location.state?.from ||
+            sessionStorage.getItem("redirectAfterLogin") ||
             "/dashboard";
-            
+
           // Clear the redirect path from sessionStorage
           sessionStorage.removeItem("redirectAfterLogin");
-          
+
           // Navigate to the redirect path
           navigate(from, { replace: true });
         } catch (error) {
           // Error is already handled in the AuthContext
-          // Reset captcha on error
-          resetCaptcha();
         }
       } else {
         // For registration
@@ -95,12 +72,10 @@ const AuthForm = ({ type }: AuthFormProps) => {
         }
 
         try {
-          await signUp(email, password, businessName, captchaToken);
+          await signUp(email, password, businessName);
           // Navigation to dashboard is handled in the AuthContext after signup
         } catch (error) {
           // Error is already handled in the AuthContext
-          // Reset captcha on error
-          resetCaptcha();
         }
       }
     } catch (error: any) {
@@ -110,8 +85,6 @@ const AuthForm = ({ type }: AuthFormProps) => {
         description: error?.message || "An unexpected error occurred",
         variant: "destructive",
       });
-      // Reset captcha on error
-      resetCaptcha();
     } finally {
       setIsLoading(false);
     }
@@ -209,40 +182,11 @@ const AuthForm = ({ type }: AuthFormProps) => {
             </div>
           )}
 
-          <div className="flex justify-center pt-2">
-            <div className="w-full min-h-[65px] flex items-center justify-center border border-gray-200 rounded-md p-2 bg-white">
-              <Turnstile
-                ref={turnstileRef}
-                siteKey={TURNSTILE_SITE_KEY}
-                options={{
-                  refreshExpired: "auto",
-                  theme: "light",
-                  size: "normal"
-                }}
-                onSuccess={(token) => {
-                  setCaptchaToken(token);
-                }}
-                onError={() => {
-                  setCaptchaToken(null);
-                  toast({
-                    title: "Verification Error",
-                    description: "Security verification failed. Please refresh and try again.",
-                    variant: "destructive",
-                  });
-                }}
-                onExpire={() => {
-                  setCaptchaToken(null);
-                  resetCaptcha();
-                }}
-              />
-            </div>
-          </div>
-          
             <div className="pt-2 sm:pt-3">
           <Button
             type="submit"
             className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue transition-colors h-9 sm:h-10 text-sm sm:text-base"
-            disabled={isLoading || !captchaToken}
+            disabled={isLoading}
           >
             {isLoading ? "Processing..." : type === "login" ? "Login" : "Create Account"}
           </Button>

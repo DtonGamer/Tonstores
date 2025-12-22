@@ -236,7 +236,7 @@ const HelpCenter = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 className="bg-white text-Tonstores-darkblue hover:bg-Tonstores-green hover:text-white"
-                onClick={() => window.location.href = "mailto:Creatorrichie@gmail.com"}
+                onClick={() => window.location.href = "mailto:tonshopdev@proton.me"}
               >
                 Email Support
               </Button>
