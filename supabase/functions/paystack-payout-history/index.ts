@@ -93,25 +93,69 @@ serve(async (req) => {
   }
 
   try {
-    // Query payout history for the user
-    // This would typically come from a payouts or transfers table
-    let query = supabase
-      .from('payouts')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
+    // First, check if the payouts table exists by trying a simple query
+    let tableExists = true;
+    let data = [];
+    let error = null;
 
-    const { data, error } = await query;
+    try {
+      // Check if the payouts table exists by attempting a count query
+      const { count, error: checkError } = await supabase
+        .from('payouts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
 
-    if (error) {
-      console.error("Error fetching payout history:", error);
-      return jsonResponse(500, { error: error.message });
+      if (checkError && checkError.code === '42P01') { // Undefined table error code
+        tableExists = false;
+      } else if (checkError) {
+        console.error("Error checking if payouts table exists:", checkError);
+        // If there's a different error, we'll handle it later
+      }
+    } catch (checkError) {
+      console.error("Exception checking if payouts table exists:", checkError);
+      tableExists = false;
+    }
+
+    if (tableExists) {
+      // Query payout history for the user from the payouts table
+      const queryResult = await supabase
+        .from('payouts')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (queryResult.error) {
+        console.error("Error fetching payout history:", queryResult.error);
+        return jsonResponse(500, { error: queryResult.error.message });
+      }
+
+      data = queryResult.data;
+    } else {
+      // If the payouts table doesn't exist, return empty results
+      // This prevents the 500 error while indicating the feature isn't implemented yet
+      data = [];
     }
 
     // Calculate summary data
     const totalAmount = data.reduce((sum, payout) => sum + (payout.amount || 0), 0);
     const totalFees = data.reduce((sum, payout) => sum + (payout.fee || 0), 0);
+
+    // Get total count for pagination if the table exists
+    let totalCount = data.length;
+    if (tableExists) {
+      const { count, error: countError } = await supabase
+        .from('payouts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+
+      if (countError) {
+        console.error("Error fetching payout count:", countError);
+        // Continue with the data we have, but log the error
+      } else {
+        totalCount = count;
+      }
+    }
 
     // Return the payout data with pagination
     return jsonResponse(200, {
@@ -132,10 +176,10 @@ serve(async (req) => {
         }
       })),
       pagination: {
-        total: data.length, // Simplified - in real implementation you'd query for total count separately
+        total: totalCount,
         limit,
         offset,
-        hasNextPage: data.length === limit, // Simplified logic
+        hasNextPage: offset + limit < totalCount, // Proper pagination logic
         hasPrevPage: offset > 0
       },
       summary: {

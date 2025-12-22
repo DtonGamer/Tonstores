@@ -83,7 +83,7 @@ serve(async (req) => {
   } = data;
 
   // Handle development mode
-  if (isDevelopmentMode) {
+  if (devMode) {
     console.log("Development mode - returning mock escrow transaction initialization");
 
     // Generate a mock transaction reference

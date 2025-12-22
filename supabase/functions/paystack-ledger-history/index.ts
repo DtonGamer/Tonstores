@@ -86,11 +86,11 @@ serve(async (req) => {
 
   try {
     // Query ledger entries for the user
-    // This would typically come from a ledger_entries table
+    // Using the correct column name 'seller_id' as defined in the table schema
     let query = supabase
       .from('ledger_entries')
       .select('*')
-      .eq('user_id', userId)
+      .eq('seller_id', userId)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -106,6 +106,17 @@ serve(async (req) => {
     const totalDebits = data.filter(entry => entry.type === 'debit').reduce((sum, entry) => sum + (entry.amount || 0), 0);
     const balance = totalCredits - totalDebits;
 
+    // Get the total count for proper pagination
+    const { count, error: countError } = await supabase
+      .from('ledger_entries')
+      .select('*', { count: 'exact', head: true })
+      .eq('seller_id', userId);
+
+    if (countError) {
+      console.error("Error fetching ledger count:", countError);
+      // Continue with the data we have, but log the error
+    }
+
     // Return the ledger data with pagination
     return jsonResponse(200, {
       entries: data.map(entry => ({
@@ -115,14 +126,14 @@ serve(async (req) => {
         amount: entry.amount,
         reference: entry.reference,
         description: entry.description,
-        userId: entry.user_id,
+        userId: entry.seller_id, // Using correct column name
         createdAt: entry.created_at
       })),
       pagination: {
-        total: data.length, // Simplified - in real implementation you'd query for total count separately
+        total: count || data.length,
         limit,
         offset,
-        hasNextPage: data.length === limit, // Simplified logic
+        hasNextPage: count ? offset + limit < count : data.length === limit, // Check against total count if available
         hasPrevPage: offset > 0
       },
       summary: {
