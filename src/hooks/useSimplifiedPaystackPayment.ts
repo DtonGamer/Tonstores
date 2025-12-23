@@ -199,7 +199,7 @@ export const useSimplifiedPaystackPayment = () => {
 
       // Build payment configuration
       const paymentConfig: PaystackConfig = {
-        amount: order.total_amount * 100,
+        amount: order.total_amount, // Amount is already in kobo
         email: customerEmail,
         currency: 'NGN',
         reference: `PS_${order.id.substring(0, 8)}_${Date.now()}`,
