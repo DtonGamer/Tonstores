@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CancelPaymentDialog } from "@/components/modals/CancelPaymentDialog";
 import { PaymentStatusService } from "@/services/PaymentStatusService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { setGuestSessionParam, getGuestUserId } from "@/utils/sessionParams";
+import { getCurrentUserId } from "@/utils/sessionHelpers";
 
 const Checkout = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -190,11 +190,11 @@ const Checkout = () => {
   // Function to handle payment initialization with retry logic
   const initializePaymentWithRetry = async (order: any, formData: OrderFormData) => {
     console.log("Initializing payment for order:", order.id);
-    
-    // For guest orders, ensure guest session params are properly set
-    const guestId = getGuestUserId();
-    await setGuestSessionParam(guestId);
-    
+
+    // Get current user ID (works for both anonymous and authenticated users)
+    const userId = await getCurrentUserId();
+    console.log("Current user ID:", userId);
+
     try {
       await initializePayment({
         order,
@@ -242,11 +242,11 @@ const Checkout = () => {
 
     setIsSubmitting(true);
     setPaymentError(null);
-    
-    // For guest orders, ensure guest session params are properly set before retrying
-    const guestId = getGuestUserId();
-    await setGuestSessionParam(guestId);
-    
+
+    // Get current user ID (works for both anonymous and authenticated users)
+    const userId = await getCurrentUserId();
+    console.log("Current user ID for retry:", userId);
+
     await initializePaymentWithRetry(orderCreated, formData);
   };
   

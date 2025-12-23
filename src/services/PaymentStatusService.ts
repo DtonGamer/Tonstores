@@ -1,5 +1,4 @@
 import { supabase } from "@/integrations/supabase/client";
-import { withSessionParams, setGuestSessionParam, getGuestUserId } from "@/utils/sessionParams";
 import { StockService } from "./StockService";
 
 type OrderStatus = 'paid' | 'failed' | 'cancelled' | 'pending' | 'processing' | 'shipped' | 'delivered' | 'dispute';
@@ -46,23 +45,13 @@ export const PaymentStatusService = {
       // Get order details first - use maybeSingle instead of single to avoid 406 errors
       const { data: orderData, error: findError } = await dbClient
         .from('orders')
-        .select('id, user_id, total_amount, transaction_reference, is_guest_order, guest_id')
+        .select('id, user_id, total_amount, transaction_reference, placed_as_guest')
         .eq('id', orderId)
         .maybeSingle();
 
       if (findError || !orderData) {
         console.error('Error finding order record:', findError || 'Order not found');
         return { success: false, error: 'Order record not found' };
-      }
-
-      // For guest orders, ensure guest session params are properly set
-      if (orderData.is_guest_order && orderData.guest_id) {
-        try {
-          await setGuestSessionParam(orderData.guest_id);
-        } catch (sessionError) {
-          console.error('Error setting guest session param:', sessionError);
-          // Continue anyway as we'll try to update the order
-        }
       }
 
       // Update order status
@@ -125,61 +114,27 @@ export const PaymentStatusService = {
       return false;
     }
 
-    // Get order details to check if it's a guest order
-    let isGuestOrder = false;
-    let guestId = '';
-
-    try {
-      const { data: orderData } = await supabase
-        .from('orders')
-        .select('is_guest_order, guest_id')
-        .eq('id', orderId)
-        .maybeSingle();
-
-      if (orderData) {
-        isGuestOrder = !!orderData.is_guest_order;
-        guestId = orderData.guest_id || getGuestUserId();
-      }
-    } catch (error) {
-      console.error("Error checking if order is guest order:", error);
-      // Continue anyway, we'll try to update using standard approach
-    }
-
     // Implement retry logic
     let retries = 3;
     let success = false;
 
     while (retries > 0 && !success) {
       try {
-        // For guest orders, ensure guest session params are properly set
-        if (isGuestOrder && guestId) {
-          await setGuestSessionParam(guestId);
-        }
-
         // Try to update the order status
-        const result = await withSessionParams(async () => {
-          const { success, error } = await this.updateOrderStatus({
-            orderId,
-            status,
-            paymentStatus,
-            escrowStatus,
-            reference
-          });
-
-          if (!success) {
-            console.error(`Failed to update order status:`, error);
-            return false;
-          }
-
-          return true;
+        const result = await this.updateOrderStatus({
+          orderId,
+          status,
+          paymentStatus,
+          escrowStatus,
+          reference
         });
 
-        success = result;
-
-        if (success) {
+        if (result.success) {
+          success = true;
           console.log(`Successfully updated order status to ${status}`);
           break;
         } else {
+          console.error(`Failed to update order status:`, result.error);
           console.log(`Update failed, retries left: ${retries - 1}`);
           await new Promise(resolve => setTimeout(resolve, 1000));
         }

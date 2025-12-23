@@ -101,31 +101,33 @@ export const refreshCurrentSession = async () => {
 };
 
 // Function to sign in with email and password with timeout
+// In authManager.ts, increase timeout and add retry logic
 export const signInWithEmailAndPassword = async (email: string, password: string) => {
-  // Create a timeout promise
+  // ADD THESE DEBUG LOGS
+  console.log("🔍 Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
+  console.log("🔍 Supabase Key exists:", !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+  console.log("🔍 Supabase client:", supabase);
+  console.log("🔍 About to call signInWithPassword...");
+  
   const timeoutPromise = new Promise((_, reject) => {
     setTimeout(() => {
-      reject(new Error('Authentication request timed out. Please check your internet connection and try again.'));
-    }, 15000); // 15 second timeout
+      reject(new Error('Authentication request timed out...'));
+    }, 15000);
   });
 
-  // Race the Supabase auth request against the timeout
   try {
     const authPromise = supabase.auth.signInWithPassword({
       email,
       password
     });
-
-    // Wait for either the auth response or the timeout
+    
+    console.log("🔍 Auth promise created:", authPromise);
+    
     const response = await Promise.race([authPromise, timeoutPromise]);
+    console.log("🔍 Auth response:", response);
     return response;
   } catch (error) {
-    // If it's our timeout error, throw it
-    if (error instanceof Error && error.message.includes('timed out')) {
-      throw error;
-    }
-
-    // Otherwise, re-throw the original error
+    console.error("🔍 Full sign in error:", error);
     throw error;
   }
 };

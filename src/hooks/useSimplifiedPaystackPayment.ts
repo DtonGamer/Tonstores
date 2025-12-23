@@ -3,8 +3,8 @@ import { toast } from 'react-hot-toast';
 import { supabase } from "@/integrations/supabase/client";
 import { Order } from "./useOrders";
 import useAuth from "@/contexts/AuthContext";
-import { getGuestUserId, setGuestSessionParam } from "@/utils/sessionParams";
-import useWithSession from "@/utils/useWithSession";
+import { getCurrentUserId, isAnonymousUser } from "@/utils/sessionHelpers";
+import useWithSession from "@/hooks/useWithSession";
 import { PaymentStatusService } from "@/services/PaymentStatusService";
 import { PaymentConfigService } from "@/services/PaymentConfigService";
 import { unifiedPaystackService } from "@/services/UnifiedPaystackService";
@@ -45,6 +45,8 @@ interface PaystackConfig {
     order_id: string;
     customer_name: string;
     guest_id?: string;
+    user_id?: string;
+    is_anonymous?: boolean;
     subaccount?: string;
     percentage_charge?: number;
     custom_fields: Array<{
@@ -52,6 +54,7 @@ interface PaystackConfig {
       variable_name: string;
       value: string;
     }>;
+    [key: string]: any; // Allow additional properties
   };
   channels: string[];
   onSuccess: (transaction: any) => void;
@@ -97,9 +100,9 @@ export const useSimplifiedPaystackPayment = () => {
     onSuccess,
     onClose
   }: InitiatePaymentProps) => {
-    // Check if this is a guest order
-    const isGuestOrder = !user;
-    const guestId = getGuestUserId(); // This will always return a valid string now
+    // Check if this is an anonymous user order
+    const isAnonymousOrder = !user || await isAnonymousUser();
+    const userId = await getCurrentUserId(); // Get the current user ID (works for both anonymous and authenticated)
 
     setIsLoading(true);
     setPaymentRetryAvailable(false);
@@ -115,10 +118,10 @@ export const useSimplifiedPaystackPayment = () => {
 
     setCurrentOrderId(order.id);
 
-    // For guest orders, ensure guest session params are properly set
-    if (isGuestOrder) {
-      console.log("Explicitly setting guest session for payment initialization");
-      await setGuestSessionParam(guestId);
+    // For anonymous orders, we don't need to set guest session params anymore
+    // Supabase handles this automatically
+    if (isAnonymousOrder) {
+      console.log("Processing anonymous user payment");
     }
 
     try {
@@ -180,7 +183,8 @@ export const useSimplifiedPaystackPayment = () => {
         metadata: {
           order_id: order.id,
           customer_name: customerName,
-          guest_id: isGuestOrder ? guestId : undefined,
+          user_id: userId, // Use the user ID instead of guest ID
+          is_anonymous: isAnonymousOrder,
           custom_fields: [
             {
               display_name: "Order ID",
@@ -199,11 +203,6 @@ export const useSimplifiedPaystackPayment = () => {
           const updateWithRetry = async (retries = 3) => {
             console.log(`Updating order status after successful payment (${retries} retries left)`);
             try {
-              // For guest orders, ensure guest session params are properly set
-              if (isGuestOrder) {
-                await setGuestSessionParam(guestId);
-              }
-
               // Update order status - set payment as paid but escrow as held
               const success = await updateOrderStatus(
                 order.id,
@@ -297,8 +296,8 @@ export const useSimplifiedPaystackPayment = () => {
       const isPolicyError = error.code === '42501' ||
                           (error.message && error.message.includes('row-level security policy'));
 
-      if (isPolicyError && isGuestOrder) {
-        console.error("RLS policy error detected for guest order, retrying with explicit session params");
+      if (isPolicyError && isAnonymousOrder) {
+        console.error("RLS policy error detected for anonymous order");
 
         // Set payment retry flag
         setPaymentRetryAvailable(true);

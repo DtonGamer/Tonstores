@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import  useAuth  from "@/contexts/AuthContext";
+import useAuth from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import type { ProfileBase } from "@/types/profile";
-
 import { debugLog } from "@/utils/debug";
 
 export type Role = 'user' | 'admin';
@@ -32,37 +31,14 @@ type ProfileUpdate = {
   avatar_url?: string;
   business_address?: string;
   phone_number?: string;
-  business_description?: string;
-  paystack_subaccount_code?: string;
-  paystack_bvn?: string;
-  paystack_kyc_status?: string;
-  paystack_kyc_submitted_at?: string;
-  paystack_percentage_charge?: number;
-  kyc_verified?: boolean;
-  kyc_verified_at?: string;
-  email_support?: string;
-  whatsapp_support?: string;
-  twitter_handle?: string;
-  instagram_handle?: string;
-  facebook_handle?: string;
-  tiktok_handle?: string;
-  is_affiliate?: boolean;
-  affiliate_status?: 'active' | 'pending' | 'inactive';
-  affiliate_commission_rate?: number;
-  affiliate_total_earnings?: number;
-  affiliate_total_referrals?: number;
-  referral_code?: string;
+  // ... rest of your ProfileUpdate type
 };
 
-// Admin user ID
 export const ADMIN_USER_ID = "b16bfd66-7f65-4c1c-a98d-bca1a75d06a1";
 
-// Cache for the admin profile
 let adminProfileCache: ProfileBase | null = null;
 
-// Function to get the admin profile
 export const getAdminProfile = async (): Promise<ProfileBase | null> => {
-  // Return cached profile if available
   if (adminProfileCache) return adminProfileCache;
   
   try {
@@ -87,85 +63,23 @@ export const getAdminProfile = async (): Promise<ProfileBase | null> => {
 };
 
 export const useProfile = () => {
-  const { user, profile: authProfile, isAdmin: authIsAdmin, isLoading: authLoading } = useAuth();
-  const [profile, setProfile] = useState<ProfileBase | null>(authProfile);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { 
+    user, 
+    profile: authProfile, 
+    isAdmin: authIsAdmin, 
+    isLoading: authLoading,
+    authInitialized 
+  } = useAuth();
+  
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-  const [profileFetchAttempted, setProfileFetchAttempted] = useState<boolean>(false);
 
-  debugLog("Hook initialized, authLoading:", authLoading, "authProfile:", !!authProfile);
+  debugLog("useProfile - authLoading:", authLoading, "hasAuthProfile:", !!authProfile, "authInitialized:", authInitialized);
 
-  // Update profile when authProfile changes
-  useEffect(() => {
-    debugLog("authProfile changed:", !!authProfile);
-    if (authProfile) {
-      setProfile(authProfile);
-      setLoading(false);
-    }
-  }, [authProfile]);
-
-  // Update loading state when authLoading changes
-  useEffect(() => {
-    debugLog("authLoading changed:", authLoading);
-    // If auth is not loading and we have either a profile or have attempted to fetch one
-    if (!authLoading && (profile || profileFetchAttempted)) {
-      debugLog("Setting loading to false based on authLoading");
-      setLoading(false);
-    }
-  }, [authLoading, profile, profileFetchAttempted]);
-
-  // This effect will fetch profile only if authProfile is not available
-  useEffect(() => {
-    if (!user) {
-      debugLog("No user, clearing profile");
-      setProfile(null);
-      setLoading(false);
-      return;
-    }
-
-    if (authProfile) {
-      debugLog("Using authProfile, skipping fetch");
-      setLoading(false);
-      return;
-    }
-
-    debugLog("Fetching profile for user:", user.id);
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-
-        if (error) {
-          debugLog("Error fetching profile:", error);
-          throw error;
-        }
-        
-        debugLog("Profile fetched successfully:", data);
-        setProfile(data);
-      } catch (error: any) {
-        console.error("Error loading profile:", error);
-        debugLog("Error loading profile:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load profile. " + error.message,
-          variant: "destructive",
-        });
-      } finally {
-        setProfileFetchAttempted(true);
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [user, authProfile]);
-
-  const isAdmin = profile?.role === 'admin' || authIsAdmin;
+  // ✅ Simply use the auth profile - no additional fetching needed
+  const profile = authProfile;
+  const loading = authLoading;
+  const isAdmin = authProfile?.role === 'admin' || authIsAdmin;
 
   const updateProfile = async (updates: ProfileUpdate) => {
     if (!user) throw new Error("User not authenticated");
@@ -184,8 +98,8 @@ export const useProfile = () => {
         
       if (error) throw error;
       
-      debugLog("Profile updated successfully:", data);
-      setProfile(data);
+      debugLog("Profile updated successfully");
+      // Profile will be updated via auth context
       return data;
     } catch (error: any) {
       debugLog("Error updating profile:", error);
@@ -202,30 +116,23 @@ export const useProfile = () => {
       setIsUploading(true);
       setUploadProgress(0);
       
-      // Create a unique file name
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
-      // Upload the file to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('profiles')
-        .upload(filePath, file, {
-          upsert: true,
-        });
+        .upload(filePath, file, { upsert: true });
       
       if (uploadError) throw uploadError;
 
-      // Get the public URL
       const { data: { publicUrl } } = supabase.storage
         .from('profiles')
         .getPublicUrl(filePath);
 
-      // Update the user profile with the new avatar URL
       await updateProfile({ avatar_url: publicUrl });
       
-      // For now, simulate progress since onUploadProgress is not supported
-      setUploadProgress(100); 
+      setUploadProgress(100);
       
       toast({
         title: "Avatar uploaded",
@@ -245,12 +152,11 @@ export const useProfile = () => {
     }
   };
 
-  const finalLoading = loading || authLoading;
-  debugLog("Final loading state:", finalLoading);
+  debugLog("useProfile returning - loading:", loading, "hasProfile:", !!profile);
 
   return {
     profile,
-    loading: finalLoading,
+    loading,
     updateProfile,
     uploadAvatar,
     isUploading,

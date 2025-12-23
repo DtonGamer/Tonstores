@@ -1,31 +1,35 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { getGuestUserId, ensureSessionParams } from '@/utils/sessionParams';
+import { getCurrentUserId, isAnonymousUser } from '@/utils/sessionHelpers';
 
 type GuestContextType = {
   guestId: string | null;
   isInitialized: boolean;
+  isAnonymous: boolean;
 };
 
 const GuestContext = createContext<GuestContextType>({
   guestId: null,
   isInitialized: false,
+  isAnonymous: false,
 });
 
 export function GuestProvider({ children }: { children: ReactNode }) {
   const [guestId, setGuestId] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   useEffect(() => {
-    // Initialize guest ID on component mount
+    // Initialize guest session on component mount
     const initializeGuest = async () => {
       try {
-        // This will generate a guest ID if one doesn't exist
-        const id = getGuestUserId();
-        setGuestId(id);
-        
-        // Ensure session parameters are set
-        await ensureSessionParams();
-        
+        // Get current user ID (could be anonymous or authenticated)
+        const userId = await getCurrentUserId();
+        setGuestId(userId);
+
+        // Check if user is anonymous
+        const anonymous = await isAnonymousUser();
+        setIsAnonymous(anonymous);
+
         setIsInitialized(true);
       } catch (error) {
         console.error('Error initializing guest session:', error);
@@ -38,7 +42,7 @@ export function GuestProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <GuestContext.Provider value={{ guestId, isInitialized }}>
+    <GuestContext.Provider value={{ guestId, isInitialized, isAnonymous }}>
       {children}
     </GuestContext.Provider>
   );
@@ -52,4 +56,4 @@ export function useGuest() {
   return context;
 }
 
-export default useGuest; 
+export default useGuest;

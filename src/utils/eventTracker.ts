@@ -57,16 +57,10 @@ const getSessionId = (): string => {
   return sessionId;
 };
 
-// Get current user ID if available
+// Get current user ID (works for both anonymous and authenticated users)
 const getCurrentUserId = async (): Promise<string | null> => {
   const { data: { session } } = await supabase.auth.getSession();
   return session?.user?.id || null;
-};
-
-// Get guest ID if no user session
-const getGuestId = (): string => {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem('Tonstores-guest-id') || '';
 };
 
 class EventTracker {
@@ -321,18 +315,16 @@ export const trackEvent = async (
 
     const userId = await getCurrentUserId();
     const sessionId = getSessionId();
-    const guestId = getGuestId();
 
     // Prepare the event record
     // For authenticated users, track with their user_id
-    // For unauthenticated users, we can still track events but with user_id as NULL
+    // For anonymous users, we can still track events but with user_id as the anonymous user ID
     const eventToInsert: EventRecord = {
-      user_id: userId, // Will be null for unauthenticated users
+      user_id: userId, // Will be the user ID for both authenticated and anonymous users
       session_id: sessionId,
       event_type: eventType,
       event_data: eventData,
       source,
-      // guest_id: guestId || null
     };
 
     // Insert the event directly into the database using Supabase client

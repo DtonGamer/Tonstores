@@ -15,6 +15,7 @@ A modern e-commerce catalog management system built with React, Vite, and Supaba
 - 🔐 Admin role system for platform management
 - 🏦 KYC onboarding and direct payments to sellers
 - 📊 Social media sales tracking
+- 👤 Anonymous user support with Supabase's built-in authentication
 
 ## Tech Stack
 
@@ -87,6 +88,43 @@ npm run dev
 yarn dev
 ```
 
+## Migration from Custom Guest System to Supabase Anonymous Authentication
+
+This project was originally built with a custom guest ID system that used localStorage and custom session parameters. We have successfully migrated to use Supabase's built-in anonymous authentication, which provides the following improvements:
+
+### Migrated Functionality
+
+1. **Anonymous User Support**: Users can now browse and place orders without creating an account using Supabase's native anonymous authentication
+2. **Session Management**: Supabase handles session persistence, refresh, and storage automatically
+3. **User ID Management**: Anonymous users get a proper user ID that persists across sessions
+4. **Simplified RLS Policies**: Updated to use `auth.uid()` instead of custom guest session parameters
+5. **Removed Complex Interceptors**: Eliminated fetch interceptors that were blocking Supabase requests
+6. **Improved Performance**: No more session parameter management overhead
+
+### Key Changes
+
+- **No more custom guest ID system**: Removed localStorage-based guest ID generation
+- **No more session parameter functions**: Eliminated `set_app_guest_id` functions and related database functions
+- **Simplified authentication flow**: Supabase handles everything automatically
+- **Better security**: Built-in Supabase authentication instead of custom implementation
+- **Improved reliability**: No more timeout issues due to fetch interceptors
+
+### Database Schema Updates
+
+- Removed `is_guest_order` and `guest_id` columns from the `orders` table
+- Added `placed_as_guest` column to track if order was placed while anonymous
+- Updated RLS policies to use `auth.uid()` instead of custom guest parameters
+- Removed `set_app_guest_id` and related functions
+- Removed guest-specific indexes and policies
+
+### Frontend Changes
+
+- Updated authentication flow to use `signInAnonymously()` instead of custom guest ID generation
+- Simplified order creation to work with Supabase's built-in user ID
+- Removed fetch interceptors that were causing timeout issues
+- Updated payment processing to work with anonymous users
+- Enhanced profile loading to work with both anonymous and authenticated users
+
 ## Migration from Monnify to Paystack
 
 This project was originally built with Monnify as the payment provider. We have successfully migrated to Paystack with the following changes:
@@ -152,6 +190,7 @@ To obtain these variables:
 1. **Supabase Configuration:**
    - Create a project at [supabase.com](https://supabase.com)
    - Get your project URL and anon key from the project settings
+   - **Important**: Enable anonymous sign-ins in your Supabase dashboard under Authentication > Settings
 
 2. **Paystack Configuration:**
    - Sign up at [paystack.com](https://paystack.com)
@@ -368,6 +407,7 @@ The project includes a `vercel.json` file for easy deployment on Vercel.
 2. **Paystack Subaccount Creation:** Verify API keys and bank information format
 3. **Order Status Updates:** Ensure RLS policies are correctly applied
 4. **Supabase Functions:** Check function logs for processing errors
+5. **Authentication Issues:** Ensure anonymous sign-ins are enabled in your Supabase dashboard
 
 ### Function Deployment Issues
 If you encounter import errors during function deployment:

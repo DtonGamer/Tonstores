@@ -57,16 +57,9 @@ export const callSupabaseFunction = async (
     headers['Authorization'] = `Bearer ${session.access_token}`;
   }
 
-  // Only add guest ID header if user is not authenticated
-  if (!session?.access_token) {
-    // User is not authenticated, add guest ID header if available
-    if (typeof window !== 'undefined') {
-      const guestId = localStorage.getItem('Tonstores-guest-id');
-      if (guestId) {
-        headers['X-Guest-ID'] = guestId;
-      }
-    }
-  }
+  // For anonymous users, we don't need to add a guest ID header
+  // Supabase handles anonymous authentication automatically
+  // The user ID is already available in the session
 
   // DEBUG: Log headers (without sensitive data)
   console.log('DEBUG - Request headers:', {

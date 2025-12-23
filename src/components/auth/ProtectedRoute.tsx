@@ -2,11 +2,9 @@ import { ReactNode, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAuth from "@/contexts/AuthContext";
 import { toast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Button } from "@/components/ui/button";
 import { LockIcon } from "lucide-react";
-
 import { debugLog } from "@/utils/debug";
 
 type ProtectedRouteProps = {
@@ -14,95 +12,41 @@ type ProtectedRouteProps = {
 };
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { user, isLoading, authInitialized } = useAuth();
+  const { user, authInitialized, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [isVerified, setIsVerified] = useState(false);
-  const [loadingTimeout, setLoadingTimeout] = useState(false);
-  const [sessionChecked, setSessionChecked] = useState(false);
 
-  // Perform an immediate session check
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        debugLog("Performing direct session check");
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          debugLog("Session check error:", error);
-          setSessionChecked(true);
-          return;
-        }
-        
-        if (data.session) {
-          debugLog("Session found directly:", !!data.session.user);
-          setIsVerified(true);
-        }
-        
-        setSessionChecked(true);
-      } catch (error) {
-        debugLog("Session check exception:", error);
-        setSessionChecked(true);
-      }
-    };
-    
-    checkSession();
-  }, []);
-
-  // Timeout to avoid infinite loading - reduced to 1000ms
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      debugLog("⏱ Loading timeout reached");
-      setLoadingTimeout(true);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Main auth check
-  useEffect(() => {
-    debugLog("Auth Initialized?", authInitialized, "Loading?", isLoading, "User?", !!user, "Timeout?", loadingTimeout, "SessionChecked?", sessionChecked);
-
-    // Quick check - if we have a user, we're good to go
-    if (user) {
-      debugLog("✅ User authenticated immediately");
-      setIsVerified(true);
+    // Wait for auth to initialize
+    if (!authInitialized) {
+      debugLog("⏳ Waiting for auth to initialize");
       return;
     }
 
-    // If auth is initialized or we've reached the timeout or session check completed
-    if (authInitialized || loadingTimeout || sessionChecked || !isLoading) {
-      // If no user, redirect to login
-      if (!user) {
-        debugLog("🚫 No user – redirecting to /login");
-        // Save the current path for redirect after login
-        sessionStorage.setItem("redirectAfterLogin", location.pathname);
+    // Once initialized, check if user exists
+    if (!user) {
+      debugLog("🚫 No user - redirecting to login");
+      
+      sessionStorage.setItem("redirectAfterLogin", location.pathname);
+      
+      toast({
+        title: "Authentication required",
+        description: "Please log in to access this page.",
+        duration: 3000,
+      });
 
-        toast({
-          title: "Authentication required",
-          description: "Please log in to access this page.",
-          variant: "default",
-          duration: 3000,
-        });
-
-        // Use navigate with state to preserve the current location for future redirect
-        navigate("/login", { 
-          replace: true,
-          state: { from: location.pathname }
-        });
-      } else {
-        debugLog("✅ User authenticated after check");
-        setIsVerified(true);
-      }
+      navigate("/login", {
+        replace: true,
+        state: { from: location.pathname }
+      });
+    } else {
+      debugLog("✅ User authenticated");
     }
-  }, [authInitialized, isLoading, loadingTimeout, user, navigate, location.pathname, sessionChecked]);
+  }, [authInitialized, user, navigate, location.pathname]);
 
-  // Show spinner only if we're still loading and haven't timed out
-  const showSpinner = !isVerified && !loadingTimeout && (isLoading || !sessionChecked);
-  debugLog("showSpinner =", showSpinner, "isVerified =", isVerified);
-
-  if (showSpinner) {
-    debugLog("🔄 Rendering loading spinner");
+  // Show loading spinner while auth initializes
+  if (!authInitialized || isLoading) {
+    debugLog("🔄 Showing loading spinner");
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-Tonstores-green"></div>
@@ -110,7 +54,12 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  debugLog("🎉 Rendering protected children");
+  // Don't render children until we have a user
+  if (!user) {
+    return null;
+  }
+
+  debugLog("✅ Rendering protected content");
   return <>{children}</>;
 };
 
@@ -120,26 +69,24 @@ type PremiumRouteProps = {
 };
 
 export const PremiumRoute = ({ children }: PremiumRouteProps) => {
-  const { user, isLoading } = useAuth();
+  const { user, authInitialized } = useAuth();
   const { subscription, isLoading: subscriptionLoading } = useSubscription();
   const navigate = useNavigate();
   const [hasPaidPlan, setHasPaidPlan] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Wait for both auth and subscription data to load
-    if (!isLoading && !subscriptionLoading) {
-      // Check if the user has a valid subscription
-      const hasPaidSubscription = subscription && 
-        subscription.pricing_plans && 
-        subscription.pricing_plans.name !== 'Free' &&
-        subscription.status === 'active';
-      
-      setHasPaidPlan(hasPaidSubscription);
-    }
-  }, [user, isLoading, subscription, subscriptionLoading]);
+    if (!authInitialized || subscriptionLoading) return;
+
+    const hasPaidSubscription = subscription && 
+      subscription.pricing_plans && 
+      subscription.pricing_plans.name !== 'Free' &&
+      subscription.status === 'active';
+    
+    setHasPaidPlan(hasPaidSubscription);
+  }, [authInitialized, subscription, subscriptionLoading]);
 
   // Show spinner while checking
-  if (isLoading || subscriptionLoading || hasPaidPlan === null) {
+  if (!authInitialized || subscriptionLoading || hasPaidPlan === null) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-Tonstores-green"></div>
@@ -147,7 +94,7 @@ export const PremiumRoute = ({ children }: PremiumRouteProps) => {
     );
   }
 
-  // If user doesn't have a paid plan, show a message
+  // If user doesn't have a paid plan
   if (!hasPaidPlan) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -168,7 +115,6 @@ export const PremiumRoute = ({ children }: PremiumRouteProps) => {
     );
   }
 
-  // If user has a paid plan, show the content
   return <>{children}</>;
 };
 
