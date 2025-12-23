@@ -3,8 +3,6 @@ import { toast } from 'react-hot-toast';
 import { supabase } from "@/integrations/supabase/client";
 import { Order } from "./useOrders";
 import useAuth from "@/contexts/AuthContext";
-import { getCurrentUserId, isAnonymousUser } from "@/utils/sessionHelpers";
-import useWithSession from "@/hooks/useWithSession";
 import { PaymentStatusService } from "@/services/PaymentStatusService";
 import { PaymentConfigService } from "@/services/PaymentConfigService";
 import { unifiedPaystackService } from "@/services/UnifiedPaystackService";
@@ -68,10 +66,14 @@ export const useSimplifiedPaystackPayment = () => {
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const [paymentRetryAvailable, setPaymentRetryAvailable] = useState(false);
   const { user } = useAuth();
-  const { withSession } = useWithSession();
 
   // Helper function to update order status
-  const updateOrderStatus = async (orderId: string, status: 'paid' | 'cancelled' | 'failed', paymentStatus: 'paid' | 'failed' | 'cancelled', escrowStatus?: 'held' | 'released' | 'refunded') => {
+  const updateOrderStatus = async (
+    orderId: string, 
+    status: 'paid' | 'cancelled' | 'failed', 
+    paymentStatus: 'paid' | 'failed' | 'cancelled', 
+    escrowStatus?: 'held' | 'released' | 'refunded'
+  ) => {
     if (!orderId) {
       console.error("Cannot update order: Missing order ID");
       return false;
@@ -108,11 +110,10 @@ export const useSimplifiedPaystackPayment = () => {
       };
       console.log('🔍 DEBUG:', logEntry);
       
-      // Store in localStorage so you can check after redirect
       try {
         const existingLogs = JSON.parse(localStorage.getItem('payment_debug_logs') || '[]');
         existingLogs.push(logEntry);
-        localStorage.setItem('payment_debug_logs', JSON.stringify(existingLogs.slice(-20))); // Keep last 20 logs
+        localStorage.setItem('payment_debug_logs', JSON.stringify(existingLogs.slice(-20)));
       } catch (e) {
         console.error('Failed to store debug log:', e);
       }
@@ -125,8 +126,9 @@ export const useSimplifiedPaystackPayment = () => {
       isProduction: !window.location.hostname.includes('localhost')
     });
 
-    const isAnonymousOrder = !user || await isAnonymousUser();
-    const userId = await getCurrentUserId();
+    // FIX: Don't require user authentication for guest checkout
+    const isAnonymousOrder = !user;
+    const userId = user?.id || null; // Allow null for anonymous
 
     setIsLoading(true);
     setPaymentRetryAvailable(false);
@@ -167,14 +169,18 @@ export const useSimplifiedPaystackPayment = () => {
         return;
       }
 
-      // Get the seller's subaccount code
-      debugLog('Fetching seller subaccount...');
+      // FIX: Handle guest checkout - don't try to get subaccount for anonymous orders
       let subaccountCode = null;
+      debugLog('Fetching seller subaccount...');
+      
       try {
+        // Try to get seller from order.user_id first
         if (order.user_id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(order.user_id)) {
           subaccountCode = await PaymentConfigService.getSellerPaystackSubaccountCode(order.user_id);
-          debugLog('Subaccount fetched', { subaccountCode });
-        } else if (order.catalog_id) {
+          debugLog('Subaccount fetched from order', { subaccountCode });
+        } 
+        // If not found, try to get seller from catalog
+        else if (order.catalog_id) {
           const { data: catalogData, error: catalogError } = await supabase
             .from("catalogs")
             .select("user_id")
@@ -202,7 +208,10 @@ export const useSimplifiedPaystackPayment = () => {
         metadata: {
           order_id: order.id,
           customer_name: customerName,
-          user_id: userId,
+          customer_email: customerEmail,
+          customer_phone: customerPhone,
+          // FIX: Don't require user_id for anonymous orders
+          ...(userId && { user_id: userId }),
           is_anonymous: isAnonymousOrder,
           custom_fields: [
             {
@@ -214,6 +223,11 @@ export const useSimplifiedPaystackPayment = () => {
               display_name: "Customer Phone",
               variable_name: "customer_phone",
               value: customerPhone
+            },
+            {
+              display_name: "Customer Email",
+              variable_name: "customer_email",
+              value: customerEmail
             }
           ]
         },
@@ -230,6 +244,7 @@ export const useSimplifiedPaystackPayment = () => {
 
               if (success) {
                 debugLog('Order status updated successfully');
+                toast.success("Payment successful!");
                 onSuccess(transaction.reference);
               } else if (retries > 0) {
                 debugLog(`Order status update failed, retrying... (${retries} attempts left)`);
@@ -237,7 +252,7 @@ export const useSimplifiedPaystackPayment = () => {
               } else {
                 debugLog('ERROR: Failed to update order status after retries');
                 setPaymentRetryAvailable(true);
-                toast.error("We are having trouble connecting to the payment provider.");
+                toast.error("Payment received but order update failed. Please contact support with reference: " + transaction.reference);
               }
             } catch (updateError) {
               debugLog('ERROR: Exception updating order status', { updateError, retries });
@@ -245,7 +260,7 @@ export const useSimplifiedPaystackPayment = () => {
                 setTimeout(() => updateWithRetry(retries - 1), 1000);
               } else {
                 setPaymentRetryAvailable(true);
-                toast.error("We are having trouble connecting to the payment provider.");
+                toast.error("Payment received but order update failed. Please contact support with reference: " + transaction.reference);
               }
             }
           };
@@ -276,7 +291,8 @@ export const useSimplifiedPaystackPayment = () => {
         amount: paymentConfig.amount,
         email: paymentConfig.email,
         reference: paymentConfig.reference,
-        hasSubaccount: !!subaccountCode
+        hasSubaccount: !!subaccountCode,
+        isAnonymous: isAnonymousOrder
       });
 
       const paystackTransactionData = {
@@ -300,16 +316,15 @@ export const useSimplifiedPaystackPayment = () => {
           splitPercentage: 100,
           feeBearer: true
         }] : undefined,
-        userId: order.user_id,
+        userId: userId, // Can be null for anonymous
         orderId: order.id
       });
 
       debugLog('Transaction initialized', {
         status: transactionData.status,
         hasData: !!transactionData.data,
-        hasAuthUrl: !!transactionData.data?.authorization_url,
-        authUrl: transactionData.data?.authorization_url,
-        message: transactionData.message
+        hasAuthUrl: !!transactionData.data?.authorizationUrl || !!transactionData.data?.authorization_url,
+        dataKeys: Object.keys(transactionData.data || {})
       });
 
       // Check if we got a valid response
@@ -328,13 +343,18 @@ export const useSimplifiedPaystackPayment = () => {
         throw new Error('Invalid response from payment service');
       }
 
-      if (!transactionData.data.authorization_url) {
-        debugLog('ERROR: No authorization URL', { data: transactionData.data });
+      // FIX: Handle both camelCase and snake_case
+      const authUrl = transactionData.data?.authorizationUrl || transactionData.data?.authorization_url;
+
+      if (!authUrl) {
+        debugLog('ERROR: No authorization URL', { 
+          data: transactionData.data,
+          keys: Object.keys(transactionData.data || {})
+        });
         throw new Error('No checkout URL received from Paystack');
       }
 
       // If we got here, we have a valid URL
-      const authUrl = transactionData.data.authorization_url;
       debugLog('REDIRECTING NOW', { url: authUrl });
 
       // Add a small delay to ensure localStorage is written
@@ -358,19 +378,6 @@ export const useSimplifiedPaystackPayment = () => {
         }
       }
 
-      // This line should never be reached if redirect works
-      debugLog('WARNING: Code after redirect was executed - redirect may have failed');
-
-      // Additional logging in case redirect doesn't work
-      console.log('DEBUG: Redirect failed - still on the same page');
-      console.log('DEBUG: Authorization URL was:', authUrl);
-      console.log('DEBUG: Environment:', {
-        hostname: window.location.hostname,
-        origin: window.location.origin,
-        isSecure: window.location.protocol === 'https:',
-        referrer: document.referrer
-      });
-
     } catch (error: any) {
       debugLog('FATAL ERROR', {
         message: error.message,
@@ -383,10 +390,10 @@ export const useSimplifiedPaystackPayment = () => {
       const isPolicyError = error.code === '42501' ||
                           (error.message && error.message.includes('row-level security policy'));
 
-      if (isPolicyError && isAnonymousOrder) {
-        console.error("RLS policy error detected for anonymous order");
+      if (isPolicyError) {
+        console.error("RLS policy error detected");
         setPaymentRetryAvailable(true);
-        toast.error("We are having trouble connecting to the payment provider.");
+        toast.error("Unable to process payment. Please contact support.");
       } else {
         toast.error(error.message || "Failed to initialize payment. Please try again.");
       }

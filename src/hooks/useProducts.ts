@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { useSubscriptionLimits } from "./useSubscriptionLimits";
@@ -28,6 +28,9 @@ interface ProductsQueryOptions {
 export const useProducts = (catalogId?: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const { canAddProductToCatalog } = useSubscriptionLimits();
+
+  // Use ref to track if we've shown the toast for this session
+  const lowStockToastShown = useRef<Set<string>>(new Set());
 
   const getProductStockStatus = (product: Product): StockStatus => {
     if (product.stock_quantity === undefined || product.stock_quantity === null) {
@@ -91,20 +94,17 @@ export const useProducts = (catalogId?: string) => {
           const threshold = product.low_stock_threshold ?? DEFAULT_LOW_STOCK_THRESHOLD;
           return product.stock_quantity > 0 && product.stock_quantity <= threshold;
         });
-        
-        // Only show toast if we haven't shown it recently for this catalog
-        const lastToastTime = localStorage.getItem(`lowStockToast_${catalogId}`);
-        const now = Date.now();
-        
-        if (lowStockItems.length > 0 && (!lastToastTime || (now - parseInt(lastToastTime)) > 3600000)) {
+
+        // Only show toast ONCE per session for this catalog
+        if (lowStockItems.length > 0 && !lowStockToastShown.current.has(catalogId)) {
           toast({
             title: "Low Stock Alert",
             description: `${lowStockItems.length} product(s) have low stock levels.`,
             variant: "destructive",
           });
-          
-          // Update last toast time
-          localStorage.setItem(`lowStockToast_${catalogId}`, now.toString());
+
+          // Mark as shown for this session
+          lowStockToastShown.current.add(catalogId);
         }
       }
       

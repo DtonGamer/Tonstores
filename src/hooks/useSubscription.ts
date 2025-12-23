@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Subscription } from "@/types/subscription";
 import useAuth from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useMemo } from "react";
 
 export const useSubscription = () => {
   const { user } = useAuth();
@@ -113,12 +114,20 @@ export const useSubscription = () => {
     },
   });
 
-  return {
+  // Use useMemo to prevent returning new objects on each render
+  return useMemo(() => ({
     subscription,
     isLoading,
     error,
     createSubscription,
     updateSubscription,
     cancelSubscription,
-  };
+  }), [
+    subscription,
+    isLoading,
+    error,
+    createSubscription,
+    updateSubscription,
+    cancelSubscription
+  ]);
 }; 

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo, useRef } from "react";
 import { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
 import { toast } from "@/components/ui/use-toast";
 import { Profile } from "@/hooks/useProfile";
@@ -35,12 +35,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [authInitialized, setAuthInitialized] = useState<boolean>(false);
-  const [profileFetched, setProfileFetched] = useState<boolean>(false);
+  
+  // Use ref to track if profile has been fetched for current user
+  const profileFetchedForUser = useRef<string | null>(null);
 
-  // Fetch profile only once per user
-  const fetchProfile = useCallback(async (userId: string) => {
-    if (!userId || profileFetched) {
-      debugLog("Skipping profile fetch - already fetched or no userId");
+  // Stable fetchProfile function - no dependencies that change
+  const fetchProfile = async (userId: string): Promise<Profile | null> => {
+    // Check if we already fetched for this user
+    if (profileFetchedForUser.current === userId) {
+      debugLog("Skipping profile fetch - already fetched for this user");
       return profile;
     }
 
@@ -60,13 +63,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       debugLog("Profile fetched successfully");
       setProfile(data);
       setIsAdmin(data?.role === 'admin');
-      setProfileFetched(true);
+      profileFetchedForUser.current = userId; // Mark as fetched
       return data;
     } catch (error) {
       console.error("Exception when fetching profile:", error);
       return null;
     }
-  }, [profileFetched, profile]);
+  };
 
   // Initialize auth state - RUNS ONCE
   useEffect(() => {
@@ -141,13 +144,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Only fetch profile on actual SIGNED_IN event (not INITIAL_SESSION or TOKEN_REFRESHED)
         if (newUser && event === "SIGNED_IN") {
           debugLog("👤 New sign-in detected, fetching profile");
-          setProfileFetched(false); // Reset flag for new user
+          profileFetchedForUser.current = null; // Reset flag for new user
           await fetchProfile(newUser.id);
         } else if (!newUser) {
           debugLog("👋 User signed out, clearing profile");
           setProfile(null);
           setIsAdmin(false);
-          setProfileFetched(false);
+          profileFetchedForUser.current = null;
         } else {
           debugLog("ℹ️ Auth event doesn't require profile fetch:", event);
         }
@@ -161,11 +164,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       unsubscribe();
       debugLog("🧹 Auth cleanup");
     };
-  }, []); // ✅ Empty array - this should only run once
+  }, []); // ✅ Empty array - runs only once
 
-  const processReferralAfterSignup = useCallback(async (referralCode: string = '') => {
+  const processReferralAfterSignup = async (referralCode: string = '') => {
     // Your referral logic here
-  }, [user]);
+  };
 
   const contextValue = useMemo(() => ({
     user,
@@ -204,7 +207,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(null);
         setIsAdmin(false);
         setSession(null);
-        setProfileFetched(false);
+        profileFetchedForUser.current = null;
       } catch (error: any) {
         toast({
           title: "Sign out failed",
@@ -215,7 +218,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
       }
     },
-  }), [user, session, isLoading, profile, isAdmin, authInitialized, processReferralAfterSignup]);
+  }), [user, session, isLoading, profile, isAdmin, authInitialized]);
 
   return (
     <AuthContext.Provider value={contextValue}>

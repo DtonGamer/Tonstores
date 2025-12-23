@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useProducts } from "@/hooks/useProducts";
 import { AlertTriangle, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,26 +14,38 @@ const LowStockAlert = ({ catalogId }: LowStockAlertProps) => {
   const { getLowStockProducts } = useProducts(catalogId);
   const navigate = useNavigate();
   
+  // Use ref to ensure we only check once per mount
+  const hasChecked = useRef(false);
+  
   useEffect(() => {
+    // Prevent multiple checks
+    if (hasChecked.current) return;
+    
     const checkLowStock = async () => {
       try {
         // Check if we've already shown the alert for this catalog in this session
-        const lastAlertTime = localStorage.getItem(`lowStockAlert_${catalogId}`);
-        const now = Date.now();
+        const sessionKey = `lowStockAlertShown_${catalogId}`;
+        const alreadyShownThisSession = sessionStorage.getItem(sessionKey);
         
-        // Only show alert if we haven't shown it in the last hour
-        if (!lastAlertTime || (now - parseInt(lastAlertTime)) > 3600000) {
-          const lowStockItems = await getLowStockProducts();
-          setLowStockCount(lowStockItems.length);
-          setIsVisible(lowStockItems.length > 0);
-          
-          // If we have low stock items, update the last alert time
-          if (lowStockItems.length > 0) {
-            localStorage.setItem(`lowStockAlert_${catalogId}`, now.toString());
-          }
+        // Don't show again if already shown this session
+        if (alreadyShownThisSession === 'true') {
+          hasChecked.current = true;
+          return;
         }
+        
+        const lowStockItems = await getLowStockProducts();
+        setLowStockCount(lowStockItems.length);
+        setIsVisible(lowStockItems.length > 0);
+        
+        // Mark as shown for this session
+        if (lowStockItems.length > 0) {
+          sessionStorage.setItem(sessionKey, 'true');
+        }
+        
+        hasChecked.current = true;
       } catch (error) {
         console.error("Error checking low stock:", error);
+        hasChecked.current = true;
       }
     };
     
@@ -42,23 +54,21 @@ const LowStockAlert = ({ catalogId }: LowStockAlertProps) => {
   
   const handleDismiss = () => {
     setIsVisible(false);
-    // Update the last alert time when manually dismissed
-    localStorage.setItem(`lowStockAlert_${catalogId}`, Date.now().toString());
   };
   
   if (!isVisible) return null;
   
   return (
-    <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 relative">
+    <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 p-4 mb-6 relative">
       <div className="flex items-start">
         <div className="flex-shrink-0">
           <AlertTriangle className="h-5 w-5 text-amber-500" />
         </div>
         <div className="ml-3 flex-1">
-          <h3 className="text-sm font-medium text-amber-800">
+          <h3 className="text-sm font-medium text-amber-800 dark:text-amber-300">
             Low Stock Alert
           </h3>
-          <div className="mt-1 text-sm text-amber-700">
+          <div className="mt-1 text-sm text-amber-700 dark:text-amber-400">
             <p>
               {lowStockCount} {lowStockCount === 1 ? 'product has' : 'products have'} low stock levels.
               Please review your inventory and restock if needed.
@@ -68,7 +78,7 @@ const LowStockAlert = ({ catalogId }: LowStockAlertProps) => {
             <Button 
               variant="outline" 
               size="sm"
-              className="text-amber-800 bg-amber-100 border-amber-200 hover:bg-amber-200"
+              className="text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700 hover:bg-amber-200 dark:hover:bg-amber-900/50"
               onClick={() => navigate(`/catalog/${catalogId}/edit`, { state: { activeTab: 'products' } })}
             >
               View Products <ArrowRight size={14} className="ml-1" />
@@ -78,7 +88,7 @@ const LowStockAlert = ({ catalogId }: LowStockAlertProps) => {
         <Button 
           variant="ghost" 
           size="sm" 
-          className="absolute top-2 right-2 h-6 w-6 p-0 rounded-full"
+          className="absolute top-2 right-2 h-6 w-6 p-0 rounded-full hover:bg-amber-200 dark:hover:bg-amber-900/50"
           onClick={handleDismiss}
         >
           <X size={14} />
@@ -88,4 +98,4 @@ const LowStockAlert = ({ catalogId }: LowStockAlertProps) => {
   );
 };
 
-export default LowStockAlert; 
+export default LowStockAlert;

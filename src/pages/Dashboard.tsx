@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
@@ -12,6 +12,8 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "@/components/ui/use-toast";
 import LowStockAlert from "@/components/dashboard/LowStockAlert";
 import { refreshSession } from "@/utils/reconnectHandler";
+import { SubscriptionDialog } from "@/components/subscription/SubscriptionDialog";
+import { usePricingPlans } from "@/hooks/usePricingPlans";
 
 type Catalog = {
   id: string;
@@ -31,119 +33,111 @@ const Dashboard = () => {
   const [orderCount, setOrderCount] = useState<number | null>(null);
   const [subscriptionLimits, setSubscriptionLimits] = useState<any>(null);
   const [productsCount, setProductsCount] = useState<Record<string, number>>({});
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const { getUserLimits } = useSubscriptionLimits();
   const navigate = useNavigate();
+
+  const { data: pricingPlans = [] } = usePricingPlans();
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
 
   // console.log('Dashboard - Initial Render');
   // console.log('User:', user);
   // console.log('Profile:', profile);
   // console.log('Subscription:', subscription);
 
+  // Memoize getUserLimits to prevent it from changing on every render
+  const stableGetUserLimits = useMemo(() => getUserLimits, [getUserLimits]);
+
+  // Fetch subscription limits only once when user changes
   useEffect(() => {
     const fetchLimits = async () => {
-      // console.log('Fetching subscription limits...');
-      const limits = await getUserLimits();
-      // console.log('Subscription limits:', limits);
-      setSubscriptionLimits(limits);
+      if (user) {
+        // console.log('Fetching subscription limits...');
+        const limits = await stableGetUserLimits();
+        // console.log('Subscription limits:', limits);
+        setSubscriptionLimits(limits);
+      }
     };
 
     fetchLimits();
-  }, [user, subscription]);
+  }, [user, stableGetUserLimits]); // Removed subscription from dependencies to prevent infinite loop
 
-  useEffect(() => {
-    const fetchCatalogs = async () => {
-      // console.log('Fetching catalogs...');
-      try {
-        if (!user) {
-          // console.log('No user found, skipping catalog fetch');
-          return;
-        }
-        
-        const { data, error } = await supabase
+  // Consolidated data fetching function
+  const fetchDashboardData = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+
+      // Fetch all data in parallel
+      const [catalogsResult, orderCountResult] = await Promise.all([
+        // Fetch catalogs
+        supabase
           .from("catalogs")
           .select("*")
           .eq("user_id", user.id)
-          .order("created_at", { ascending: false });
+          .order("created_at", { ascending: false }),
 
-        if (error) throw error;
-        // console.log('Catalogs fetched:', data);
-        setCatalogs(data || []);
+        // Fetch order count
+        (async () => {
+          const { data: userCatalogs } = await supabase
+            .from("catalogs")
+            .select("id")
+            .eq("user_id", user.id);
 
-        // For each catalog, get product count
-        if (data && data.length > 0) {
-          // console.log('Fetching product counts for catalogs...');
-          const counts: Record<string, number> = {};
-          
-          await Promise.all(data.map(async (catalog) => {
-            const { count, error } = await supabase
-              .from("products")
-              .select("id", { count: "exact", head: true })
-              .eq("catalog_id", catalog.id);
-              
-            if (error) throw error;
-            counts[catalog.id] = count || 0;
-            // console.log(`Catalog ${catalog.id} (${catalog.name}) has ${count} products`);
-          }));
-          
-          // console.log('Product counts:', counts);
-          setProductsCount(counts);
-        }
-      } catch (error: any) {
-        console.error('Error fetching catalogs:', error);
-        toast({
-          title: "Error loading catalogs",
-          description: error.message,
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
+          if (!userCatalogs || userCatalogs.length === 0) return { count: 0 };
+
+          const catalogIds = userCatalogs.map(c => c.id);
+          const { count } = await supabase
+            .from("orders")
+            .select("*", { count: "exact", head: true })
+            .in("catalog_id", catalogIds);
+
+          return { count: count || 0 };
+        })()
+      ]);
+
+      if (catalogsResult.error) throw catalogsResult.error;
+
+      const catalogData = catalogsResult.data || [];
+      setCatalogs(catalogData);
+      setOrderCount(orderCountResult.count);
+
+      // Fetch product counts in parallel
+      if (catalogData.length > 0) {
+        const countPromises = catalogData.map(catalog =>
+          supabase
+            .from("products")
+            .select("id", { count: "exact", head: true })
+            .eq("catalog_id", catalog.id)
+            .then(({ count }) => ({ id: catalog.id, count: count || 0 }))
+        );
+
+        const counts = await Promise.all(countPromises);
+        const countsMap = counts.reduce((acc, { id, count }) => {
+          acc[id] = count;
+          return acc;
+        }, {} as Record<string, number>);
+
+        setProductsCount(countsMap);
       }
-    };
-
-    // Get pending orders count
-    const fetchOrderCount = async () => {
-      // console.log('Fetching order count...');
-      try {
-        if (!user) {
-          // console.log('No user found, skipping order count fetch');
-          return;
-        }
-        
-        // First, get all catalogs owned by the user
-        const { data: userCatalogs, error: catalogError } = await supabase
-          .from("catalogs")
-          .select("id")
-          .eq("user_id", user.id);
-        
-        if (catalogError) throw catalogError;
-        // console.log('User catalogs for order count:', userCatalogs);
-        
-        if (!userCatalogs || userCatalogs.length === 0) {
-          // console.log('No catalogs found, setting order count to 0');
-          setOrderCount(0);
-          return;
-        }
-        
-        // Extract catalog IDs
-        const catalogIds = userCatalogs.map(catalog => catalog.id);
-        
-        // Get count of all orders for these catalogs
-        const { count, error } = await supabase
-          .from("orders")
-          .select("*", { count: "exact", head: true })
-          .in("catalog_id", catalogIds);
-          
-        if (error) throw error;
-        // console.log('Order count:', count);
-        setOrderCount(count || 0);
-      } catch (error) {
-        console.error("Error fetching order count:", error);
-      }
-    };
-
-    fetchCatalogs();
-    fetchOrderCount();
+    } catch (error: any) {
+      console.error('Error fetching dashboard data:', error);
+      toast({
+        title: "Error loading dashboard",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   }, [user]);
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   useEffect(() => {
     // console.log('Dashboard state update:');
@@ -187,76 +181,32 @@ const Dashboard = () => {
     }
   };
 
-  // Add a function to reload dashboard data
-  const reloadDashboardData = useCallback(async () => {
-    if (!user) return;
-    
-    try {
-      // Refresh Supabase session first
-      await refreshSession();
-      
-      // Then reload catalogs
-      const { data, error } = await supabase
-        .from("catalogs")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setCatalogs(data || []);
-      
-      // Reload product counts
-      if (data && data.length > 0) {
-        const counts: Record<string, number> = {};
-        
-        await Promise.all(data.map(async (catalog) => {
-          const { count, error } = await supabase
-            .from("products")
-            .select("id", { count: "exact", head: true })
-            .eq("catalog_id", catalog.id);
-            
-          if (error) throw error;
-          counts[catalog.id] = count || 0;
-        }));
-        
-        setProductsCount(counts);
-      }
-    } catch (error: any) {
-      console.error('Error reloading dashboard data:', error);
-    }
-  }, [user]);
-
-  // Add visibility change listener specific to this component
+  // Add visibility change handler - only reload after long absence
   useEffect(() => {
     let wasHidden = false;
     let lastVisibleTime = Date.now();
     const VISIBILITY_THRESHOLD = 10 * 60 * 1000; // 10 minutes
-    
+
     const handleVisibilityChange = async () => {
-      const isHidden = document.visibilityState === 'hidden';
-      
-      if (isHidden) {
+      if (document.visibilityState === 'hidden') {
         wasHidden = true;
         lastVisibleTime = Date.now();
       } else if (wasHidden) {
-        // Tab is now visible again after being hidden
         const hiddenDuration = Date.now() - lastVisibleTime;
-        
-        // If hidden for more than the threshold, reload data
+
         if (hiddenDuration > VISIBILITY_THRESHOLD) {
-          await reloadDashboardData();
+          await refreshSession();
+          await fetchDashboardData();
         }
-        
+
         wasHidden = false;
       }
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [reloadDashboardData]);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [fetchDashboardData]);
+
 
   if (loading || profileLoading) {
     // console.log('Dashboard is loading...');
@@ -290,11 +240,20 @@ const Dashboard = () => {
                 <span className="text-sm font-medium dark:text-white">Plan: {subscription?.pricing_plans?.name || "Free"}</span>
               </div>
               {!subscriptionLimits.canCreateCatalog && (
-                <Link to="/pricing">
-                  <Button variant="outline" size="sm" className="h-7 text-xs border-Tonstores-green text-Tonstores-green hover:bg-Tonstores-green/10 dark:border-Tonstores-green/70 dark:text-Tonstores-green/90 dark:hover:bg-Tonstores-green/20">
-                    Upgrade
-                  </Button>
-                </Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs border-Tonstores-green text-Tonstores-green hover:bg-Tonstores-green/10 dark:border-Tonstores-green/70 dark:text-Tonstores-green/90 dark:hover:bg-Tonstores-green/20"
+                  onClick={() => {
+                    const plan = pricingPlans.find(p => p.name !== "Free");
+                    if (plan) {
+                      setSelectedPlan(plan);
+                      setIsSubscriptionModalOpen(true);
+                    }
+                  }}
+                >
+                  Upgrade
+                </Button>
               )}
             </div>
             
@@ -448,8 +407,18 @@ const Dashboard = () => {
           ))}
         </div>
       )}
-    </div>
-  );
-};
+   
+
+    {/* Subscription Modal */}
+    {selectedPlan && (
+      <SubscriptionDialog
+        isOpen={isSubscriptionModalOpen}
+        onClose={() => setIsSubscriptionModalOpen(false)}
+        plan={selectedPlan}
+        billingCycle={billingCycle}
+      />
+    )}
+  </div>
+)};
 
 export default Dashboard;

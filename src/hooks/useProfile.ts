@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import useAuth from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
@@ -112,9 +112,17 @@ export const useProfile = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
-  debugLog("useProfile - authLoading:", authLoading, "hasAuthProfile:", !!authProfile, "authInitialized:", authInitialized);
+  // Only log once when values actually change
+  if (process.env.NODE_ENV === 'development') {
+    // Use a more throttled logging approach
+    const logKey = `${authLoading}-${!!authProfile}-${authInitialized}`;
+    if (!window._lastProfileLog || window._lastProfileLog !== logKey) {
+      debugLog("useProfile - authLoading:", authLoading, "hasAuthProfile:", !!authProfile, "authInitialized:", authInitialized);
+      window._lastProfileLog = logKey;
+    }
+  }
 
-  // ✅ Simply use the auth profile - no additional fetching needed
+  // Memoize values to prevent unnecessary re-renders
   const profile = authProfile;
   const loading = authLoading;
   const isAdmin = authProfile?.role === 'admin' || authIsAdmin;
@@ -137,7 +145,6 @@ export const useProfile = () => {
       if (error) throw error;
       
       debugLog("Profile updated successfully");
-      // Profile will be updated via auth context
       return data;
     } catch (error: any) {
       debugLog("Error updating profile:", error);
@@ -190,9 +197,8 @@ export const useProfile = () => {
     }
   };
 
-  debugLog("useProfile returning - loading:", loading, "hasProfile:", !!profile);
-
-  return {
+  // Memoize the return value to prevent object recreation
+  return useMemo(() => ({
     profile,
     loading,
     updateProfile,
@@ -200,5 +206,12 @@ export const useProfile = () => {
     isUploading,
     uploadProgress,
     isAdmin,
-  };
+  }), [profile, loading, isUploading, uploadProgress, isAdmin]);
 };
+
+// Add type declaration for window
+declare global {
+  interface Window {
+    _lastProfileLog?: string;
+  }
+}
