@@ -97,23 +97,27 @@ const CatalogBuilder = () => {
   // Load catalog and products data
   useEffect(() => {
     let isMounted = true;
-    
+
     const loadData = async () => {
       if (!isMounted) return;
-      
+
       if (!isNewCatalog && !id) {
         setIsLoading(false);
         return;
       }
-      
+
       try {
         setIsLoading(true);
-        
+
         if (!isNewCatalog && id) {
-          // Load existing catalog
-          const catalogData = await getCatalog(id);
+          // Load catalog and products data in parallel for better performance
+          const [catalogData, productsData] = await Promise.all([
+            getCatalog(id),
+            getProducts(id)
+          ]);
+
           if (!catalogData) return;
-          
+
           if (isMounted) {
             form.reset({
               name: catalogData.name,
@@ -121,15 +125,11 @@ const CatalogBuilder = () => {
               description: catalogData.description || "",
               is_active: catalogData.is_active
             });
-            
-            // Load products for this catalog
-            const productsData = await getProducts(id);
-            if (isMounted) {
-              if (Array.isArray(productsData)) {
-                setProducts(productsData);
-              }
-              setShareableLink(`${window.location.origin}/c/${catalogData.slug}`);
+
+            if (Array.isArray(productsData)) {
+              setProducts(productsData);
             }
+            setShareableLink(`${window.location.origin}/c/${catalogData.slug}`);
           }
         } else {
           // New catalog, just clear loading
@@ -149,9 +149,9 @@ const CatalogBuilder = () => {
         }
       }
     };
-    
+
     loadData();
-    
+
     return () => {
       isMounted = false;
     };

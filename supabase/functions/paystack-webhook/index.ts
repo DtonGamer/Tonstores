@@ -128,7 +128,29 @@ serve(async (req) => {
                 updateData.status = 'paid';
                 updateData.payment_status = 'paid';
                 updateData.payment_date = new Date().toISOString();
-                
+
+                // For escrow transactions, keep funds held until release
+                // Check if this is an escrow transaction
+                const { data: escrowData } = await supabase
+                  .from('escrow_transactions')
+                  .select('id')
+                  .eq('transaction_reference', reference)
+                  .single();
+
+                if (escrowData) {
+                  // This is an escrow transaction - keep funds held
+                  updateData.escrow_status = 'held';
+
+                  // Also update the escrow transaction status
+                  await supabase
+                    .from('escrow_transactions')
+                    .update({
+                      status: 'held',
+                      updated_at: new Date().toISOString()
+                    })
+                    .eq('transaction_reference', reference);
+                }
+
                 // Update the actual payment reference if it's different
                 if (data.transaction_id) {
                   updateData.transaction_reference = data.transaction_id;
@@ -137,6 +159,28 @@ serve(async (req) => {
                 // Payout successful - mark order as completed/paid out
                 updateData.payout_status = 'completed';
                 updateData.release_date = new Date().toISOString();
+
+                // For escrow transactions, update the escrow status to 'released'
+                const { data: escrowData } = await supabase
+                  .from('escrow_transactions')
+                  .select('id')
+                  .eq('transaction_reference', reference)
+                  .single();
+
+                if (escrowData) {
+                  // This is an escrow transaction - update escrow status to 'released'
+                  updateData.escrow_status = 'released';
+
+                  // Also update the escrow transaction status
+                  await supabase
+                    .from('escrow_transactions')
+                    .update({
+                      status: 'released',
+                      released_at: new Date().toISOString(),
+                      updated_at: new Date().toISOString()
+                    })
+                    .eq('transaction_reference', reference);
+                }
               }
 
               // Update the order status

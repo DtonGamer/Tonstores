@@ -282,13 +282,35 @@ export const useSimplifiedPaystackPayment = () => {
         orderId: order.id  // Include order ID for tracking
       });
 
+      console.log("Checking transaction data for redirect:", {
+        hasStatus: !!transactionData.status,
+        hasData: !!transactionData.data,
+        hasAuthUrl: !!transactionData.data?.authorization_url,
+        fullTransactionData: transactionData
+      });
+
       if (transactionData.status && transactionData.data?.authorization_url) {
+        console.log("Redirecting to authorization URL:", transactionData.data.authorization_url);
         // Open the Paystack checkout page in the same window
-        window.location.href = transactionData.data.authorization_url;
+        const authUrl = transactionData.data.authorization_url;
+        // For production debugging - use alert to confirm redirect is being attempted
+        if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) {
+          // Only show alert in non-dev environments for debugging
+          console.log("Attempting redirect in production to:", authUrl);
+          // Optional: uncomment the next line for immediate visual feedback in production
+           alert(`Redirecting to Paystack: ${authUrl.substring(0, 50)}...`);
+        }
+        window.location.href = authUrl;
+        console.log("Redirect executed - this message should not appear if redirect worked");
       } else {
+        console.error("Redirect condition failed:", {
+          status: transactionData.status,
+          authUrl: transactionData.data?.authorization_url
+        });
         throw new Error(transactionData.message || 'Failed to get checkout URL from Paystack');
       }
 
+      console.log("Reached after redirect - this shouldn't happen if redirect worked");
     } catch (error: any) {
       console.error("Error initializing payment:", error);
 
