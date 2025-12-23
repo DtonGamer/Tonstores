@@ -11,6 +11,8 @@ export type Profile = {
   id: string;
   business_name: string;
   avatar_url?: string;
+  business_logo_url?: string;
+  website?: string;
   business_address?: string;
   phone_number?: string;
   business_description?: string;
@@ -28,6 +30,12 @@ export type Profile = {
   instagram_handle?: string;
   facebook_handle?: string;
   tiktok_handle?: string;
+  is_affiliate?: boolean;
+  affiliate_status?: 'active' | 'pending' | 'inactive';
+  affiliate_commission_rate?: number;
+  affiliate_total_earnings?: number;
+  affiliate_total_referrals?: number;
+  referral_code?: string;
   role: Role;
   created_at: string;
   updated_at: string;
@@ -36,9 +44,32 @@ export type Profile = {
 type ProfileUpdate = {
   business_name?: string;
   avatar_url?: string;
+  business_logo_url?: string;
+  website?: string;
   business_address?: string;
   phone_number?: string;
-  // ... rest of your ProfileUpdate type
+  business_description?: string;
+  paystack_subaccount_code?: string;
+  paystack_bvn?: string;
+  paystack_kyc_status?: string;
+  paystack_kyc_submitted_at?: string;
+  paystack_percentage_charge?: number;
+  kyc_verified?: boolean;
+  kyc_verified_at?: string;
+  email_support?: string;
+  contact_email?: string;
+  whatsapp_support?: string;
+  twitter_handle?: string;
+  instagram_handle?: string;
+  facebook_handle?: string;
+  tiktok_handle?: string;
+  is_affiliate?: boolean;
+  affiliate_status?: 'active' | 'pending' | 'inactive';
+  affiliate_commission_rate?: number;
+  affiliate_total_earnings?: number;
+  affiliate_total_referrals?: number;
+  referral_code?: string;
+  role?: Role;
 };
 
 export const ADMIN_USER_ID = "b16bfd66-7f65-4c1c-a98d-bca1a75d06a1";
