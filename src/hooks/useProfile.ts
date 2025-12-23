@@ -15,7 +15,14 @@ export type Profile = {
   phone_number?: string;
   business_description?: string;
   paystack_subaccount_code?: string;
+  paystack_bvn?: string;
+  paystack_kyc_status?: string;
+  paystack_kyc_submitted_at?: string;
+  paystack_percentage_charge?: number;
+  kyc_verified?: boolean;
+  kyc_verified_at?: string;
   email_support?: string;
+  contact_email?: string;
   whatsapp_support?: string;
   twitter_handle?: string;
   instagram_handle?: string;
