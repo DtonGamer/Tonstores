@@ -290,7 +290,7 @@ export const useSimplifiedPaystackPayment = () => {
       };
 
       debugLog('Calling initializeEscrowTransaction...');
-      
+
       // Call the unified paystack service
       const transactionData = await unifiedPaystackService.initializeEscrowTransaction({
         ...paystackTransactionData,
@@ -336,15 +336,40 @@ export const useSimplifiedPaystackPayment = () => {
       // If we got here, we have a valid URL
       const authUrl = transactionData.data.authorization_url;
       debugLog('REDIRECTING NOW', { url: authUrl });
-      
+
       // Add a small delay to ensure localStorage is written
       await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Perform redirect
-      window.location.href = authUrl;
-      
+
+      // Try the standard redirect first
+      try {
+        window.location.href = authUrl;
+      } catch (redirectError) {
+        debugLog('Standard redirect failed, trying window.open as fallback', { redirectError });
+        console.error('Standard redirect failed:', redirectError);
+
+        // Fallback: Open in a new tab/window if the redirect fails
+        const newWindow = window.open(authUrl, '_blank');
+
+        if (!newWindow) {
+          // If popup is blocked, show a message to the user
+          debugLog('Popup blocked, showing fallback UI');
+          console.error('Popup blocked - showing fallback UI');
+          toast.error('Payment page blocked. Please allow popups for this site or check your browser settings.');
+        }
+      }
+
       // This line should never be reached if redirect works
       debugLog('WARNING: Code after redirect was executed - redirect may have failed');
+
+      // Additional logging in case redirect doesn't work
+      console.log('DEBUG: Redirect failed - still on the same page');
+      console.log('DEBUG: Authorization URL was:', authUrl);
+      console.log('DEBUG: Environment:', {
+        hostname: window.location.hostname,
+        origin: window.location.origin,
+        isSecure: window.location.protocol === 'https:',
+        referrer: document.referrer
+      });
 
     } catch (error: any) {
       debugLog('FATAL ERROR', {

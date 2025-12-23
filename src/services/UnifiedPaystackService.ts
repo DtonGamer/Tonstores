@@ -137,11 +137,33 @@ export const unifiedPaystackService = {
 
   // Initialize escrow transaction for product purchases (funds go to platform first)
   initializeEscrowTransaction: async (params: PaystackInitializeEscrowTransactionParams) => {
-    const response = await callSupabaseFunction('paystack-initialize-escrow-transaction', {
-      ...params,
-      dev_mode: isDevMode()
-    });
-    return response;
+    try {
+      const response = await callSupabaseFunction('paystack-initialize-escrow-transaction', {
+        ...params,
+        dev_mode: isDevMode()
+      });
+
+      // Add this logging RIGHT after getting the response
+      console.log('EDGE FUNCTION RESPONSE:', JSON.stringify(response, null, 2));
+
+      // Additional logging specifically for the authorization URL
+      if (response?.data?.authorization_url) {
+        console.log('✅ AUTHORIZATION URL AVAILABLE:', response.data.authorization_url);
+      } else {
+        console.error('❌ NO AUTHORIZATION URL IN RESPONSE:', {
+          hasResponse: !!response,
+          hasData: !!response?.data,
+          hasAuthUrl: !!response?.data?.authorization_url
+        });
+      }
+
+      // Make sure you're returning the data correctly
+      return response; // Should have data.data.authorization_url
+    } catch (error) {
+      console.error('ERROR in initializeEscrowTransaction:', error);
+      // Re-throw the error to be handled by the calling function
+      throw error;
+    }
   },
 
   // Get seller balance
