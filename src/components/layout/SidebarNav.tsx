@@ -169,7 +169,7 @@ export default function SidebarNav() {
 
       {/* Desktop Sidebar */}
       <div className={`hidden lg:flex ${isSidebarCollapsed ? 'lg:w-20' : 'lg:w-64'} lg:flex-col lg:fixed lg:inset-y-0`}>
-        <div className="flex flex-col flex-grow border-r border-gray-200 bg-white overflow-y-auto">
+        <div className="flex flex-col flex-grow border-r border-gray-200 bg-white overflow-y-auto overflow-x-hidden scrollbar-hide">
           <div className="flex items-center justify-between h-16 flex-shrink-0 px-4 border-b border-gray-200">
             <Link to="/" className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : ''}`}>
               {!isSidebarCollapsed && (
@@ -295,7 +295,7 @@ export default function SidebarNav() {
       <div className={`lg:hidden fixed inset-0 z-40 transition-opacity duration-300 ${isMobileNavOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <div className="absolute inset-0 bg-gray-600 bg-opacity-75" onClick={() => setIsMobileNavOpen(false)}></div>
 
-        <div className={`sidebar-content relative transform transition-transform duration-300 ease-in-out ${isMobileNavOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col w-72 max-w-[80%] h-full bg-white shadow-xl`}>
+        <div className={`sidebar-content relative transform transition-transform duration-300 ease-in-out ${isMobileNavOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col w-72 max-w-[80%] h-full bg-white shadow-xl overflow-y-auto overflow-x-hidden scrollbar-hide`}>
           <div className="flex items-center justify-between h-16 flex-shrink-0 px-4 border-b border-gray-200">
             <Link to="/" className="flex items-center">
               <div className="flex items-center space-x-2">

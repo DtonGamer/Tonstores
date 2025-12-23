@@ -153,6 +153,16 @@
   scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
 }
 
+/* Scrollbar hide utility class */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 /* Analytics page animations */
 @keyframes fadeIn {
   from { opacity: 0; }
