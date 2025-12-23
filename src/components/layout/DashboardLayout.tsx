@@ -99,9 +99,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex-grow">
             {children}
           </main>
-          <Footer />
         </div>
-        {!isCheckoutRoute && <Disclaimer />}
+        <Disclaimer />
       </div>
     </ErrorBoundary>
   );

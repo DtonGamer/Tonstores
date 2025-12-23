@@ -51,8 +51,9 @@ export const createPaystackConfig = async ({
     }
 
     // Calculate amount based on billing cycle (Paystack uses kobo)
+    // The plan prices are already stored in kobo, so no conversion needed
     const planAmount = billingCycle === 'yearly' ? plan.yearly_price : plan.monthly_price;
-    const amountInKobo = planAmount * 100; // Convert to kobo
+    const amountInKobo = planAmount; // Already in kobo
 
     // Get Paystack public key
     const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
