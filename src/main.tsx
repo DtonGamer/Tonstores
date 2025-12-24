@@ -34,24 +34,13 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
 import './tailwind.output.css';
-import { ensureUserSession } from './utils/sessionHelpers';
 
-// Initialize user session (anonymous or authenticated) BEFORE rendering
-ensureUserSession().then(() => {
-  const container = document.getElementById('root');
-  if (!container) {
-    throw new Error('Root container missing');
-  }
+const container = document.getElementById('root');
+if (!container) {
+  throw new Error('Root container missing');
+}
 
-  const root = createRoot(container);
-  root.render(
-    <App />
-  );
-}).catch(error => {
-  console.error('Failed to initialize user session:', error);
-
-  const container = document.getElementById('root');
-  if (container) {
-    container.innerHTML = '<div class="error-message">Failed to initialize application. Please refresh the page.</div>';
-  }
-});
+const root = createRoot(container);
+root.render(
+  <App />
+);

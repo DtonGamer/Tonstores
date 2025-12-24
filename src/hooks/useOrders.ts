@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { CartItem } from "./useCart";
 import { v4 as uuidv4 } from 'uuid';
-import { getCurrentUserId, isAnonymousUser } from "@/utils/sessionHelpers";
+import { getCurrentUserId } from "@/utils/sessionHelpers";
 
 // Function to generate UUID v4
 const generateUUID = () => {
@@ -64,8 +64,6 @@ export const useOrders = () => {
         throw new Error('Authentication error');
       }
 
-      // Determine if this is an anonymous user order
-      const isAnonymousOrder = !sessionData.session?.user || await isAnonymousUser(sessionData.session?.user);
       const userId = await getCurrentUserId();
 
       // Validate required data
@@ -77,7 +75,7 @@ export const useOrders = () => {
       const totalAmount = items.reduce((sum, item) =>
         sum + (Number(item.price) || 0) * (Number(item.quantity) || 0), 0);
 
-      // Create the order with proper handling for anonymous users
+      // Create the order
       const orderData: any = {
         ...formData,
         total_amount: totalAmount,
@@ -87,7 +85,6 @@ export const useOrders = () => {
         catalog_id: catalogId,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        placed_as_guest: isAnonymousOrder, // Use a simpler flag for anonymous orders
         user_id: sessionData.session?.user?.id || userId
       };
 

@@ -15,7 +15,7 @@ A modern e-commerce catalog management system built with React, Vite, and Supaba
 - 🔐 Admin role system for platform management
 - 🏦 KYC onboarding and direct payments to sellers
 - 📊 Social media sales tracking
-- 👤 Anonymous user support with Supabase's built-in authentication
+- 👤 User authentication with Supabase's built-in authentication
 
 ## Tech Stack
 

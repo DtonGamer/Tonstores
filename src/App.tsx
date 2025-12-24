@@ -27,7 +27,6 @@ import Finances from "./pages/Finances";
 import AuthForm from "./components/auth/AuthForm";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./contexts/AuthContext";
-import { GuestProvider } from "./contexts/GuestContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ProtectedRoute, { PremiumRoute } from "./components/auth/ProtectedRoute";
 import DashboardLayout from "./components/layout/DashboardLayout";
@@ -270,15 +269,13 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <GuestProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <ErrorBoundary>
-                <RouterProvider router={router} />
-              </ErrorBoundary>
-            </TooltipProvider>
-          </GuestProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <ErrorBoundary>
+              <RouterProvider router={router} />
+            </ErrorBoundary>
+          </TooltipProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

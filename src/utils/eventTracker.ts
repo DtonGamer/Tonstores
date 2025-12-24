@@ -57,7 +57,7 @@ const getSessionId = (): string => {
   return sessionId;
 };
 
-// Get current user ID (works for both anonymous and authenticated users)
+// Get current user ID
 const getCurrentUserId = async (): Promise<string | null> => {
   const { data: { session } } = await supabase.auth.getSession();
   return session?.user?.id || null;
@@ -318,9 +318,9 @@ export const trackEvent = async (
 
     // Prepare the event record
     // For authenticated users, track with their user_id
-    // For anonymous users, we can still track events but with user_id as the anonymous user ID
+    // Track events with user ID
     const eventToInsert: EventRecord = {
-      user_id: userId, // Will be the user ID for both authenticated and anonymous users
+      user_id: userId, // Will be the user ID for authenticated users, null for unauthenticated
       session_id: sessionId,
       event_type: eventType,
       event_data: eventData,

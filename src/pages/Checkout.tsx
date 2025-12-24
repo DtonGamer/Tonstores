@@ -191,7 +191,7 @@ const Checkout = () => {
   const initializePaymentWithRetry = async (order: any, formData: OrderFormData) => {
     console.log("Initializing payment for order:", order.id);
 
-    // Get current user ID (works for both anonymous and authenticated users)
+    // Get current user ID
     const userId = await getCurrentUserId();
     console.log("Current user ID:", userId);
 
@@ -243,7 +243,7 @@ const Checkout = () => {
     setIsSubmitting(true);
     setPaymentError(null);
 
-    // Get current user ID (works for both anonymous and authenticated users)
+    // Get current user ID
     const userId = await getCurrentUserId();
     console.log("Current user ID for retry:", userId);
 

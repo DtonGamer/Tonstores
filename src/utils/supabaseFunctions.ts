@@ -57,9 +57,7 @@ export const callSupabaseFunction = async (
     headers['Authorization'] = `Bearer ${session.access_token}`;
   }
 
-  // For anonymous users, we don't need to add a guest ID header
-  // Supabase handles anonymous authentication automatically
-  // The user ID is already available in the session
+  // The user ID is available in the session for authenticated users
 
   // DEBUG: Log headers (without sensitive data)
   console.log('DEBUG - Request headers:', {

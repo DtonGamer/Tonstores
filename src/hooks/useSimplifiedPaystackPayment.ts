@@ -126,9 +126,7 @@ export const useSimplifiedPaystackPayment = () => {
       isProduction: !window.location.hostname.includes('localhost')
     });
 
-    // FIX: Don't require user authentication for guest checkout
-    const isAnonymousOrder = !user;
-    const userId = user?.id || null; // Allow null for anonymous
+    const userId = user?.id || null;
 
     setIsLoading(true);
     setPaymentRetryAvailable(false);
@@ -143,7 +141,7 @@ export const useSimplifiedPaystackPayment = () => {
     }
 
     setCurrentOrderId(order.id);
-    debugLog('Order validated', { orderId: order.id, isAnonymous: isAnonymousOrder });
+    debugLog('Order validated', { orderId: order.id, userId: userId });
 
     try {
       // Get the Paystack public key
@@ -210,9 +208,7 @@ export const useSimplifiedPaystackPayment = () => {
           customer_name: customerName,
           customer_email: customerEmail,
           customer_phone: customerPhone,
-          // FIX: Don't require user_id for anonymous orders
           ...(userId && { user_id: userId }),
-          is_anonymous: isAnonymousOrder,
           custom_fields: [
             {
               display_name: "Order ID",
@@ -316,7 +312,7 @@ export const useSimplifiedPaystackPayment = () => {
           splitPercentage: 100,
           feeBearer: true
         }] : undefined,
-        userId: userId, // Can be null for anonymous
+        userId: userId, // Can be null for unauthenticated users
         orderId: order.id
       });
 
