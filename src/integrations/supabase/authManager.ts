@@ -136,7 +136,8 @@ export const signInWithEmailAndPassword = async (email: string, password: string
 export const signUpWithEmailAndPassword = async (
   email: string,
   password: string,
-  businessName: string
+  businessName: string,
+  userType: 'buyer' | 'seller' = 'seller' // Default to seller for regular account creation
 ) => {
   // Create a timeout promise
   const timeoutPromise = new Promise((_, reject) => {
@@ -151,13 +152,29 @@ export const signUpWithEmailAndPassword = async (
       email,
       password,
       options: {
-        emailRedirectTo: null, // Disable email verification
-        data: { business_name: businessName }
+        emailRedirectTo: `${window.location.origin}/auth/verify`, // Enable email verification
+        data: {
+          business_name: businessName,
+          user_type: userType
+        }
       }
     });
 
     // Wait for either the auth response or the timeout
     const response = await Promise.race([authPromise, timeoutPromise]);
+
+    // If the user is a buyer, update their profile to reflect this
+    if (userType === 'buyer' && response.data.user) {
+      // Update the profile to set an appropriate business name for buyers
+      await supabase
+        .from('profiles')
+        .update({
+          business_name: response.data.user.user_metadata.full_name || 'Buyer Account',
+          user_type: 'buyer'
+        })
+        .eq('id', response.data.user.id);
+    }
+
     return response;
   } catch (error) {
     // If it's our timeout error, throw it

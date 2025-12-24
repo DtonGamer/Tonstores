@@ -6,16 +6,20 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { Button } from "@/components/ui/button";
 import { LockIcon } from "lucide-react";
 import { debugLog } from "@/utils/debug";
+import { supabase } from "@/integrations/supabase/client";
 
 type ProtectedRouteProps = {
   children: ReactNode;
+  allowedUserTypes?: ('buyer' | 'seller')[]; // Optional: specify which user types can access this route
 };
 
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ children, allowedUserTypes }: ProtectedRouteProps) => {
   const { user, authInitialized, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  
+  const [userType, setUserType] = useState<'buyer' | 'seller' | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+
   // Use ref to track if we've already checked auth
   const hasCheckedAuth = useRef(false);
   const hasShownToast = useRef(false);
@@ -33,9 +37,9 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     // Once initialized, check if user exists
     if (!user) {
       debugLog("🚫 No user - redirecting to login");
-      
+
       sessionStorage.setItem("redirectAfterLogin", location.pathname);
-      
+
       // Only show toast once
       if (!hasShownToast.current) {
         toast({
@@ -50,7 +54,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         replace: true,
         state: { from: location.pathname }
       });
-      
+
       hasCheckedAuth.current = true;
     } else {
       debugLog("✅ User authenticated");
@@ -58,8 +62,57 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     }
   }, [authInitialized, user, navigate, location.pathname]);
 
+  // Fetch user profile to determine user type
+  useEffect(() => {
+    if (!user || !authInitialized || !hasCheckedAuth.current) return;
+
+    const fetchProfile = async () => {
+      setProfileLoading(true);
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          debugLog("❌ Error fetching profile:", error.message);
+          // If profile doesn't exist yet, default to seller for backward compatibility
+          setUserType('seller');
+        } else {
+          setUserType(profile.user_type || 'seller');
+        }
+      } catch (err) {
+        debugLog("❌ Error in fetchProfile:", err);
+        setUserType('seller'); // Default to seller on error
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [user, authInitialized]);
+
+  // Check if user type is allowed for this route
+  useEffect(() => {
+    if (!userType || !allowedUserTypes || profileLoading) return;
+
+    if (!allowedUserTypes.includes(userType)) {
+      debugLog(`❌ User type ${userType} not allowed for this route`);
+
+      // Redirect based on user type
+      if (userType === 'buyer') {
+        // Buyers should only go to their profile page
+        navigate("/buyer-profile", { replace: true });
+      } else {
+        // Sellers can go to dashboard
+        navigate("/dashboard", { replace: true });
+      }
+    }
+  }, [userType, allowedUserTypes, profileLoading, navigate]);
+
   // Show loading spinner while auth initializes
-  if (!authInitialized || isLoading) {
+  if (!authInitialized || isLoading || profileLoading) {
     debugLog("🔄 Showing loading spinner");
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -73,6 +126,11 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return null;
   }
 
+  // If allowedUserTypes is specified but user type doesn't match, don't render
+  if (allowedUserTypes && userType && !allowedUserTypes.includes(userType)) {
+    return null;
+  }
+
   debugLog("✅ Rendering protected content");
   return <>{children}</>;
 };
@@ -80,39 +138,101 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 // Premium route that requires a paid subscription
 type PremiumRouteProps = {
   children: ReactNode;
+  allowedUserTypes?: ('buyer' | 'seller')[]; // Optional: specify which user types can access this route
 };
 
-export const PremiumRoute = ({ children }: PremiumRouteProps) => {
-  const { authInitialized } = useAuth();
+export const PremiumRoute = ({ children, allowedUserTypes }: PremiumRouteProps) => {
+  const { user, authInitialized, isLoading } = useAuth();
   const { subscription, isLoading: subscriptionLoading } = useSubscription();
   const navigate = useNavigate();
   const [hasPaidPlan, setHasPaidPlan] = useState<boolean | null>(null);
-  
+  const [userType, setUserType] = useState<'buyer' | 'seller' | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+
   // Use ref to prevent re-checking
   const hasCheckedSubscription = useRef(false);
+
+  // Fetch user profile to determine user type
+  useEffect(() => {
+    if (!user || !authInitialized) return;
+
+    const fetchProfile = async () => {
+      setProfileLoading(true);
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          debugLog("❌ Error fetching profile:", error.message);
+          // If profile doesn't exist yet, default to seller for backward compatibility
+          setUserType('seller');
+        } else {
+          setUserType(profile.user_type || 'seller');
+        }
+      } catch (err) {
+        debugLog("❌ Error in fetchProfile:", err);
+        setUserType('seller'); // Default to seller on error
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [user, authInitialized]);
 
   useEffect(() => {
     // Skip if already checked
     if (hasCheckedSubscription.current) return;
-    
-    if (!authInitialized || subscriptionLoading) return;
 
-    const hasPaidSubscription = subscription && 
-      subscription.pricing_plans && 
+    if (!authInitialized || subscriptionLoading || profileLoading) return;
+
+    const hasPaidSubscription = subscription &&
+      subscription.pricing_plans &&
       subscription.pricing_plans.name !== 'Free' &&
       subscription.status === 'active';
-    
+
     setHasPaidPlan(hasPaidSubscription);
     hasCheckedSubscription.current = true;
-  }, [authInitialized, subscription, subscriptionLoading]);
+  }, [authInitialized, subscription, subscriptionLoading, profileLoading]);
+
+  // Check if user type is allowed for this route
+  useEffect(() => {
+    if (!userType || !allowedUserTypes || profileLoading) return;
+
+    if (!allowedUserTypes.includes(userType)) {
+      debugLog(`❌ User type ${userType} not allowed for this route`);
+
+      // Redirect based on user type
+      if (userType === 'buyer') {
+        // Buyers should only go to their profile page
+        navigate("/buyer-profile", { replace: true });
+      } else {
+        // Sellers can go to dashboard
+        navigate("/dashboard", { replace: true });
+      }
+    }
+  }, [userType, allowedUserTypes, profileLoading, navigate]);
 
   // Show spinner while checking
-  if (!authInitialized || subscriptionLoading || hasPaidPlan === null) {
+  if (!authInitialized || isLoading || subscriptionLoading || profileLoading || hasPaidPlan === null) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-Tonstores-green"></div>
       </div>
     );
+  }
+
+  // Don't render children until we have a user
+  if (!user) {
+    return null;
+  }
+
+  // If allowedUserTypes is specified but user type doesn't match, don't render
+  if (allowedUserTypes && userType && !allowedUserTypes.includes(userType)) {
+    return null;
   }
 
   // If user doesn't have a paid plan
@@ -125,7 +245,7 @@ export const PremiumRoute = ({ children }: PremiumRouteProps) => {
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             This feature is available to business users only.
           </p>
-          <Button 
+          <Button
             onClick={() => navigate("/pricing")}
             className="bg-Tonstores-green hover:bg-Tonstores-darkblue text-white"
           >

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +26,39 @@ export function QuickAccountCreation({
   const [showPassword, setShowPassword] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string }>({});
+  
+  // Use ref to track if component is mounted
+  const isMountedRef = useRef(true);
+
+  // Check if user is already signed in
+  useEffect(() => {
+    let cancelled = false;
+    
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!cancelled && session?.user) {
+          onAccountCreated(session.user.id);
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+      }
+    };
+
+    checkSession();
+    
+    // Cleanup function
+    return () => {
+      cancelled = true;
+    };
+  }, [onAccountCreated]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const validatePassword = (pwd: string): string | null => {
     if (pwd.length < 8) return 'Password must be at least 8 characters';
@@ -38,13 +71,17 @@ export function QuickAccountCreation({
   const handlePasswordChange = (value: string) => {
     setPassword(value);
     const error = validatePassword(value);
-    setErrors(prev => ({ ...prev, password: error || undefined }));
+    if (isMountedRef.current) {
+      setErrors(prev => ({ ...prev, password: error || undefined }));
+    }
   };
 
   const handleConfirmPasswordChange = (value: string) => {
     setConfirmPassword(value);
     const error = value !== password ? 'Passwords do not match' : undefined;
-    setErrors(prev => ({ ...prev, confirmPassword: error }));
+    if (isMountedRef.current) {
+      setErrors(prev => ({ ...prev, confirmPassword: error }));
+    }
   };
 
   const createAccount = async () => {
@@ -63,59 +100,81 @@ export function QuickAccountCreation({
     setIsCreating(true);
 
     try {
-      // Create account with email confirmation disabled
+      // First, try to sign in with the provided credentials to see if the user already exists
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      // Check if component is still mounted before proceeding
+      if (!isMountedRef.current) return;
+
+      if (signInData.user) {
+        // User successfully signed in with existing credentials
+        toast.success('Welcome back! Signed in successfully.');
+        onAccountCreated(signInData.user.id);
+        return;
+      }
+
+      // If sign in failed because user doesn't exist, try to sign up (create new account)
+      if (signInError) {
+        // Check if the error indicates the user doesn't exist (email not registered)
+        if (signInError.message.includes('Invalid login credentials')) {
+          // User doesn't exist, so we can proceed with sign up
+        } else {
+          // Some other error occurred, throw it
+          throw signInError;
+        }
+      }
+
+      // Proceed with sign up (create new account)
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: name,
-            phone: phone
+            phone: phone,
+            user_type: 'buyer',
+            from_checkout: 'true'
           },
-          // This bypasses email verification - user is immediately confirmed
-          emailRedirectTo: undefined
+          emailRedirectTo: `${window.location.origin}/auth/verify`
         }
       });
 
+      // Check if component is still mounted
+      if (!isMountedRef.current) return;
+
       if (signUpError) {
         if (signUpError.message.includes('already registered')) {
-          // User already has an account - try to sign them in
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email,
-            password
-          });
-
-          if (signInError) {
-            toast.error('This email is already registered. Please sign in with your existing password.');
-            return;
-          }
-
-          if (signInData.user) {
-            toast.success('Welcome back! Signed in successfully.');
-            onAccountCreated(signInData.user.id);
-            return;
-          }
+          toast.error('This email is already registered. Please sign in with your existing password.');
+          return;
         }
-
         throw signUpError;
       }
 
       if (!signUpData.user) {
+        if (signUpData.session) {
+          toast.success('Buyer account created successfully! You can now track your order.');
+          onAccountCreated(signUpData.session.user.id);
+          return;
+        }
         throw new Error('Account creation failed - no user returned');
       }
 
-      // In Supabase, you need to manually confirm the user if email verification is required
-      // But we're bypassing that by having the user immediately confirmed
-      // This requires a database trigger or function
-
-      toast.success('Account created! You can now track your order.');
+      // If the user was created and confirmed, proceed
+      toast.success('Buyer account created successfully! You can now track your order.');
       onAccountCreated(signUpData.user.id);
 
     } catch (error: any) {
       console.error('Account creation error:', error);
-      toast.error(error.message || 'Failed to create account. Please try again.');
+      if (isMountedRef.current) {
+        toast.error(error.message || 'Failed to create account. Please try again.');
+      }
     } finally {
-      setIsCreating(false);
+      if (isMountedRef.current) {
+        setIsCreating(false);
+      }
     }
   };
 
@@ -129,8 +188,8 @@ export function QuickAccountCreation({
           <CardTitle className="text-xl">Secure Your Order</CardTitle>
         </div>
         <CardDescription>
-          Create an account to track your order and enjoy faster checkout next time. 
-          <span className="font-medium text-green-600"> No email verification needed!</span>
+          Create a buyer account to track your order and enjoy faster checkout next time.
+          <span className="font-medium text-green-600"> Email verification required for security.</span>
         </CardDescription>
       </CardHeader>
 
@@ -159,6 +218,7 @@ export function QuickAccountCreation({
               onChange={(e) => handlePasswordChange(e.target.value)}
               placeholder="Enter a secure password"
               className={errors.password ? 'border-red-500' : ''}
+              disabled={isCreating}
             />
             <Button
               type="button"
@@ -166,6 +226,7 @@ export function QuickAccountCreation({
               size="sm"
               className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
               onClick={() => setShowPassword(!showPassword)}
+              disabled={isCreating}
             >
               {showPassword ? (
                 <EyeOff className="h-4 w-4 text-gray-500" />
@@ -192,6 +253,7 @@ export function QuickAccountCreation({
             onChange={(e) => handleConfirmPasswordChange(e.target.value)}
             placeholder="Re-enter your password"
             className={errors.confirmPassword ? 'border-red-500' : ''}
+            disabled={isCreating}
           />
           {errors.confirmPassword && (
             <p className="text-xs text-red-500">{errors.confirmPassword}</p>
@@ -200,7 +262,7 @@ export function QuickAccountCreation({
 
         {/* Benefits */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-2">
-          <p className="text-sm font-medium text-blue-900">With your account you can:</p>
+          <p className="text-sm font-medium text-blue-900">As a buyer, with your account you can:</p>
           <ul className="text-xs text-blue-700 space-y-1 ml-4 list-disc">
             <li>Track your order status in real-time</li>
             <li>View order history anytime</li>

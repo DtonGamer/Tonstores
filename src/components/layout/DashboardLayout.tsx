@@ -20,7 +20,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [sessionChecked, setSessionChecked] = useState(false);
-  
+  const [userType, setUserType] = useState<'buyer' | 'seller' | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+
   // Check if we're on a checkout route
   const isCheckoutRoute = pathname.startsWith("/checkout/") || pathname.includes("/checkout/");
 
@@ -30,19 +32,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       try {
         debugLog("Performing direct session check");
         const { data, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           debugLog("Session check error:", error);
           setSessionChecked(true);
           return;
         }
-        
+
         if (!data.session) {
           debugLog("No session found, redirecting to login");
           navigate("/login");
           return;
         }
-        
+
         debugLog("Session found directly");
         setSessionChecked(true);
       } catch (error) {
@@ -50,9 +52,40 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         setSessionChecked(true);
       }
     };
-    
+
     checkSession();
   }, [navigate]);
+
+  // Fetch user profile to determine user type
+  useEffect(() => {
+    if (!user || !authInitialized) return;
+
+    const fetchProfile = async () => {
+      setProfileLoading(true);
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          debugLog("❌ Error fetching profile:", error.message);
+          // If profile doesn't exist yet, default to seller for backward compatibility
+          setUserType('seller');
+        } else {
+          setUserType(profile.user_type || 'seller');
+        }
+      } catch (err) {
+        debugLog("❌ Error in fetchProfile:", err);
+        setUserType('seller'); // Default to seller on error
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [user, authInitialized]);
 
   useEffect(() => {
     debugLog("Auth state:", { isLoading, hasProfile: !!profile, authInitialized, hasUser: !!user, sessionChecked });
@@ -73,8 +106,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return () => clearTimeout(timer);
   }, [isLoading, profile, authInitialized, user, sessionChecked]);
 
-  // Show loading spinner only if content is not ready AND we're still loading auth
-  if (!contentReady && isLoading && !sessionChecked) {
+  // Show loading spinner while determining user type
+  if (!contentReady || profileLoading) {
     debugLog("Showing loading spinner");
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -83,15 +116,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     );
   }
 
+  // Determine if sidebar should be shown based on user type and route
+  const shouldShowSidebar = !isCheckoutRoute && userType === 'seller';
+  const shouldShowBuyerSidebar = !isCheckoutRoute && userType === 'buyer';
+
   debugLog("Rendering dashboard content");
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        {!isCheckoutRoute && <SidebarNav />}
+        {shouldShowSidebar && <SidebarNav />}
+        {shouldShowBuyerSidebar && <SidebarNav />}
 
         {/* Main content */}
-        <div className={`${!isCheckoutRoute ? 'lg:pl-[var(--sidebar-width,16rem)]' : ''} pt-4 lg:pt-0 flex flex-col flex-grow`}>
-          {!isCheckoutRoute && (
+        <div className={`${shouldShowSidebar || shouldShowBuyerSidebar ? 'lg:pl-[var(--sidebar-width,16rem)]' : ''} pt-4 lg:pt-0 flex flex-col flex-grow`}>
+          {(shouldShowSidebar || shouldShowBuyerSidebar) && (
             <div className="px-4 sm:px-6 lg:px-8 pt-4">
               <Breadcrumbs />
             </div>

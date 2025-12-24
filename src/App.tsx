@@ -54,6 +54,24 @@ const queryClient = new QueryClient({
 });
 
 // Create route wrappers for protected routes using Dashboard Layout
+const SellerRoute = ({ children }: { children: React.ReactNode }) => (
+  <ProtectedRoute allowedUserTypes={['seller']}>
+    <DashboardLayout>
+      <PageViewTracker />
+      {children}
+    </DashboardLayout>
+  </ProtectedRoute>
+);
+
+const BuyerRoute = ({ children }: { children: React.ReactNode }) => (
+  <ProtectedRoute allowedUserTypes={['buyer']}>
+    <DashboardLayout>
+      <PageViewTracker />
+      {children}
+    </DashboardLayout>
+  </ProtectedRoute>
+);
+
 const DashboardRoute = ({ children }: { children: React.ReactNode }) => (
   <ProtectedRoute>
     <DashboardLayout>
@@ -182,31 +200,31 @@ const App = () => {
     },
     {
       path: "/dashboard",
-      element: <DashboardRoute><Dashboard /></DashboardRoute>
+      element: <SellerRoute><Dashboard /></SellerRoute>
     },
     {
       path: "/onboarding",
-      element: <DashboardRoute><OnboardingFlow /></DashboardRoute>
+      element: <SellerRoute><OnboardingFlow /></SellerRoute>
     },
     {
       path: "/catalog/new",
-      element: <DashboardRoute><CatalogBuilder /></DashboardRoute>
+      element: <SellerRoute><CatalogBuilder /></SellerRoute>
     },
     {
       path: "/catalog/:id/edit",
-      element: <DashboardRoute><CatalogBuilder /></DashboardRoute>
+      element: <SellerRoute><CatalogBuilder /></SellerRoute>
     },
     {
       path: "/orders",
-      element: <DashboardRoute><OrderManagement /></DashboardRoute>
+      element: <SellerRoute><OrderManagement /></SellerRoute>
     },
     {
       path: "/settings",
-      element: <DashboardRoute><Settings /></DashboardRoute>
+      element: <SellerRoute><Settings /></SellerRoute>
     },
     {
       path: "/analytics",
-      element: <DashboardRoute><Analytics /></DashboardRoute>
+      element: <SellerRoute><Analytics /></SellerRoute>
     },
     {
       path: "/c/:slug",
@@ -226,7 +244,7 @@ const App = () => {
     },
     {
       path: "/buyer-profile",
-      element: <DashboardRoute><BuyerProfile /></DashboardRoute>
+      element: <BuyerRoute><BuyerProfile /></BuyerRoute>
     },
     {
       path: "/login",
@@ -250,19 +268,19 @@ const App = () => {
     },
     {
       path: "/finances",
-      element: <DashboardRoute><PremiumRoute><Finances /></PremiumRoute></DashboardRoute>
+      element: <SellerRoute><PremiumRoute><Finances /></PremiumRoute></SellerRoute>
     },
     {
       path: "/affiliate",
-      element: <DashboardRoute><AffiliateDashboard /></DashboardRoute>
+      element: <SellerRoute><AffiliateDashboard /></SellerRoute>
     },
     {
       path: "/affiliate/tools",
-      element: <DashboardRoute><AffiliateToolsPage /></DashboardRoute>
+      element: <SellerRoute><AffiliateToolsPage /></SellerRoute>
     },
     {
       path: "/affiliate/terms",
-      element: <DashboardRoute><AffiliateTermsPage /></DashboardRoute>
+      element: <SellerRoute><AffiliateTermsPage /></SellerRoute>
     },
     {
       path: "*",

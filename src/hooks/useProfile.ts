@@ -37,6 +37,7 @@ export type Profile = {
   affiliate_total_referrals?: number;
   referral_code?: string;
   role: Role;
+  user_type?: 'buyer' | 'seller';
   created_at: string;
   updated_at: string;
 };

@@ -197,6 +197,7 @@ export interface Database {
           instagram_handle?: string
           facebook_handle?: string
           role: 'user' | 'admin'
+          user_type: 'buyer' | 'seller'
         }
         Insert: {
           business_name: string
@@ -213,6 +214,7 @@ export interface Database {
           instagram_handle?: string
           facebook_handle?: string
           role?: 'user' | 'admin'
+          user_type?: 'buyer' | 'seller'
         }
         Update: {
           business_name?: string
@@ -229,6 +231,7 @@ export interface Database {
           instagram_handle?: string
           facebook_handle?: string
           role?: 'user' | 'admin'
+          user_type?: 'buyer' | 'seller'
         }
         Relationships: []
       }

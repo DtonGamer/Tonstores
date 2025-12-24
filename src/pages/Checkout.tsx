@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ShoppingCart, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { PaymentStatusService } from "@/services/PaymentStatusService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getCurrentUserId } from "@/utils/sessionHelpers";
 import { QuickAccountCreation } from "@/components/checkout/QuickAccountCreation";
+import { supabase } from "@/integrations/supabase/client";
 
 const Checkout = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -137,7 +138,7 @@ const Checkout = () => {
     loadCatalog();
   }, [slug, getCatalogBySlug, navigate, toast]);
   
-  // Handle form submission - show quick account creation
+  // Handle form submission - show quick account creation or proceed directly if authenticated
   const handleCheckout = async (formData: OrderFormData) => {
     if (!catalog || cart.isEmpty) {
       toast({
@@ -149,9 +150,18 @@ const Checkout = () => {
       return;
     }
 
-    // Set the form data and show the quick account creation form
-    setCheckoutData(formData);
-    setShowQuickAccount(true);
+    // Check if user is already authenticated
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      // User is already authenticated, proceed directly to order creation
+      setCheckoutData(formData);
+      setFormData(formData); // Set the form data for payment retry
+      await handleAccountCreated(session.user.id);
+    } else {
+      // User is not authenticated, show quick account creation
+      setCheckoutData(formData);
+      setShowQuickAccount(true);
+    }
   };
 
   // Handle account creation and order placement
@@ -199,7 +209,7 @@ const Checkout = () => {
   };
 
   // Handle account creation completion - create the order
-  const handleAccountCreated = async (userId: string) => {
+  const handleAccountCreated = useCallback(async (userId: string) => {
     if (!checkoutData || !catalog) {
       toast({
         title: "Error",
@@ -247,7 +257,7 @@ const Checkout = () => {
         }
       }
     }
-  };
+  }, [checkoutData, catalog, cart.items, createOrder, orderId]);
 
   // Function to handle payment initialization with retry logic
   const initializePaymentWithRetry = async (order: any, formData: OrderFormData) => {

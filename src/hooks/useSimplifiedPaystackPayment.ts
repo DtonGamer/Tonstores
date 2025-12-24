@@ -287,8 +287,7 @@ export const useSimplifiedPaystackPayment = () => {
         amount: paymentConfig.amount,
         email: paymentConfig.email,
         reference: paymentConfig.reference,
-        hasSubaccount: !!subaccountCode,
-        isAnonymous: isAnonymousOrder
+        hasSubaccount: !!subaccountCode
       });
 
       const paystackTransactionData = {

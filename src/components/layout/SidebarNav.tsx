@@ -45,6 +45,9 @@ export default function SidebarNav() {
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
 
+  // Get user's full name from user metadata
+  const userFullName = user?.user_metadata?.full_name || user?.user_metadata?.name || profile?.business_name;
+
   // Update CSS variable for sidebar width on collapse/expand
   useEffect(() => {
     document.documentElement.style.setProperty(
@@ -76,14 +79,23 @@ export default function SidebarNav() {
 
   const selectedPlan = plans?.find(plan => plan.id === selectedPlanId);
 
+  // Determine user type from profile
+  const isBuyer = profile?.user_type === 'buyer';
+
   // Determine if user has a business plan by checking if they have a subscription that is not 'Free'
   const isBusinessUser = subscription &&
                         subscription.pricing_plans &&
                         subscription.pricing_plans.name !== 'Free' &&
                         subscription.status === 'active';
 
-  // Define navigation items, conditionally including Finances for business users only
-  const navItems: NavItem[] = [
+  // Define navigation items based on user type
+  const navItems: NavItem[] = isBuyer ? [
+    {
+      name: "My Profile",
+      href: "/buyer-profile",
+      icon: <LayoutDashboard className="h-5 w-5" />,
+    },
+  ] : [
     {
       name: "Dashboard",
       href: "/dashboard",
@@ -178,7 +190,7 @@ export default function SidebarNav() {
                     <span className="text-white font-bold text-lg">T</span>
                   </div>
                   <span className="text-xl font-bold bg-gradient-to-r from-Tonstores-green to-Tonstores-darkblue bg-clip-text text-transparent">
-                onstores
+                Tonstores
                   </span>
                 </div>
               )}
@@ -222,7 +234,7 @@ export default function SidebarNav() {
           {/* Upgrade button and user profile section */}
           <div className="flex-shrink-0 flex flex-col border-t border-gray-200 p-4 space-y-4">
             {/* Upgrade subscription button */}
-            {!isSidebarCollapsed && (
+            {!isSidebarCollapsed && !isBuyer && (
               <Button
                 onClick={handleUpgradeClick}
                 className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center justify-center gap-2 py-5"
@@ -242,7 +254,7 @@ export default function SidebarNav() {
                   </Avatar>
                   <div className="ml-3 flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-700 truncate group-hover:text-gray-900">
-                      {profile?.business_name || "My Business"}
+                      {isBuyer ? userFullName || "Buyer Profile" : profile?.business_name || "My Business"}
                     </p>
                     <Button
                       variant="ghost"
@@ -261,14 +273,16 @@ export default function SidebarNav() {
             {/* Collapsed view - icons only */}
             {isSidebarCollapsed && (
               <div className="flex flex-col items-center space-y-3">
-                <Button
-                  onClick={handleUpgradeClick}
-                  className="w-10 h-10 p-0 rounded-full bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center justify-center"
-                  disabled={!nextTierPlan}
-                  title="Upgrade Subscription"
-                >
-                  <ArrowUpCircle size={16} />
-                </Button>
+                {!isBuyer && (
+                  <Button
+                    onClick={handleUpgradeClick}
+                    className="w-10 h-10 p-0 rounded-full bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center justify-center"
+                    disabled={!nextTierPlan}
+                    title="Upgrade Subscription"
+                  >
+                    <ArrowUpCircle size={16} />
+                  </Button>
+                )}
                 <div className="flex flex-col items-center">
                   <Avatar className="inline-block h-9 w-9 rounded-full">
                     <AvatarImage src={profile?.avatar_url} />
@@ -332,14 +346,16 @@ export default function SidebarNav() {
           {/* Upgrade button and user profile section */}
           <div className="flex-shrink-0 flex flex-col border-t border-gray-200 dark:border-gray-700 p-4 space-y-4">
             {/* Upgrade subscription button - Mobile */}
-            <Button
-              onClick={handleUpgradeClick}
-              className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center justify-center gap-2 py-5"
-              disabled={!nextTierPlan}
-            >
-              <ArrowUpCircle size={18} />
-              <span className="font-medium">Upgrade Subscription</span>
-            </Button>
+            {!isBuyer && (
+              <Button
+                onClick={handleUpgradeClick}
+                className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center justify-center gap-2 py-5"
+                disabled={!nextTierPlan}
+              >
+                <ArrowUpCircle size={18} />
+                <span className="font-medium">Upgrade Subscription</span>
+              </Button>
+            )}
 
             <div className="flex items-center justify-center pt-2">
               <div className="flex items-center w-full">
@@ -349,7 +365,7 @@ export default function SidebarNav() {
                 </Avatar>
                 <div className="ml-3 flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-700 dark:text-white truncate">
-                    {profile?.business_name || "My Business"}
+                    {isBuyer ? profile?.business_name || "Buyer Profile" : profile?.business_name || "My Business"}
                   </p>
                   <Button
                     variant="ghost"
