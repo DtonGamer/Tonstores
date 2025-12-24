@@ -14,6 +14,7 @@ import { CancelPaymentDialog } from "@/components/modals/CancelPaymentDialog";
 import { PaymentStatusService } from "@/services/PaymentStatusService";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getCurrentUserId } from "@/utils/sessionHelpers";
+import { QuickAccountCreation } from "@/components/checkout/QuickAccountCreation";
 
 const Checkout = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -23,6 +24,8 @@ const Checkout = () => {
   const [orderCreated, setOrderCreated] = useState<any>(null);
   const [formData, setFormData] = useState<OrderFormData | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [showQuickAccount, setShowQuickAccount] = useState(false);
+  const [checkoutData, setCheckoutData] = useState<OrderFormData | null>(null);
 
   const { getCatalogBySlug } = useCatalog();
   const { createOrder } = useOrders();
@@ -134,7 +137,7 @@ const Checkout = () => {
     loadCatalog();
   }, [slug, getCatalogBySlug, navigate, toast]);
   
-  // Handle form submission and order creation
+  // Handle form submission - show quick account creation
   const handleCheckout = async (formData: OrderFormData) => {
     if (!catalog || cart.isEmpty) {
       toast({
@@ -145,27 +148,35 @@ const Checkout = () => {
       navigate(`/c/${slug}`);
       return;
     }
-    
+
+    // Set the form data and show the quick account creation form
+    setCheckoutData(formData);
+    setShowQuickAccount(true);
+  };
+
+  // Handle account creation and order placement
+  const handleCreateAccountAndOrder = async () => {
+    if (!checkoutData || !catalog) return;
+
     try {
       setIsSubmitting(true);
-      setFormData(formData);
       setPaymentError(null);
-      console.log("Starting checkout process with form data:", formData);
-      
+      console.log("Starting checkout process with form data:", checkoutData);
+
       // Create order in database
       const order = await createOrder(
         catalog.id,
         catalog.user_id,
-        formData,
+        checkoutData,
         cart.items
       );
-      
+
       console.log("Order created successfully:", order);
       setOrderId(order.id);
       setOrderCreated(order);
-      
+
       // Initialize payment
-      await initializePaymentWithRetry(order, formData);
+      await initializePaymentWithRetry(order, checkoutData);
     } catch (error: any) {
       console.error("Checkout error:", error);
       setPaymentError(error.message || "There was a problem processing your checkout.");
@@ -175,7 +186,58 @@ const Checkout = () => {
         variant: "destructive",
       });
       setIsSubmitting(false);
-      
+
+      // Handle the case where order was created but payment failed
+      if (orderId) {
+        try {
+          await PaymentStatusService.updateOrderStatusClient(orderId, 'failed', 'failed');
+        } catch (statusError) {
+          console.error("Error updating order status after failed payment:", statusError);
+        }
+      }
+    }
+  };
+
+  // Handle account creation completion - create the order
+  const handleAccountCreated = async (userId: string) => {
+    if (!checkoutData || !catalog) {
+      toast({
+        title: "Error",
+        description: "Missing checkout data. Please go back and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setPaymentError(null);
+      console.log("Starting checkout process with form data:", checkoutData);
+
+      // Create order in database
+      const order = await createOrder(
+        catalog.id,
+        catalog.user_id,
+        checkoutData,
+        cart.items
+      );
+
+      console.log("Order created successfully:", order);
+      setOrderId(order.id);
+      setOrderCreated(order);
+
+      // Initialize payment
+      await initializePaymentWithRetry(order, checkoutData);
+    } catch (error: any) {
+      console.error("Checkout error:", error);
+      setPaymentError(error.message || "There was a problem processing your checkout.");
+      toast({
+        title: "Checkout Failed",
+        description: error.message || "There was a problem processing your checkout.",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+
       // Handle the case where order was created but payment failed
       if (orderId) {
         try {
@@ -300,12 +362,19 @@ const Checkout = () => {
                     </Alert>
                   )}
                   
-                  {paymentRetryAvailable ? (
+                  {showQuickAccount && checkoutData ? (
+                    <QuickAccountCreation
+                      email={checkoutData.customer_email}
+                      name={checkoutData.customer_name}
+                      phone={checkoutData.customer_phone}
+                      onAccountCreated={handleAccountCreated}
+                    />
+                  ) : paymentRetryAvailable ? (
                     <div className="space-y-4">
                       <p className="text-gray-600">
                         We encountered an issue connecting to our payment provider. Your order has been created, but we need to retry the payment.
                       </p>
-                      <Button 
+                      <Button
                         onClick={handleRetryPayment}
                         disabled={isSubmitting || isPaymentLoading}
                         className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue flex items-center justify-center"
@@ -315,9 +384,9 @@ const Checkout = () => {
                       </Button>
                     </div>
                   ) : (
-                    <CheckoutForm 
-                      onSubmit={handleCheckout} 
-                      isLoading={isSubmitting || isPaymentLoading} 
+                    <CheckoutForm
+                      onSubmit={handleCheckout}
+                      isLoading={isSubmitting || isPaymentLoading}
                     />
                   )}
                 </CardContent>

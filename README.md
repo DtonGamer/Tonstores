@@ -88,23 +88,22 @@ npm run dev
 yarn dev
 ```
 
-## Migration from Custom Guest System to Supabase Anonymous Authentication
+## Guest Checkout Implementation
 
-This project was originally built with a custom guest ID system that used localStorage and custom session parameters. We have successfully migrated to use Supabase's built-in anonymous authentication, which provides the following improvements:
+This project implements a guest checkout system that allows users to place orders without creating an account, with the option to create an account during checkout. The system has evolved from a custom guest ID system to a more robust approach.
 
-### Migrated Functionality
+### Key Features
 
-1. **Anonymous User Support**: Users can now browse and place orders without creating an account using Supabase's native anonymous authentication
-2. **Session Management**: Supabase handles session persistence, refresh, and storage automatically
-3. **User ID Management**: Anonymous users get a proper user ID that persists across sessions
-4. **Simplified RLS Policies**: Updated to use `auth.uid()` instead of custom guest session parameters
-5. **Removed Complex Interceptors**: Eliminated fetch interceptors that were blocking Supabase requests
-6. **Improved Performance**: No more session parameter management overhead
+1. **Guest Checkout**: Users can browse and place orders without creating an account
+2. **Quick Account Creation**: Option to create an account during checkout for order tracking
+3. **Session Management**: Proper session handling for both authenticated and unauthenticated users
+4. **Simplified RLS Policies**: Updated to use `auth.uid()` for authenticated users
+5. **Improved Performance**: Streamlined authentication flow
 
 ### Key Changes
 
-- **No more custom guest ID system**: Removed localStorage-based guest ID generation
-- **No more session parameter functions**: Eliminated `set_app_guest_id` functions and related database functions
+- **Simplified authentication**: Removed complex anonymous authentication system
+- **Quick account creation**: Introduced account creation during checkout flow
 - **Simplified authentication flow**: Supabase handles everything automatically
 - **Better security**: Built-in Supabase authentication instead of custom implementation
 - **Improved reliability**: No more timeout issues due to fetch interceptors
@@ -112,18 +111,18 @@ This project was originally built with a custom guest ID system that used localS
 ### Database Schema Updates
 
 - Removed `is_guest_order` and `guest_id` columns from the `orders` table
-- Added `placed_as_guest` column to track if order was placed while anonymous
+- Added `placed_as_guest` column to track if order was placed by a guest user
 - Updated RLS policies to use `auth.uid()` instead of custom guest parameters
 - Removed `set_app_guest_id` and related functions
 - Removed guest-specific indexes and policies
 
 ### Frontend Changes
 
-- Updated authentication flow to use `signInAnonymously()` instead of custom guest ID generation
+- Updated authentication flow to work with both authenticated and unauthenticated users
 - Simplified order creation to work with Supabase's built-in user ID
 - Removed fetch interceptors that were causing timeout issues
-- Updated payment processing to work with anonymous users
-- Enhanced profile loading to work with both anonymous and authenticated users
+- Updated payment processing to work with guest users
+- Enhanced profile loading to work with both authenticated and unauthenticated users
 
 ## Migration from Monnify to Paystack
 

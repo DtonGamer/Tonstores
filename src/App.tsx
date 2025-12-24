@@ -42,6 +42,7 @@ import { PageViewTracker } from "./components/analytics/PageViewTracker";
 import AffiliateDashboard from "./pages/AffiliateDashboard";
 import AffiliateToolsPage from "./pages/AffiliateToolsPage";
 import AffiliateTermsPage from "./pages/AffiliateTermsPage";
+import BuyerProfile from "./pages/BuyerProfile";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -222,6 +223,10 @@ const App = () => {
     {
       path: "/order-tracking/:id",
       element: <OrderTrackingLayout><OrderTracking /></OrderTrackingLayout>
+    },
+    {
+      path: "/buyer-profile",
+      element: <DashboardRoute><BuyerProfile /></DashboardRoute>
     },
     {
       path: "/login",
