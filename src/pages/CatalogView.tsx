@@ -11,7 +11,7 @@ import { useCart } from "@/hooks/useCart";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { getAdminProfile } from "@/hooks/useProfile";
-import { refreshSession } from "@/utils/reconnectHandler";
+import { refreshCurrentSession } from "@/integrations/supabase/authManager";
 import { Helmet } from "react-helmet";
 import {
   DropdownMenu,
@@ -128,15 +128,31 @@ const CatalogView = () => {
     }
 
     const loadCatalogAndProducts = async () => {
-      // Skip if already loaded
-      if (hasLoadedInitially.current && !paymentCancelled) {
-        return;
-      }
-
       try {
+        // If we've already loaded and we're just navigating back (not from a cancelled payment),
+        // use cached data to avoid unnecessary loading state
+        if (hasLoadedInitially.current && !paymentCancelled) {
+          const cachedCatalog = sessionStorage.getItem(sessionStorageKey);
+          const cachedProducts = sessionStorage.getItem(productsStorageKey);
+
+          if (cachedCatalog && cachedProducts && isMounted) {
+            const catalogData = JSON.parse(cachedCatalog);
+            const productsData = JSON.parse(cachedProducts);
+
+            setCatalog(catalogData);
+            if (Array.isArray(productsData)) {
+              setProducts(productsData);
+              setFilteredProducts(productsData);
+            }
+
+            setIsLoading(false);
+            return;
+          }
+        }
+
         setIsLoading(true);
 
-        // Try cache first for payment cancellation returns
+        // Try cache first for payment cancellation returns or initial load
         const cachedCatalog = sessionStorage.getItem(sessionStorageKey);
         const cachedProducts = sessionStorage.getItem(productsStorageKey);
 
@@ -167,7 +183,14 @@ const CatalogView = () => {
         // Fetch fresh data
         const catalogData = await getCatalogBySlug(slug);
 
-        if (!catalogData || !isMounted) return;
+        if (!catalogData) {
+          if (isMounted) {
+            setIsLoading(false);
+          }
+          return;
+        }
+
+        if (!isMounted) return;
 
         setCatalog(catalogData);
         sessionStorage.setItem(sessionStorageKey, JSON.stringify(catalogData));
@@ -187,7 +210,7 @@ const CatalogView = () => {
               setSellerProfile(profile);
             }
           }
-          
+
           hasLoadedInitially.current = true;
         }
       } catch (error: any) {
@@ -210,7 +233,16 @@ const CatalogView = () => {
     return () => {
       isMounted = false;
     };
-  }, [slug, paymentCancelled]); // Minimal dependencies
+  }, [slug, paymentCancelled, location.pathname]);
+
+  // Handle navigation state changes (e.g., going back from checkout)
+  // We'll use this to clear payment cancellation state from location
+  useEffect(() => {
+    // Clear the payment cancelled state from location when component mounts or navigates
+    if (paymentCancelled) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [location.key, paymentCancelled]);
 
   // Visibility change handler - only reload after long absence
   useEffect(() => {
@@ -229,7 +261,7 @@ const CatalogView = () => {
 
         if (hiddenDuration > VISIBILITY_THRESHOLD && slug && catalog?.id) {
           try {
-            await refreshSession();
+            await refreshCurrentSession();
             const catalogData = await getCatalogBySlug(slug);
             if (catalogData) {
               setCatalog(catalogData);
@@ -253,7 +285,7 @@ const CatalogView = () => {
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [slug, catalog?.id]); // Stable dependencies
+  }, [slug, catalog?.id]);
 
   // Handle search
   useEffect(() => {

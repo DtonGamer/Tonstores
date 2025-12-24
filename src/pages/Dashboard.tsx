@@ -11,7 +11,7 @@ import { Plus, Loader2, ListCheck, CreditCard, Package } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/components/ui/use-toast";
 import LowStockAlert from "@/components/dashboard/LowStockAlert";
-import { refreshSession } from "@/utils/reconnectHandler";
+import { refreshCurrentSession } from "@/integrations/supabase/authManager";
 import { SubscriptionDialog } from "@/components/subscription/SubscriptionDialog";
 import { usePricingPlans } from "@/hooks/usePricingPlans";
 
@@ -195,7 +195,7 @@ const Dashboard = () => {
         const hiddenDuration = Date.now() - lastVisibleTime;
 
         if (hiddenDuration > VISIBILITY_THRESHOLD) {
-          await refreshSession();
+          await refreshCurrentSession();
           await fetchDashboardData();
         }
 

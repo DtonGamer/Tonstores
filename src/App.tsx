@@ -39,7 +39,6 @@ import VerifyEmail from "./pages/auth/VerifyEmail";
 import PasswordRecovery from "./pages/auth/PasswordRecovery";
 import UpdatePassword from "./pages/auth/UpdatePassword";
 import { ErrorBoundary } from "./components/layout/ErrorBoundary";
-import { initReconnectHandler } from "./utils/reconnectHandler";
 import { PageViewTracker } from "./components/analytics/PageViewTracker";
 import AffiliateDashboard from "./pages/AffiliateDashboard";
 import AffiliateToolsPage from "./pages/AffiliateToolsPage";
@@ -134,11 +133,6 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => {
-  // Initialize reconnection handler
-  useEffect(() => {
-    initReconnectHandler();
-  }, []);
-
   // Check for redirect after login
   useEffect(() => {
     const redirectPath = sessionStorage.getItem("redirectAfterLogin");
