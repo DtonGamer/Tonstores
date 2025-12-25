@@ -56,8 +56,10 @@ const CatalogView = () => {
   const catalogId = useMemo(() => catalog?.id || `temp-${slug}`, [catalog?.id, slug]);
   const cart = useCart(catalogId);
 
-  // Use ref to track if initial load is complete
+  // Use ref to track if initial load is complete and prevent duplicate requests
   const hasLoadedInitially = useRef(false);
+  const isLoadingRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
   
   const toggleCart = useCallback(() => {
     setIsCartOpen(prev => !prev);
@@ -118,17 +120,33 @@ const CatalogView = () => {
     }
   }, [paymentCancelled]);
 
-  // Main data loading effect
+  // Main data loading effect - OPTIMIZED TO PREVENT DUPLICATE REQUESTS
   useEffect(() => {
-    let isMounted = true;
+    // Prevent duplicate requests
+    if (isLoadingRef.current) {
+      console.log("Already loading, skipping duplicate request");
+      return;
+    }
 
     if (!slug) {
       setIsLoading(false);
       return;
     }
 
+    // Cancel any in-flight requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+    let isMounted = true;
+
     const loadCatalogAndProducts = async () => {
       try {
+        // Mark as loading
+        isLoadingRef.current = true;
+
         // If we've already loaded and we're just navigating back (not from a cancelled payment),
         // use cached data to avoid unnecessary loading state
         if (hasLoadedInitially.current && !paymentCancelled) {
@@ -146,6 +164,7 @@ const CatalogView = () => {
             }
 
             setIsLoading(false);
+            isLoadingRef.current = false;
             return;
           }
         }
@@ -176,6 +195,7 @@ const CatalogView = () => {
 
             setIsLoading(false);
             hasLoadedInitially.current = true;
+            isLoadingRef.current = false;
             return;
           }
         }
@@ -183,9 +203,15 @@ const CatalogView = () => {
         // Fetch fresh data
         const catalogData = await getCatalogBySlug(slug);
 
+        // Check if request was aborted
+        if (abortController.signal.aborted) {
+          return;
+        }
+
         if (!catalogData) {
           if (isMounted) {
             setIsLoading(false);
+            isLoadingRef.current = false;
           }
           return;
         }
@@ -196,6 +222,11 @@ const CatalogView = () => {
         sessionStorage.setItem(sessionStorageKey, JSON.stringify(catalogData));
 
         const productsData = await getProducts(catalogData.id!);
+
+        // Check if request was aborted
+        if (abortController.signal.aborted) {
+          return;
+        }
 
         if (isMounted) {
           if (Array.isArray(productsData)) {
@@ -214,6 +245,11 @@ const CatalogView = () => {
           hasLoadedInitially.current = true;
         }
       } catch (error: any) {
+        // Ignore abort errors
+        if (error.name === 'AbortError' || abortController.signal.aborted) {
+          return;
+        }
+
         if (isMounted) {
           toast({
             title: "Error",
@@ -224,6 +260,7 @@ const CatalogView = () => {
       } finally {
         if (isMounted) {
           setIsLoading(false);
+          isLoadingRef.current = false;
         }
       }
     };
@@ -232,17 +269,16 @@ const CatalogView = () => {
 
     return () => {
       isMounted = false;
+      abortController.abort();
     };
-  }, [slug, paymentCancelled, location.pathname]);
+  }, [slug]); // ONLY depend on slug, not on paymentCancelled or location.pathname
 
-  // Handle navigation state changes (e.g., going back from checkout)
-  // We'll use this to clear payment cancellation state from location
+  // Handle payment cancellation state separately
   useEffect(() => {
-    // Clear the payment cancelled state from location when component mounts or navigates
     if (paymentCancelled) {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [location.key, paymentCancelled]);
+  }, [paymentCancelled]);
 
   // Visibility change handler - only reload after long absence
   useEffect(() => {

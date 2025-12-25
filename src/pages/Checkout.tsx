@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ShoppingCart, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ const Checkout = () => {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [showQuickAccount, setShowQuickAccount] = useState(false);
   const [checkoutData, setCheckoutData] = useState<OrderFormData | null>(null);
+  const [isLoadingCatalog, setIsLoadingCatalog] = useState(true);
 
   const { getCatalogBySlug } = useCatalog();
   const { createOrder } = useOrders();
@@ -43,6 +44,23 @@ const Checkout = () => {
   // Get catalog and cart
   const [catalog, setCatalog] = useState<any>(null);
   const cart = useCart(catalog?.id || "");
+  
+  // Use refs to store latest values to avoid stale closure issues
+  const catalogRef = useRef<any>(null);
+  const checkoutDataRef = useRef<OrderFormData | null>(null);
+  
+  // Update refs whenever state changes
+  useEffect(() => {
+    catalogRef.current = catalog;
+  }, [catalog]);
+  
+  useEffect(() => {
+    checkoutDataRef.current = checkoutData;
+  }, [checkoutData]);
+  
+  // Use ref to prevent duplicate catalog loads
+  const catalogLoadedRef = useRef(false);
+  const sessionStorageKey = `catalog_${slug}`;
   
   // Handle payment cancellation
   const handlePaymentCancel = async () => {
@@ -66,7 +84,8 @@ const Checkout = () => {
           state: { 
             payment_cancelled: true,
             order_id: orderId
-          } 
+          },
+          replace: true // Use replace to avoid adding to history stack
         });
       }
     } else {
@@ -92,7 +111,8 @@ const Checkout = () => {
             state: { 
               payment_failed: true,
               order_id: orderId
-            } 
+            },
+            replace: true // Use replace to avoid adding to history stack
           });
         }
       } catch (error) {
@@ -107,22 +127,59 @@ const Checkout = () => {
     }
   };
   
-  // Load catalog data
+  // Load catalog data - OPTIMIZED VERSION
   useEffect(() => {
+    // Prevent duplicate loads
+    if (catalogLoadedRef.current) return;
+    
     const loadCatalog = async () => {
-      if (!slug) return;
+      if (!slug) {
+        setIsLoadingCatalog(false);
+        return;
+      }
       
       try {
+        setIsLoadingCatalog(true);
+        
+        // TRY CACHE FIRST for instant load
+        const cachedCatalog = sessionStorage.getItem(sessionStorageKey);
+        if (cachedCatalog) {
+          try {
+            const catalogData = JSON.parse(cachedCatalog);
+            setCatalog(catalogData);
+            setIsLoadingCatalog(false);
+            catalogLoadedRef.current = true;
+            
+            // Optionally validate in background without blocking UI
+            getCatalogBySlug(slug).then(freshData => {
+              if (freshData && JSON.stringify(freshData) !== cachedCatalog) {
+                setCatalog(freshData);
+                sessionStorage.setItem(sessionStorageKey, JSON.stringify(freshData));
+              }
+            }).catch(err => {
+              console.error("Background catalog validation failed:", err);
+            });
+            
+            return;
+          } catch (parseError) {
+            console.error("Failed to parse cached catalog:", parseError);
+            sessionStorage.removeItem(sessionStorageKey);
+          }
+        }
+        
+        // No cache available, fetch fresh data
         const catalogData = await getCatalogBySlug(slug);
         if (catalogData) {
           setCatalog(catalogData);
+          sessionStorage.setItem(sessionStorageKey, JSON.stringify(catalogData));
+          catalogLoadedRef.current = true;
         } else {
           toast({
             title: "Catalog Not Found",
             description: "The requested catalog could not be found.",
             variant: "destructive",
           });
-          navigate("/");
+          navigate("/", { replace: true });
         }
       } catch (error) {
         console.error("Failed to load catalog:", error);
@@ -131,35 +188,48 @@ const Checkout = () => {
           description: "There was a problem loading the catalog.",
           variant: "destructive",
         });
-        navigate("/");
+        navigate("/", { replace: true });
+      } finally {
+        setIsLoadingCatalog(false);
       }
     };
     
     loadCatalog();
-  }, [slug, getCatalogBySlug, navigate, toast]);
+  }, [slug]); // Only depend on slug
   
   // Handle form submission - show quick account creation or proceed directly if authenticated
   const handleCheckout = async (formData: OrderFormData) => {
-    if (!catalog || cart.isEmpty) {
+    // Critical: Check catalog is loaded first
+    if (!catalog) {
+      toast({
+        title: "Error",
+        description: "Catalog data is not loaded yet. Please wait a moment and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (cart.isEmpty) {
       toast({
         title: "Empty Cart",
         description: "Your cart is empty. Please add some products before checking out.",
         variant: "destructive",
       });
-      navigate(`/c/${slug}`);
+      navigate(`/c/${slug}`, { replace: true });
       return;
     }
+
+    // Store form data for later use
+    setCheckoutData(formData);
+    setFormData(formData); // Set the form data for payment retry
 
     // Check if user is already authenticated
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
       // User is already authenticated, proceed directly to order creation
-      setCheckoutData(formData);
-      setFormData(formData); // Set the form data for payment retry
       await handleAccountCreated(session.user.id);
     } else {
       // User is not authenticated, show quick account creation
-      setCheckoutData(formData);
       setShowQuickAccount(true);
     }
   };
@@ -210,10 +280,25 @@ const Checkout = () => {
 
   // Handle account creation completion - create the order
   const handleAccountCreated = useCallback(async (userId: string) => {
-    if (!checkoutData || !catalog) {
+    // Use refs to get the latest values and avoid stale closure issues
+    const currentCheckoutData = checkoutDataRef.current;
+    const currentCatalog = catalogRef.current;
+    
+    console.log("handleAccountCreated called with:", { 
+      userId, 
+      hasCheckoutData: !!currentCheckoutData, 
+      hasCatalog: !!currentCatalog 
+    });
+    
+    if (!currentCheckoutData || !currentCatalog) {
+      console.error("Missing data:", { 
+        checkoutData: currentCheckoutData, 
+        catalog: currentCatalog 
+      });
+      
       toast({
         title: "Error",
-        description: "Missing checkout data. Please go back and try again.",
+        description: "Missing checkout data or catalog information. Please go back and try again.",
         variant: "destructive",
       });
       return;
@@ -222,13 +307,13 @@ const Checkout = () => {
     try {
       setIsSubmitting(true);
       setPaymentError(null);
-      console.log("Starting checkout process with form data:", checkoutData);
+      console.log("Starting checkout process with form data:", currentCheckoutData);
 
       // Create order in database
       const order = await createOrder(
-        catalog.id,
-        catalog.user_id,
-        checkoutData,
+        currentCatalog.id,
+        currentCatalog.user_id,
+        currentCheckoutData,
         cart.items
       );
 
@@ -237,7 +322,7 @@ const Checkout = () => {
       setOrderCreated(order);
 
       // Initialize payment
-      await initializePaymentWithRetry(order, checkoutData);
+      await initializePaymentWithRetry(order, currentCheckoutData);
     } catch (error: any) {
       console.error("Checkout error:", error);
       setPaymentError(error.message || "There was a problem processing your checkout.");
@@ -257,7 +342,7 @@ const Checkout = () => {
         }
       }
     }
-  }, [checkoutData, catalog, cart.items, createOrder, orderId]);
+  }, [cart.items, createOrder, orderId]); // Removed checkoutData and catalog from dependencies
 
   // Function to handle payment initialization with retry logic
   const initializePaymentWithRetry = async (order: any, formData: OrderFormData) => {
@@ -286,7 +371,7 @@ const Checkout = () => {
           };
           
           // Redirect to success page and stay there
-          navigate(`/order-success/${order.id}`, { state: navigationState });
+          navigate(`/order-success/${order.id}`, { state: navigationState, replace: true });
         },
         onClose: () => {
           console.log("Payment modal closed");
@@ -322,6 +407,18 @@ const Checkout = () => {
     await initializePaymentWithRetry(orderCreated, formData);
   };
   
+  // Show loading state while catalog is loading
+  if (isLoadingCatalog) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-Tonstores-green mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading checkout...</p>
+        </div>
+      </div>
+    );
+  }
+  
   if (!catalog || cart.isEmpty) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -333,7 +430,7 @@ const Checkout = () => {
           </p>
           <Button 
             variant="outline" 
-            onClick={() => navigate(`/c/${slug}`)}
+            onClick={() => navigate(`/c/${slug}`, { replace: true })}
           >
             Back to Catalog
           </Button>
@@ -350,7 +447,7 @@ const Checkout = () => {
             <Button
               variant="ghost"
               className="flex items-center mb-4"
-              onClick={() => navigate(`/c/${slug}`)}
+              onClick={() => navigate(`/c/${slug}`, { replace: true })}
             >
               <ArrowLeft className="mr-2" size={18} />
               Back to Catalog
