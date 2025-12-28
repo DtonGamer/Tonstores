@@ -65,8 +65,10 @@ const CatalogBuilder = () => {
   const [isGeneratingSlug, setIsGeneratingSlug] = useState(false);
   const [catalogId, setCatalogId] = useState<string | null>(id);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleteCatalogDialogOpen, setIsDeleteCatalogDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeletingCatalog, setIsDeletingCatalog] = useState(false);
   
   const { getCatalog, createCatalog, updateCatalog, generateUniqueSlug, deleteCatalog } = useCatalog();
   const { 
@@ -364,7 +366,7 @@ const CatalogBuilder = () => {
     setIsDeleteDialogOpen(true);
   };
   
-  const confirmDelete = async () => {
+  const confirmDeleteProduct = async () => {
     if (!productToDelete) return;
     
     try {
@@ -389,6 +391,30 @@ const CatalogBuilder = () => {
       });
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteCatalog = async () => {
+    if (!catalogId || catalogId === "new") {
+      toast({
+        title: "Error",
+        description: "Cannot delete unsaved catalog",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsDeletingCatalog(true);
+      await deleteCatalog(catalogId);
+      
+      // Navigate to dashboard after successful deletion
+      navigate('/dashboard');
+    } catch (error: any) {
+      // Error is already handled by the deleteCatalog function
+      setIsDeleteCatalogDialogOpen(false);
+    } finally {
+      setIsDeletingCatalog(false);
     }
   };
   
@@ -436,7 +462,8 @@ const CatalogBuilder = () => {
           }}
           onPreview={previewCatalog}
           onShare={copyLinkToClipboard}
-          onDelete={() => setIsDeleteDialogOpen(true)}
+          onDelete={() => setIsDeleteCatalogDialogOpen(true)}
+          showDeleteButton={selectedTab === "details" && !isNewCatalog}
           isSaving={isSaving}
         />
         
@@ -591,14 +618,24 @@ const CatalogBuilder = () => {
         initialData={currentProduct}
       />
       
-      {/* Delete confirmation dialog */}
+      {/* Delete product confirmation dialog */}
       <DeleteConfirmationDialog
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
-        onConfirm={confirmDelete}
+        onConfirm={confirmDeleteProduct}
         isDeleting={isDeleting}
         title="Delete Product"
         description="Are you sure you want to delete this product? This action cannot be undone."
+      />
+
+      {/* Delete catalog confirmation dialog */}
+      <DeleteConfirmationDialog
+        isOpen={isDeleteCatalogDialogOpen}
+        onClose={() => setIsDeleteCatalogDialogOpen(false)}
+        onConfirm={handleDeleteCatalog}
+        isDeleting={isDeletingCatalog}
+        title="Delete Catalog"
+        description="Are you sure you want to delete this catalog? This action cannot be undone. You cannot delete a catalog that has existing orders."
       />
     </div>
   );

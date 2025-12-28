@@ -63,15 +63,15 @@ const OrderProgress = ({ status }: { status: string }) => {
 
   return (
     <div className="mt-8 mb-8">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
         {steps.map((step, index) => {
           const isCompleted = index <= currentStepIndex;
           const isActive = index === currentStepIndex;
           
           return (
-            <div key={step} className="flex flex-col items-center">
+            <div key={step} className="flex items-center gap-3 sm:gap-0 sm:flex-col">
               <div className={`
-                flex items-center justify-center h-12 w-12 rounded-full
+                flex items-center justify-center h-12 w-12 rounded-full flex-shrink-0
                 ${isCompleted 
                   ? "bg-Tonstores-green text-white" 
                   : "bg-gray-200 text-gray-400"}
@@ -79,27 +79,17 @@ const OrderProgress = ({ status }: { status: string }) => {
               `}>
                 {icons[step as keyof typeof icons]}
               </div>
-              <span className={`mt-2 text-xs sm:text-sm text-center ${isCompleted ? "font-medium" : "text-gray-500"}`}>
+              <span className={`text-xs sm:text-sm ${isCompleted ? "font-medium" : "text-gray-500"}`}>
                 {step.charAt(0).toUpperCase() + step.slice(1)}
               </span>
+              {index < steps.length - 1 && (
+                <div className={`hidden sm:block h-1 flex-1 sm:mt-4 ${
+                  isCompleted ? "bg-Tonstores-green" : "bg-gray-200"
+                }`} />
+              )}
             </div>
           );
         })}
-      </div>
-      
-      <div className="relative">
-        <div className="absolute top-0 left-0 right-0 flex">
-          {steps.slice(0, -1).map((step, index) => {
-            const isCompleted = index < currentStepIndex;
-            
-            return (
-              <div
-                key={step}
-                className={`h-1 flex-1 ${isCompleted ? "bg-Tonstores-green" : "bg-gray-200"}`}
-              />
-            );
-          })}
-        </div>
       </div>
     </div>
   );
@@ -245,8 +235,8 @@ const OrderTracking = () => {
   }
   
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
-      <div className="max-w-4xl mx-auto p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 sm:py-12">
+      <div className="max-w-2xl mx-auto p-4 sm:p-6">
         <button
           onClick={() => {
             // Check if browser history has previous entries
@@ -257,20 +247,20 @@ const OrderTracking = () => {
               navigate('/orders');
             }
           }}
-          className="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-6"
+          className="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-4 sm:mb-6"
         >
           <ArrowLeft className="mr-2" size={18} />
           Back
         </button>
         
-        <h1 className="text-2xl md:text-3xl font-bold mb-6 dark:text-white">Track Your Order</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 dark:text-white">Track Your Order</h1>
         
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-start flex-wrap gap-4 mb-6">
+        <Card className="mb-6 sm:mb-8">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex justify-between items-start flex-wrap gap-4 mb-4 sm:mb-6">
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Order Number</p>
-                <p className="font-semibold dark:text-white">{order.id.slice(0, 8)}</p>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Order Number</p>
+                <p className="font-semibold text-base sm:text-lg dark:text-white">{order.id.slice(0, 8)}</p>
               </div>
               <div className="flex flex-col gap-2 items-end">
                 <OrderStatus status={order.status} />
@@ -284,45 +274,45 @@ const OrderTracking = () => {
 
             {/* Show delivery confirmation button if order is shipped and escrow is held */}
             {order.status === 'shipped' && order.escrow_status === 'held' && (
-              <div className="mt-6">
+              <div className="mt-4 sm:mt-6">
                 <Button
                   onClick={handleConfirmDelivery}
-                  className="bg-green-600 hover:bg-green-700 w-full md:w-auto"
+                  className="bg-green-600 hover:bg-green-700 w-full text-sm sm:text-base py-5 sm:py-auto"
                 >
                   Confirm Delivery & Release Payment
                 </Button>
-                <p className="text-sm text-gray-500 mt-2 dark:text-gray-400">
+                <p className="text-xs sm:text-sm text-gray-500 mt-2 dark:text-gray-400">
                   Click this button when you have received your order to release payment to the seller
                 </p>
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-4 sm:mt-6">
               <div>
-                <h3 className="font-semibold mb-2 dark:text-white">Customer</h3>
-                <p className="dark:text-white">{order.customer_name}</p>
-                <p className="text-gray-600 dark:text-gray-300">{order.customer_email}</p>
-                <p className="text-gray-600 dark:text-gray-300">{order.customer_phone}</p>
+                <h3 className="font-semibold mb-2 dark:text-white text-sm sm:text-base">Customer</h3>
+                <p className="dark:text-white text-sm">{order.customer_name}</p>
+                <p className="text-gray-600 dark:text-gray-300 text-sm break-all">{order.customer_email}</p>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">{order.customer_phone}</p>
               </div>
               
               <div>
-                <h3 className="font-semibold mb-2 dark:text-white">Order Date</h3>
-                <p className="dark:text-white">{new Date(order.created_at).toLocaleDateString()}</p>
-                <p className="text-gray-600 dark:text-gray-300">
+                <h3 className="font-semibold mb-2 dark:text-white text-sm sm:text-base">Order Date</h3>
+                <p className="dark:text-white text-sm">{new Date(order.created_at).toLocaleDateString()}</p>
+                <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">
                   {new Date(order.created_at).toLocaleTimeString()}
                 </p>
               </div>
               
               <div>
-                <h3 className="font-semibold mb-2 dark:text-white">Total Amount</h3>
-                <p className="font-semibold text-lg dark:text-white">
+                <h3 className="font-semibold mb-2 dark:text-white text-sm sm:text-base">Total Amount</h3>
+                <p className="font-semibold text-base sm:text-lg dark:text-white">
                   ₦{(order.total_amount / 100).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                   })}
                 </p>
                 {order.payment_reference && (
-                  <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  <p className="text-gray-600 dark:text-gray-300 text-xs break-all">
                     Ref: {order.payment_reference}
                   </p>
                 )}
@@ -332,13 +322,13 @@ const OrderTracking = () => {
         </Card>
         
         <Card>
-          <CardContent className="p-6">
-            <h2 className="text-xl font-semibold mb-4 dark:text-white">Order Items</h2>
+          <CardContent className="p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 dark:text-white">Order Items</h2>
             
             <div className="space-y-4">
               {orderItems.map((item) => (
-                <div key={item.id} className="flex items-center space-x-4 py-3 border-b dark:border-gray-700 last:border-0">
-                  <div className="h-16 w-16 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden flex-shrink-0">
+                <div key={item.id} className="flex items-center space-x-3 sm:space-x-4 py-3 border-b dark:border-gray-700 last:border-0">
+                  <div className="h-14 w-14 sm:h-16 sm:w-16 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden flex-shrink-0">
                     {item.product?.image_url ? (
                       <img
                         src={getStorageUrl(item.product.image_url)}
@@ -357,13 +347,13 @@ const OrderTracking = () => {
                     )}
                   </div>
                   
-                  <div className="flex-grow">
-                    <h3 className="font-medium dark:text-white">{item.product?.name || "Product"}</h3>
+                  <div className="flex-grow min-w-0">
+                    <h3 className="font-medium dark:text-white text-sm sm:text-base truncate">{item.product?.name || "Product"}</h3>
                     <div className="flex justify-between mt-1">
-                      <span className="text-gray-600 dark:text-gray-300">
+                      <span className="text-gray-600 dark:text-gray-300 text-sm">
                         {item.quantity} x ₦{(item.price_at_purchase / 100).toFixed(2)}
                       </span>
-                      <span className="font-semibold dark:text-white">
+                      <span className="font-semibold dark:text-white text-sm">
                         ₦{((item.quantity * item.price_at_purchase) / 100).toFixed(2)}
                       </span>
                     </div>
@@ -372,11 +362,11 @@ const OrderTracking = () => {
               ))}
             </div>
             
-            <Separator className="my-6" />
+            <Separator className="my-4 sm:my-6" />
             
-            <div className="flex justify-between items-center font-bold text-lg">
-              <span>Total</span>
-              <span>
+            <div className="flex justify-between items-center font-bold text-base sm:text-lg">
+              <span className="text-sm sm:text-base">Total</span>
+              <span className="text-base sm:text-lg">
                 ₦{(order.total_amount / 100).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2

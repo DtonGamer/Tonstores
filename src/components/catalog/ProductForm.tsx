@@ -247,19 +247,19 @@ const ProductForm = ({ isOpen, onClose, onSubmit, initialData }: ProductFormProp
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] sm:max-w-[500px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">
             {initialData ? "Edit Product" : "Add New Product"}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm sm:text-base">
             {initialData ? "Make changes to your product here." : "Add the details of your new product below."}
           </DialogDescription>
         </DialogHeader>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <div className="mb-6 flex flex-col items-center justify-center">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 sm:space-y-6">
+            <div className="mb-4 sm:mb-6 flex flex-col items-center justify-center">
               <div className="w-full max-w-[200px] aspect-square relative rounded-md overflow-hidden mb-4 border border-gray-200 bg-gray-50 flex items-center justify-center">
                 {previewUrls.length > 0 ? (
                   <>
@@ -314,9 +314,9 @@ const ProductForm = ({ isOpen, onClose, onSubmit, initialData }: ProductFormProp
                 )}
               </div>
               
-              <div className="flex flex-col gap-2 items-center">
-                <label className="cursor-pointer">
-                  <div className="flex items-center gap-2 bg-Tonstores-blue bg-opacity-10 hover:bg-opacity-20 text-Tonstores-blue px-4 py-2 rounded-md text-sm">
+              <div className="flex flex-col gap-2 items-center w-full max-w-[200px]">
+                <label className="cursor-pointer w-full">
+                  <div className="flex items-center justify-center gap-2 bg-Tonstores-blue bg-opacity-10 hover:bg-opacity-20 text-Tonstores-blue px-4 py-2 rounded-md text-sm w-full">
                     <Upload size={16} />
                     <span>{previewUrls.length > 0 ? "Add Image" : "Upload Image"}</span>
                   </div>
@@ -328,14 +328,14 @@ const ProductForm = ({ isOpen, onClose, onSubmit, initialData }: ProductFormProp
                     disabled={previewUrls.length >= 3}
                   />
                 </label>
-                <p className="text-xs text-gray-500">Upload up to 3 images (1 required)</p>
+                <p className="text-xs text-gray-500 text-center">Upload up to 3 images (1 required)</p>
                 
                 {previewUrls.length > 0 && (
-                  <div className="flex gap-2 mt-2">
+                  <div className="flex gap-2 mt-2 overflow-x-auto w-full justify-center flex-wrap">
                     {previewUrls.map((url, index) => (
                       <div 
                         key={index}
-                        className={`w-8 h-8 rounded-md overflow-hidden border-2 cursor-pointer ${
+                        className={`w-10 h-10 sm:w-8 sm:h-8 rounded-md overflow-hidden border-2 cursor-pointer flex-shrink-0 ${
                           index === currentImageIndex ? 'border-Tonstores-blue' : 'border-gray-200'
                         }`}
                         onClick={() => setCurrentImageIndex(index)}
@@ -497,18 +497,20 @@ const ProductForm = ({ isOpen, onClose, onSubmit, initialData }: ProductFormProp
               )}
             />
             
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
                 disabled={isSubmitting}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting || previewUrls.length === 0}
+                className="w-full sm:w-auto"
               >
                 {isSubmitting ? "Saving..." : initialData ? "Save Changes" : "Add Product"}
               </Button>

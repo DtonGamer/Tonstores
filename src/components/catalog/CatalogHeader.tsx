@@ -11,6 +11,7 @@ interface CatalogHeaderProps {
   onPreview: () => void;
   onShare: () => void;
   onDelete: () => void;
+  showDeleteButton: boolean;
   isSaving: boolean;
 }
 
@@ -22,6 +23,7 @@ const CatalogHeader = ({
   onPreview,
   onShare,
   onDelete,
+  showDeleteButton,
   isSaving
 }: CatalogHeaderProps) => {
   return (
@@ -53,15 +55,17 @@ const CatalogHeader = ({
                 <Share2 size={16} />
                 <span>Share</span>
               </Button>
-              <Button
-                variant="destructive"
-                className="flex items-center gap-1 px-3 text-sm"
-                size="sm"
-                onClick={onDelete}
-              >
-                <Trash2 size={16} />
-                <span>Delete</span>
-              </Button>
+              {showDeleteButton && (
+                <Button
+                  variant="destructive"
+                  className="flex items-center gap-1 px-3 text-sm"
+                  size="sm"
+                  onClick={onDelete}
+                >
+                  <Trash2 size={16} />
+                  <span>Delete Catalog</span>
+                </Button>
+              )}
             </>
           )}
         </div>
