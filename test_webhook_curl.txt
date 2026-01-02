@@ -1,0 +1,29 @@
+# Test Paystack Webhook Function with curl
+# This command tests the Paystack webhook function with a simulated charge.success event
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Paystack-Signature: TEST_SIGNATURE" \
+  -d '{
+  "event": "charge.success",
+  "data": {
+    "reference": "TEST_REF_12345",
+    "status": "success",
+    "amount": 20000,
+    "currency": "NGN",
+    "transaction_date": "2023-12-01T10:00:00.000Z",
+    "gateway_response": "Successful",
+    "channel": "card",
+    "ip_address": "127.0.0.1",
+    "metadata": {
+      "custom_fields": [
+        {
+          "display_name": "Order ID",
+          "variable_name": "order_id",
+          "value": "ORDER_12345"
+        }
+      ]
+    }
+  }
+}' \
+  http://127.0.0.1:54321/functions/v1/paystack-webhook

@@ -206,6 +206,15 @@ export const unifiedPaystackService = {
     return response;
   },
 
+  // Request manual payout
+  requestPayout: async (userId: string) => {
+    const response = await callSupabaseFunction('request-payout', {
+      userId,
+      dev_mode: isDevMode()
+    });
+    return response;
+  },
+
   // Customer verification
   customerVerification: async (params: PaystackCustomerVerificationParams) => {
     const response = await callSupabaseFunction('paystack-customer-verification', {

@@ -40,6 +40,7 @@ export type Profile = {
   user_type?: 'buyer' | 'seller';
   created_at: string;
   updated_at: string;
+  next_payout_available_at?: string;
 };
 
 type ProfileUpdate = {

@@ -34,7 +34,12 @@ const OrderSuccess = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [sellerContact, setSellerContact] = useState<string | null>(null);
 
-  const paymentReference = location.state?.paymentReference;
+  // Handle query parameters for order ID and reference
+  const searchParams = new URLSearchParams(location.search);
+  const orderIdFromUrl = searchParams.get('orderId');
+  const referenceFromUrl = searchParams.get('reference');
+
+  const paymentReference = location.state?.paymentReference || referenceFromUrl;
   const orderDetails = location.state?.orderDetails;
   const returnUrl = location.state?.returnUrl;
 
@@ -142,7 +147,10 @@ const OrderSuccess = () => {
 
   useEffect(() => {
     const loadOrderDetails = async () => {
-      if (!id) return;
+      // Determine which order ID to use
+      const orderId = id || orderIdFromUrl;
+
+      if (!orderId) return;
 
       try {
         setIsLoading(true);
@@ -154,7 +162,7 @@ const OrderSuccess = () => {
           }
         } else {
           try {
-            const details = await getOrderDetails(id);
+            const details = await getOrderDetails(orderId);
             setOrder(details.order);
             if (details.order?.catalog_id) {
               await fetchSellerContact(details.order.catalog_id);
@@ -171,7 +179,50 @@ const OrderSuccess = () => {
     };
 
     loadOrderDetails();
-  }, [id, orderDetails, getOrderDetails]);
+  }, [id, orderIdFromUrl, orderDetails, getOrderDetails]);
+
+  // Poll for order status updates if we have an order ID from URL
+  useEffect(() => {
+    if (!orderIdFromUrl) return;
+
+    let pollInterval: NodeJS.Timeout;
+
+    const pollOrderStatus = async () => {
+      try {
+        const { data: orderData, error } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('id', orderIdFromUrl)
+          .single();
+
+        if (error) {
+          console.error('Error polling order status:', error);
+          return;
+        }
+
+        // If order is paid, update the state
+        if (orderData?.status === 'paid' || orderData?.payment_status === 'paid') {
+          setOrder(orderData);
+          // Clear the interval since we found the updated status
+          if (pollInterval) {
+            clearInterval(pollInterval);
+          }
+        }
+      } catch (error) {
+        console.error('Error polling order status:', error);
+      }
+    };
+
+    // Poll every 2 seconds
+    pollInterval = setInterval(pollOrderStatus, 2000);
+
+    // Clean up interval on unmount
+    return () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
+    };
+  }, [orderIdFromUrl]);
 
   if (isLoading) {
     return (

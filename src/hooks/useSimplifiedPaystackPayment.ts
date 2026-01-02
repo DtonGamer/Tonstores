@@ -195,13 +195,16 @@ export const useSimplifiedPaystackPayment = () => {
         console.error("Error fetching seller subaccount:", error);
       }
 
+      // Generate reference first to avoid circular reference
+      const reference = `PS_${order.id.substring(0, 8)}_${Date.now()}`;
+
       // Build payment configuration
       const paymentConfig: PaystackConfig = {
         amount: order.total_amount, // Amount is already in kobo
         email: customerEmail,
         currency: 'NGN',
-        reference: `PS_${order.id.substring(0, 8)}_${Date.now()}`,
-        callbackUrl: `${window.location.origin}/api/paystack-webhook`,
+        reference: reference,
+        callbackUrl: `${window.location.origin}/order-success?orderId=${order.id}&reference=${reference}`,
         channels: ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer'],
         metadata: {
           order_id: order.id,

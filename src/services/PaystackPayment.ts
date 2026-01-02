@@ -71,7 +71,7 @@ export const createPaystackConfig = async ({
       customerName: profile.business_name || user.email || 'Customer',
       currency: 'NGN',
       reference: reference,
-      callbackUrl: `${window.location.origin}/api/paystack-webhook`, // Browser will be redirected here after payment
+      callbackUrl: `${window.location.origin}/dashboard`, // Browser will be redirected here after payment
       publicKey,
       metadata: {
         user_id: user.id,

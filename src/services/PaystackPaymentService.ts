@@ -299,3 +299,33 @@ export interface PaystackPayoutHistoryResponse {
     total_net_amount: number;
   };
 }
+
+/**
+ * Request a manual payout for a seller
+ */
+export const requestManualPayout = async (userId: string): Promise<{ success: boolean; message: string; data?: any }> => {
+  try {
+    // Call the unified Paystack service to request a payout
+    const responseData = await unifiedPaystackService.requestPayout(userId);
+
+    if (responseData.status) {
+      return {
+        success: true,
+        message: responseData.message,
+        data: responseData.data
+      };
+    } else {
+      return {
+        success: false,
+        message: responseData.error || 'Failed to request payout',
+        data: responseData
+      };
+    }
+  } catch (error: any) {
+    console.error('Error requesting manual payout:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to request payout'
+    };
+  }
+};
