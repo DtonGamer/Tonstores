@@ -41,6 +41,7 @@ export type Profile = {
   created_at: string;
   updated_at: string;
   next_payout_available_at?: string;
+  last_payout_at?: string;
 };
 
 type ProfileUpdate = {

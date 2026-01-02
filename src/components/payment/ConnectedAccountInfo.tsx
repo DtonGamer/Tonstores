@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Loader2, AlertCircle, Wallet, CreditCard, Building, DollarSign, Clock } from "lucide-react";
+import { CheckCircle2, Loader2, AlertCircle, Wallet, CreditCard, Building, DollarSign, Clock, ArrowRight } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { ProfileBase } from "@/types/profile";
-import { getPaystackSellerBalance, getPaystackSellerLedgerHistory, requestManualPayout } from "@/services/PaystackPaymentService";
+import { getPaystackSellerLedgerHistory, requestManualPayout } from "@/services/PaystackPaymentService";
 import { formatCurrency } from "@/utils/format";
 
 interface BankAccount {
@@ -27,15 +27,45 @@ export default function ConnectedAccountInfo({ profile }: ConnectedAccountInfoPr
   const [accountDetails, setAccountDetails] = useState<BankAccount | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
-  const [ledgerBalance, setLedgerBalance] = useState<number | null>(null);
   const [isRequestingPayout, setIsRequestingPayout] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState("");
+  const [canRequestPayout, setCanRequestPayout] = useState(false);
+
+  // Calculate time remaining until next payout
+  useEffect(() => {
+    if (!profile?.next_payout_available_at) {
+      setCanRequestPayout(true);
+      setTimeRemaining("");
+      return;
+    }
+
+    const timer = setInterval(() => {
+      const now = new Date();
+      const nextPayout = new Date(profile.next_payout_available_at);
+      const diff = nextPayout.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setCanRequestPayout(true);
+        setTimeRemaining("");
+        clearInterval(timer);
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      setCanRequestPayout(false);
+      setTimeRemaining(`${hours}h ${minutes}m`);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [profile?.next_payout_available_at]);
 
   // Fetch bank account details
   useEffect(() => {
     async function fetchAccountDetails() {
       try {
         setLoading(true);
-        // Try to get account details from payment_accounts table
         const { data, error } = await supabase
           .from("payment_accounts")
           .select("*")
@@ -44,18 +74,14 @@ export default function ConnectedAccountInfo({ profile }: ConnectedAccountInfoPr
 
         if (error && error.code !== 'PGRST116') {
           console.error("Error fetching account details:", error);
-          // Don't throw the error - we'll just show a simpler view
         } else if (data) {
           setAccountDetails(data);
         } else {
-          // console.log("No payment account details found in database");
-          // Create mock data from profile info if we have KYC verified
           if (profile.kyc_verified) {
-            // Create a mock account details object based on profile info
             const mockAccountDetails: BankAccount = {
               id: 'mock-id',
               account_name: profile.business_name || 'Account Holder',
-              account_number: '**********', // Masked for privacy
+              account_number: '**********',
               bank_name: 'Bank details pending',
               bank_code: '',
               created_at: profile.kyc_verified_at || new Date().toISOString()
@@ -75,37 +101,18 @@ export default function ConnectedAccountInfo({ profile }: ConnectedAccountInfoPr
     }
   }, [profile?.id]);
 
-  // Fetch seller balance
+  // Fetch seller balance from ledger
   useEffect(() => {
     async function fetchBalance() {
       if (!profile?.id || !profile?.kyc_verified) return;
 
       try {
         setIsLoadingBalance(true);
-        console.log("Fetching balance for Connected Account:", profile.id);
-        // Add a small delay to avoid race conditions
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Fetch both the traditional balance and the ledger balance
-        const sellerBalance = await getPaystackSellerBalance(profile.id);
-        setBalance(sellerBalance);
-        console.log("Traditional balance loaded:", sellerBalance);
-
-        // Get the ledger balance if available
-        try {
-          const ledgerData = await getPaystackSellerLedgerHistory(profile.id, 1, 0);
-          console.log("Ledger balance loaded:", ledgerData.summary.balance);
-          setLedgerBalance(ledgerData.summary.balance);
-        } catch (ledgerError) {
-          console.error("Error loading ledger balance:", ledgerError);
-          // If ledger balance fails, we'll just use the traditional balance
-          setLedgerBalance(null);
-        }
+        const ledgerData = await getPaystackSellerLedgerHistory(profile.id, 1, 0);
+        setBalance(ledgerData.summary.balance);
       } catch (error: any) {
         console.error("Error loading balance:", error);
-        // Set a mock balance on error instead of showing "Not available"
         setBalance(0);
-        setLedgerBalance(null);
       } finally {
         setIsLoadingBalance(false);
       }
@@ -114,70 +121,41 @@ export default function ConnectedAccountInfo({ profile }: ConnectedAccountInfoPr
     fetchBalance();
   }, [profile?.id, profile?.kyc_verified]);
 
-  // Function to handle manual payout request
+  // Handle manual payout request
   const handleRequestPayout = async () => {
-    if (!profile?.id) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to request a payout",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (displayBalance === null || displayBalance <= 0) {
-      toast({
-        title: "Error",
-        description: "You don't have any funds available for payout",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!profile?.id || balance === null || balance <= 0 || !canRequestPayout) return;
 
     setIsRequestingPayout(true);
+    
     try {
       const result = await requestManualPayout(profile.id);
-      if (result.success) {
-        toast({
-          title: "Success",
-          description: result.message,
-        });
-        // Refresh the balance after successful payout request
-        const sellerBalance = await getPaystackSellerBalance(profile.id);
-        setBalance(sellerBalance);
-
-        // Also refresh ledger balance
-        const ledgerData = await getPaystackSellerLedgerHistory(profile.id, 1, 0);
-        setLedgerBalance(ledgerData.summary.balance);
-      } else {
-        toast({
-          title: "Error",
-          description: result.message,
-          variant: "destructive",
-        });
-      }
-    } catch (error: any) {
-      // Provide more user-friendly error messages
-      let errorMessage = "Failed to request payout. Please try again later.";
-
-      if (error.message?.includes("404") && error.message?.includes("function was not found")) {
-        errorMessage = "Payout service is temporarily unavailable. The payout function needs to be deployed to our servers. Please contact support or try again later.";
-      } else if (error.message?.includes("400") && error.message?.includes("Payout not available yet")) {
-        errorMessage = "You need to wait 48 hours between payouts. Please try again later.";
-      } else if (error.message?.includes("Insufficient balance")) {
-        errorMessage = "You don't have enough funds available for a payout.";
-      } else if (error.message?.includes("Bank account not found")) {
-        errorMessage = "Please set up your bank account details first before requesting a payout.";
-      } else if (error.message?.includes("Profile not found")) {
-        errorMessage = "Your profile information is incomplete. Please contact support.";
-      } else if (error.message?.includes("401") || error.message?.includes("unauthorized")) {
-        errorMessage = "Authentication required. Please log in and try again.";
-      } else if (error.message?.includes("500")) {
-        errorMessage = "A server error occurred. Please try again later or contact support.";
-      }
-
+      
       toast({
-        title: "Payout Request Failed",
+        title: "Payout Successful!",
+        description: `₦${(result.data.amount / 100).toFixed(2)} transferred to your bank account.`,
+      });
+      
+      // Refresh balance
+      const ledgerData = await getPaystackSellerLedgerHistory(profile.id, 1, 0);
+      setBalance(ledgerData.summary.balance);
+      
+    } catch (error: any) {
+      console.error('Payout error:', error);
+      
+      let errorMessage = "Failed to request payout. Please try again.";
+      
+      if (error.message?.includes("404") && error.message?.includes("function was not found")) {
+        errorMessage = "Payout service is temporarily unavailable. Please contact support or try again later.";
+      } else if (error.message?.includes("Payout not available yet")) {
+        errorMessage = error.message;
+      } else if (error.message?.includes("Insufficient balance")) {
+        errorMessage = "You don't have enough funds available for payout.";
+      } else if (error.message?.includes("Bank account not found")) {
+        errorMessage = "Please set up your bank account details first.";
+      }
+      
+      toast({
+        title: "Payout Failed",
         description: errorMessage,
         variant: "destructive",
       });
@@ -195,9 +173,6 @@ export default function ConnectedAccountInfo({ profile }: ConnectedAccountInfoPr
       </Card>
     );
   }
-
-  // Use ledger balance if available, otherwise fall back to traditional balance
-  const displayBalance = ledgerBalance !== null ? ledgerBalance : balance;
 
   return (
     <Card>
@@ -237,16 +212,16 @@ export default function ConnectedAccountInfo({ profile }: ConnectedAccountInfoPr
                 {isLoadingBalance ? (
                   <div className="flex items-center space-x-2">
                     <Loader2 className="h-4 w-4 animate-spin text-Tonstores-green" />
-                    <span className="text-gray-500 dark:text-gray-400">Loading balance...</span>
+                    <span className="text-gray-500 dark:text-gray-400">Loading...</span>
                   </div>
                 ) : (
                   <span className="text-lg font-semibold dark:text-white">
-                    {displayBalance !== null ? formatCurrency(displayBalance / 100) : "₦0.00"}
+                    {balance !== null ? formatCurrency(balance / 100) : "₦0.00"}
                   </span>
                 )}
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                This is your current available balance from completed orders.
+                Available balance from completed orders.
               </p>
             </div>
           </div>
@@ -288,36 +263,67 @@ export default function ConnectedAccountInfo({ profile }: ConnectedAccountInfoPr
               </div>
             )}
           </div>
+
+          {/* Payout Info Banner */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div className="flex items-start space-x-3">
+              <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100">Payout Schedule</h4>
+                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                  You can request a payout every 48 hours. Funds are held in escrow for security 
+                  and will be transferred to your bank account within minutes.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </CardContent>
       
-      <CardFooter className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t">
+      <CardFooter className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t">
         <div className="text-xs text-gray-500 dark:text-gray-400">
-          <p>Your payment account is managed by Paystack.</p>
-          {profile?.next_payout_available_at && new Date(profile.next_payout_available_at) > new Date() && (
-            <p className="mt-1 text-amber-600">
-              Next payout available in {Math.ceil((new Date(profile.next_payout_available_at).getTime() - Date.now()) / (1000 * 60 * 60))} hours
+          {!canRequestPayout && timeRemaining ? (
+            <div className="flex items-center space-x-2 text-amber-600 dark:text-amber-500">
+              <Clock className="h-4 w-4" />
+              <span className="font-medium">
+                Next payout available in: {timeRemaining}
+              </span>
+            </div>
+          ) : balance && balance > 0 ? (
+            <p className="text-green-600 dark:text-green-500 font-medium">
+              ✓ Payout available now
             </p>
+          ) : (
+            <p>No funds available for payout</p>
           )}
         </div>
+        
         <Button
           onClick={handleRequestPayout}
-          disabled={isRequestingPayout ||
-            displayBalance === null ||
-            displayBalance <= 0 ||
-            (profile?.next_payout_available_at && new Date(profile.next_payout_available_at) > new Date())}
-          className="w-full sm:w-auto"
+          disabled={isRequestingPayout || !canRequestPayout || balance === null || balance <= 0}
+          size="lg"
+          className="w-full sm:w-auto min-w-[200px]"
         >
           {isRequestingPayout ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Processing...
             </>
+          ) : !canRequestPayout ? (
+            <>
+              <Clock className="mr-2 h-4 w-4" />
+              Payout Locked
+            </>
+          ) : balance === null || balance <= 0 ? (
+            "No Funds Available"
           ) : (
-            'Request Payout'
+            <>
+              Request Payout
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </>
           )}
         </Button>
       </CardFooter>
     </Card>
   );
-} 
+}
