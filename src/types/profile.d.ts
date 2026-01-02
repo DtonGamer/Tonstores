@@ -30,6 +30,7 @@ export interface ProfileBase {
   referral_code?: string;
   created_at: string;
   updated_at: string;
+  next_payout_available_at?: string;
 }
 
 declare module '@/hooks/useProfile' {
