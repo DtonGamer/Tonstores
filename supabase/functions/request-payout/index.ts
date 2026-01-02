@@ -44,7 +44,7 @@ serve(async (req) => {
     console.log("🔍 Fetching seller profile...");
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('id, next_payout_available_at, paystack_subaccount_code')
+      .select('id, last_payout_at, paystack_subaccount_code')
       .eq('id', userId)
       .single();
 
@@ -54,15 +54,17 @@ serve(async (req) => {
     }
 
     // Check if 48 hours have passed since last payout
-    const nextPayoutAvailableAt = profile.next_payout_available_at ? new Date(profile.next_payout_available_at) : new Date();
+    const lastPayoutAt = profile.last_payout_at ? new Date(profile.last_payout_at) : null;
     const now = new Date();
-    
-    console.log("⏰ Next payout available at:", nextPayoutAvailableAt);
-    console.log("⏰ Current time:", now);
+    const hoursSinceLastPayout = lastPayoutAt 
+      ? (now.getTime() - lastPayoutAt.getTime()) / (1000 * 60 * 60)
+      : 999; // Large number if never paid out
 
-    if (now < nextPayoutAvailableAt) {
-      const hoursRemaining = Math.ceil((nextPayoutAvailableAt.getTime() - now.getTime()) / (1000 * 60 * 60));
-      const nextAvailable = nextPayoutAvailableAt;
+    console.log("⏰ Hours since last payout:", hoursSinceLastPayout);
+
+    if (hoursSinceLastPayout < 48) {
+      const hoursRemaining = Math.ceil(48 - hoursSinceLastPayout);
+      const nextAvailable = new Date(lastPayoutAt!.getTime() + (48 * 60 * 60 * 1000));
       
       console.log("⚠️ Payout requested too soon");
       return jsonResponse(400, {
@@ -95,7 +97,7 @@ serve(async (req) => {
     
     const availableBalance = credits - debits;
 
-    console.log("💵 Available balance:", availableBalance);
+    console.log("💵 Available balance:", availableBalance / 100);
 
     if (availableBalance <= 0) {
       return jsonResponse(400, {
@@ -165,35 +167,16 @@ serve(async (req) => {
 
     console.log("✅ Payout initiated successfully");
 
-    // Update next_payout_available_at to 48 hours from now
+    // Update last_payout_at and next_payout_available_at
     const nextPayoutAvailable = new Date(now.getTime() + (48 * 60 * 60 * 1000));
     
     await supabase
       .from('profiles')
       .update({
+        last_payout_at: now.toISOString(),
         next_payout_available_at: nextPayoutAvailable.toISOString()
       })
       .eq('id', userId);
-
-    // Create a payout record
-    const { error: payoutError } = await supabase
-      .from('payouts')
-      .insert([{
-        seller_id: userId,
-        amount: availableBalance,
-        fee: Math.ceil(availableBalance * 0.02), // 2% platform fee
-        net_amount: availableBalance * 0.98,
-        status: 'processing',
-        reference: reference,
-        account_number: bankAccount.account_number,
-        bank_name: bankAccount.bank_name,
-        account_name: bankAccount.account_name
-      }]);
-
-    if (payoutError) {
-      console.error("❌ Error creating payout record:", payoutError);
-      // This is not critical as the payout was processed, just the record wasn't saved
-    }
 
     console.log("🎉 === REQUEST PAYOUT SUCCESS ===");
 
@@ -203,7 +186,7 @@ serve(async (req) => {
       data: {
         amount: availableBalance,
         reference: reference,
-        transferCode: payoutResult.data.transfer_code,
+        transferCode: payoutResult.data.transferCode,
         nextPayoutAvailable: nextPayoutAvailable.toISOString(),
         bankAccount: {
           accountName: bankAccount.account_name,

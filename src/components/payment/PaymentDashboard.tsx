@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, ArrowRight, Calendar, DollarSign, Wallet, ArrowDown, ArrowUp, AlertCircle, Clock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useProfile } from "@/hooks/useProfile";
-import { getPaystackSellerBalance, getPaystackSellerLedgerHistory, PaystackLedgerEntry, getPaystackSellerPayoutHistory, PaystackPayoutHistoryResponse, requestManualPayout } from "@/services/PaystackPaymentService";
+import { getPaystackSellerBalance, getPaystackSellerLedgerHistory, PaystackLedgerEntry, getPaystackSellerPayoutHistory, PaystackPayoutHistoryResponse } from "@/services/PaystackPaymentService";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,8 +34,6 @@ export function PaymentDashboard() {
     total_debits: 0,
     balance: 0
   });
-  const [isRequestingPayout, setIsRequestingPayout] = useState(false);
-
   // Load seller balance
   useEffect(() => {
     const loadBalance = async () => {
@@ -128,61 +126,6 @@ export function PaymentDashboard() {
     loadLedgerHistory();
   }, [profile?.id, toast]);
 
-  // Function to handle manual payout request
-  const handleRequestPayout = async () => {
-    if (!profile?.id) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to request a payout",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (balance === null || balance <= 0) {
-      toast({
-        title: "Error",
-        description: "You don't have any funds available for payout",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsRequestingPayout(true);
-    try {
-      const result = await requestManualPayout(profile.id);
-      if (result.success) {
-        toast({
-          title: "Success",
-          description: result.message,
-        });
-        // Refresh the balance and payout history
-        if (profile?.id) {
-          const sellerBalance = await getPaystackSellerBalance(profile.id);
-          setBalance(sellerBalance);
-
-          const payoutData = await getPaystackSellerPayoutHistory(profile.id, 10, 0);
-          if (payoutData.payouts) {
-            setPayoutHistory(payoutData.payouts);
-          }
-        }
-      } else {
-        toast({
-          title: "Error",
-          description: result.message,
-          variant: "destructive",
-        });
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to request payout",
-        variant: "destructive",
-      });
-    } finally {
-      setIsRequestingPayout(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -295,52 +238,6 @@ export function PaymentDashboard() {
         </Card>
       </div>
 
-      {/* Manual Payout Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Request Payout</CardTitle>
-          <CardDescription>
-            Request a manual payout of your available balance.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <p className="text-sm text-gray-600">
-                Current balance available for payout:
-                <span className="font-semibold ml-1">
-                  ₦{balance !== null ? (balance / 100).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  }) : "0.00"}
-                </span>
-              </p>
-              {profile?.next_payout_available_at && new Date(profile.next_payout_available_at) > new Date() && (
-                <p className="text-sm text-amber-600 mt-1">
-                  Next payout available in {Math.ceil((new Date(profile.next_payout_available_at).getTime() - Date.now()) / (1000 * 60 * 60))} hours
-                </p>
-              )}
-            </div>
-            <Button
-              onClick={handleRequestPayout}
-              disabled={isRequestingPayout ||
-                balance === null ||
-                balance <= 0 ||
-                (profile?.next_payout_available_at && new Date(profile.next_payout_available_at) > new Date())}
-              className="w-full sm:w-auto"
-            >
-              {isRequestingPayout ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                'Request Payout'
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Transaction History Tabs */}
       <Card>
