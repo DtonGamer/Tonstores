@@ -21,7 +21,7 @@ type AuthContextType = {
   isAdmin: boolean;
   authInitialized: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, businessName: string) => Promise<void>;
+  signUp: (email: string, password: string, businessName: string, referralCode?: string) => Promise<void>;
   processReferralAfterSignup: (referralCode?: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -167,7 +167,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []); // ✅ Empty array - runs only once
 
   const processReferralAfterSignup = async (referralCode: string = '') => {
-    // Your referral logic here
+    if (!referralCode || !user) return;
+
+    try {
+      debugLog("Processing referral code:", referralCode);
+      const { AffiliateService } = await import('@/services/AffiliateService');
+      await AffiliateService.processReferralFromUrl(user.id, referralCode);
+      debugLog("Referral processed successfully");
+    } catch (error: any) {
+      console.error("Referral processing error:", error);
+      toast({
+        title: "Referral Warning",
+        description: error.message || "Unable to process referral code",
+        variant: "destructive",
+      });
+    }
   };
 
   const contextValue = useMemo(() => ({
@@ -195,8 +209,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
       }
     },
-    signUp: async (email: string, password: string, businessName: string) => {
-      // Your signup logic
+    signUp: async (email: string, password: string, businessName: string, referralCode?: string) => {
+      setIsLoading(true);
+      try {
+        const { error, data } = await signUpWithEmailAndPassword(
+          email,
+          password,
+          businessName,
+          'seller'
+        );
+
+        if (error) throw error;
+
+        toast({
+          title: "Registration Successful!",
+          description: "Please check your email to verify your account. You'll be redirected to the verification page.",
+        });
+
+        if (data.user) {
+          await processReferralAfterSignup(referralCode);
+        }
+      } catch (error: any) {
+        toast({
+          title: "Registration Failed",
+          description: error.message || "An unexpected error occurred",
+          variant: "destructive",
+        });
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
     },
     processReferralAfterSignup,
     signOut: async () => {

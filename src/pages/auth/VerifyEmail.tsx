@@ -52,10 +52,14 @@ export default function VerifyEmail() {
         }
         
         setStatus("success");
-        
-        // Redirect to dashboard after a brief delay to show success message
+
+        // Redirect to login after a brief delay to show success message
+        // User needs to log in after email verification
         setTimeout(() => {
-          navigate("/dashboard");
+          navigate("/login", {
+            replace: true,
+            state: { message: "Email verified successfully! Please log in to continue." }
+          });
         }, 3000);
       } catch (error: any) {
         console.error("Email verification error:", error);

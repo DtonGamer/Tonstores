@@ -72,8 +72,8 @@ const AuthForm = ({ type }: AuthFormProps) => {
         }
 
         try {
-          await signUp(email, password, businessName);
-          // Navigation to dashboard is handled in the AuthContext after signup
+          await signUp(email, password, businessName, referralCode);
+          navigate("/auth/verify");
         } catch (error) {
           // Error is already handled in the AuthContext
         }
@@ -193,11 +193,20 @@ const AuthForm = ({ type }: AuthFormProps) => {
             </div>
 
             {type === "login" && (
-              <div className="pt-3 text-center">
-                <Link to="/auth/recovery" className="text-sm text-Tonstores-blue hover:underline">
-                  Forgot your password?
-                </Link>
-              </div>
+              <>
+                <div className="pt-3 text-center">
+                  <Link to="/auth/recovery" className="text-sm text-Tonstores-blue hover:underline">
+                    Forgot your password?
+                  </Link>
+                </div>
+                {location.state?.message && (
+                  <div className="pt-2 text-center">
+                    <p className="text-sm text-green-600 font-medium">
+                      {location.state.message}
+                    </p>
+                  </div>
+                )}
+              </>
             )}
         </form>
       </CardContent>
