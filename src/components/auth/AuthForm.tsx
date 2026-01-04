@@ -73,9 +73,16 @@ const AuthForm = ({ type }: AuthFormProps) => {
 
         try {
           await signUp(email, password, businessName, referralCode);
-          navigate("/auth/verify");
+          // Show success message and don't navigate - user needs to verify via email
+          toast({
+            title: "Registration Successful!",
+            description: "Please check your email to verify your account.",
+          });
+          // Reset form or show verification message instead of navigating
+          setIsLoading(false);
         } catch (error) {
           // Error is already handled in the AuthContext
+          setIsLoading(false);
         }
       }
     } catch (error: any) {

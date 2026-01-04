@@ -221,11 +221,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (error) throw error;
 
+        // Show success message to user
         toast({
           title: "Registration Successful!",
-          description: "Please check your email to verify your account. You'll be redirected to the verification page.",
+          description: "Please check your email to verify your account.",
         });
 
+        // Only process referral if user was created successfully
         if (data.user) {
           await processReferralAfterSignup(referralCode);
         }

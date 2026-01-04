@@ -28,14 +28,25 @@ export default function VerifyEmail() {
         const type = hashParams.get("type");
         const token = hashParams.get("access_token");
         const refreshToken = hashParams.get("refresh_token");
-        const email = hashParams.get("email") || "";
+        const emailParam = hashParams.get("email") || "";
 
-        setEmail(email);
+        setEmail(emailParam);
 
+        // If there's no token, the user might have navigated here manually
+        // In this case, if they're already logged in and verified, redirect appropriately
         if (!token) {
-          setStatus("error");
-          setErrorMessage("Verification token is missing. Please try again or request a new verification email.");
-          return;
+          if (session?.user && session.user.email_confirmed_at) {
+            // User is already logged in and verified
+            setStatus("success");
+            setTimeout(() => {
+              navigate("/dashboard", { replace: true });
+            }, 1500);
+            return;
+          } else {
+            setStatus("error");
+            setErrorMessage("Verification token is missing. Please check your email for the verification link or request a new verification email.");
+            return;
+          }
         }
 
         // Set session from the tokens in the URL
@@ -64,7 +75,7 @@ export default function VerifyEmail() {
         // If user already has a valid session after verification, go to dashboard
         // Otherwise, go to login page
         setTimeout(() => {
-          if (user) {
+          if (user || (await supabase.auth.getSession()).data.session?.user) {
             navigate("/dashboard", { replace: true });
           } else {
             navigate("/login", {
@@ -81,7 +92,7 @@ export default function VerifyEmail() {
     };
 
     verifyEmail();
-  }, [location.hash, navigate, user]);
+  }, [location.hash, navigate]);
   
   return (
     <div className="flex min-h-screen items-center justify-center p-4 bg-gray-50">
@@ -103,7 +114,7 @@ export default function VerifyEmail() {
               <CheckCircle2 className="h-12 w-12 text-green-500" />
               <div className="text-center">
                 <p className="text-lg font-medium">Email verified successfully!</p>
-                <p className="text-gray-500">You will be redirected to the login page shortly to access your account.</p>
+                <p className="text-gray-500">You will be redirected shortly to access your account.</p>
               </div>
             </div>
           )}
