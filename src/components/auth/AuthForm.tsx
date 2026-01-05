@@ -21,6 +21,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
   const [referralCode, setReferralCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
   const navigate = useNavigate();
   const { signIn, signUp } = useAuth();
   const location = useLocation();
@@ -73,15 +74,11 @@ const AuthForm = ({ type }: AuthFormProps) => {
 
         try {
           await signUp(email, password, businessName, referralCode);
-          // Show success message and don't navigate - user needs to verify via email
-          toast({
-            title: "Registration Successful!",
-            description: "Please check your email to verify your account.",
-          });
-          // Reset form or show verification message instead of navigating
-          setIsLoading(false);
+          // Show verification message instead of navigating
+          setShowVerificationMessage(true);
         } catch (error) {
           // Error is already handled in the AuthContext
+        } finally {
           setIsLoading(false);
         }
       }
@@ -110,126 +107,155 @@ const AuthForm = ({ type }: AuthFormProps) => {
         </Link>
       </div>
       <Card className="w-full shadow-md bg-white">
-        <CardHeader className="px-5 sm:px-6 py-5 sm:py-6">
-          <CardTitle className="text-xl sm:text-2xl text-center text-black">
-          {type === "login" ? "Login to Your Account" : "Create Your Store Account"}
-        </CardTitle>
-          <CardDescription className="text-center text-sm sm:text-base mt-1 sm:mt-2 text-gray-600">
-          {type === "login" 
-            ? "Enter your credentials to access your dashboard" 
-            : "Sign up to start creating your product catalog"}
-        </CardDescription>
-      </CardHeader>
-        <CardContent className="px-5 sm:px-6">
-          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-          {type === "register" && (
-            <>
-              <div className="space-y-1 sm:space-y-2">
-                <Label htmlFor="businessName" className="text-sm text-black">Business Name</Label>
-                <Input
-                  id="businessName"
-                  type="text"
-                  placeholder="Your Business Name"
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                  required
-                  className="h-9 sm:h-10 text-sm sm:text-base bg-white text-black"
-                />
-              </div>
-            </>
-          )}
-
-            <div className="space-y-1 sm:space-y-2">
-              <Label htmlFor="email" className="text-sm text-black">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="h-9 sm:h-10 text-sm sm:text-base bg-white text-black"
-            />
+        {showVerificationMessage ? (
+          // Show verification message UI
+          <div className="p-8 text-center">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
+              <svg className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="mt-6 text-xl font-bold text-gray-900">Registration Successful!</h2>
+            <p className="mt-2 text-gray-600">
+              We've sent a verification email to <span className="font-semibold">{email}</span>
+            </p>
+            <p className="mt-2 text-gray-600">
+              Please check your email and click the verification link to activate your account.
+            </p>
+            <div className="mt-6">
+              <Button
+                onClick={() => setShowVerificationMessage(false)}
+                className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue transition-colors"
+              >
+                Back to Login
+              </Button>
+            </div>
           </div>
+        ) : (
+          // Original form UI
+          <>
+            <CardHeader className="px-5 sm:px-6 py-5 sm:py-6">
+              <CardTitle className="text-xl sm:text-2xl text-center text-black">
+              {type === "login" ? "Login to Your Account" : "Create Your Store Account"}
+            </CardTitle>
+              <CardDescription className="text-center text-sm sm:text-base mt-1 sm:mt-2 text-gray-600">
+              {type === "login"
+                ? "Enter your credentials to access your dashboard"
+                : "Sign up to start creating your product catalog"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-5 sm:px-6">
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+            {type === "register" && (
+              <>
+                <div className="space-y-1 sm:space-y-2">
+                  <Label htmlFor="businessName" className="text-sm text-black">Business Name</Label>
+                  <Input
+                    id="businessName"
+                    type="text"
+                    placeholder="Your Business Name"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    required
+                    className="h-9 sm:h-10 text-sm sm:text-base bg-white text-black"
+                  />
+                </div>
+              </>
+            )}
 
-            <div className="space-y-1 sm:space-y-2">
-              <Label htmlFor="password" className="text-sm text-black">Password</Label>
-            <div className="relative">
+              <div className="space-y-1 sm:space-y-2">
+                <Label htmlFor="email" className="text-sm text-black">Email</Label>
               <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="h-9 sm:h-10 text-sm sm:text-base bg-white text-black"
               />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                onClick={togglePasswordVisibility}
-              >
-                  {showPassword ? <EyeOff size={16} className="text-gray-500" /> : <Eye size={16} className="text-gray-500" />}
-              </button>
-            </div>
-          </div>
-
-          {type === "register" && (
-            <div className="space-y-1 sm:space-y-2">
-              <Label htmlFor="referralCode" className="text-sm text-black">Referral Code (Optional)</Label>
-              <Input
-                id="referralCode"
-                type="text"
-                placeholder="Enter referral code (if any)"
-                value={referralCode}
-                onChange={(e) => setReferralCode(e.target.value)}
-                className="h-9 sm:h-10 text-sm sm:text-base bg-white text-black"
-              />
-              <p className="text-xs text-gray-500">If someone referred you to Tonstores, enter their referral code here</p>
-            </div>
-          )}
-
-            <div className="pt-2 sm:pt-3">
-          <Button
-            type="submit"
-            className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue transition-colors h-9 sm:h-10 text-sm sm:text-base"
-            disabled={isLoading}
-          >
-            {isLoading ? "Processing..." : type === "login" ? "Login" : "Create Account"}
-          </Button>
             </div>
 
-            {type === "login" && (
-              <>
-                <div className="pt-3 text-center">
-                  <Link to="/auth/recovery" className="text-sm text-Tonstores-blue hover:underline">
-                    Forgot your password?
-                  </Link>
-                </div>
-                {location.state?.message && (
-                  <div className="pt-2 text-center">
-                    <p className="text-sm text-green-600 font-medium">
-                      {location.state.message}
-                    </p>
+              <div className="space-y-1 sm:space-y-2">
+                <Label htmlFor="password" className="text-sm text-black">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="h-9 sm:h-10 text-sm sm:text-base bg-white text-black"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                  onClick={togglePasswordVisibility}
+                >
+                    {showPassword ? <EyeOff size={16} className="text-gray-500" /> : <Eye size={16} className="text-gray-500" />}
+                </button>
+              </div>
+            </div>
+
+            {type === "register" && (
+              <div className="space-y-1 sm:space-y-2">
+                <Label htmlFor="referralCode" className="text-sm text-black">Referral Code (Optional)</Label>
+                <Input
+                  id="referralCode"
+                  type="text"
+                  placeholder="Enter referral code (if any)"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value)}
+                  className="h-9 sm:h-10 text-sm sm:text-base bg-white text-black"
+                />
+                <p className="text-xs text-gray-500">If someone referred you to Tonstores, enter their referral code here</p>
+              </div>
+            )}
+
+              <div className="pt-2 sm:pt-3">
+            <Button
+              type="submit"
+              className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue transition-colors h-9 sm:h-10 text-sm sm:text-base"
+              disabled={isLoading}
+            >
+              {isLoading ? "Processing..." : type === "login" ? "Login" : "Create Account"}
+            </Button>
+              </div>
+
+              {type === "login" && (
+                <>
+                  <div className="pt-3 text-center">
+                    <Link to="/auth/recovery" className="text-sm text-Tonstores-blue hover:underline">
+                      Forgot your password?
+                    </Link>
                   </div>
-                )}
+                  {location.state?.message && (
+                    <div className="pt-2 text-center">
+                      <p className="text-sm text-green-600 font-medium">
+                        {location.state.message}
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+          </form>
+        </CardContent>
+          <CardFooter className="flex justify-center px-5 sm:px-6 py-4 sm:py-5 border-t">
+            <p className="text-xs sm:text-sm text-gray-500">
+            {type === "login" ? (
+              <>
+                  Don't have an account? <Link to="/register" className="text-Tonstores-blue hover:underline font-medium">Sign up</Link>
+              </>
+            ) : (
+              <>
+                  Already have an account? <Link to="/login" className="text-Tonstores-blue hover:underline font-medium">Login</Link>
               </>
             )}
-        </form>
-      </CardContent>
-        <CardFooter className="flex justify-center px-5 sm:px-6 py-4 sm:py-5 border-t">
-          <p className="text-xs sm:text-sm text-gray-500">
-          {type === "login" ? (
-            <>
-                Don't have an account? <Link to="/register" className="text-Tonstores-blue hover:underline font-medium">Sign up</Link>
-            </>
-          ) : (
-            <>
-                Already have an account? <Link to="/login" className="text-Tonstores-blue hover:underline font-medium">Login</Link>
-            </>
-          )}
-        </p>
-      </CardFooter>
+          </p>
+        </CardFooter>
+        </>
+        )}
     </Card>
     </div>
   );
