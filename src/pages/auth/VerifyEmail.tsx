@@ -74,8 +74,9 @@ export default function VerifyEmail() {
         // Redirect to dashboard or login after a brief delay
         // If user already has a valid session after verification, go to dashboard
         // Otherwise, go to login page
-        setTimeout(() => {
-          if (user || (await supabase.auth.getSession()).data.session?.user) {
+        setTimeout(async () => {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (user || session?.user) {
             navigate("/dashboard", { replace: true });
           } else {
             navigate("/login", {
