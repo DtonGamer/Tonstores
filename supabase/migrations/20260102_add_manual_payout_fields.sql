@@ -14,7 +14,7 @@ ON profiles(last_payout_at);
 CREATE INDEX IF NOT EXISTS idx_profiles_next_payout 
 ON profiles(next_payout_available_at);
 
--- Function to check if seller can request payout (using next_payout_available_at)
+-- Function to check if seller can request payout based on T+1 schedule
 CREATE OR REPLACE FUNCTION can_request_payout(seller_profile_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
@@ -23,13 +23,13 @@ BEGIN
   SELECT next_payout_available_at INTO next_payout
   FROM profiles
   WHERE id = seller_profile_id;
-  
+
   -- If never requested payout before, they can request
   IF next_payout IS NULL THEN
     RETURN TRUE;
   END IF;
-  
-  -- Can request if current time is past next_payout_available_at
+
+  -- Can request if current time is past next_payout_available_at (T+1 schedule)
   RETURN NOW() >= next_payout;
 END;
 $$ LANGUAGE plpgsql;

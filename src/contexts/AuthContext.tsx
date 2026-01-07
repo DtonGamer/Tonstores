@@ -196,7 +196,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const { error } = await signInWithEmailAndPassword(email, password);
         if (error) throw error;
-        
+
         toast({ title: "Success", description: "Logged in successfully" });
       } catch (error: any) {
         toast({

@@ -22,9 +22,24 @@ const AuthForm = ({ type }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | undefined>(undefined);
   const navigate = useNavigate();
   const { signIn, signUp } = useAuth();
   const location = useLocation();
+
+  const validatePassword = (pwd: string): string | null => {
+    if (pwd.length < 8) return 'Password must be at least 8 characters';
+    if (!/[A-Z]/.test(pwd)) return 'Password must contain an uppercase letter';
+    if (!/[a-z]/.test(pwd)) return 'Password must contain a lowercase letter';
+    if (!/[0-9]/.test(pwd)) return 'Password must contain a number';
+    return null;
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    const error = validatePassword(value);
+    setPasswordError(error || undefined);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +55,20 @@ const AuthForm = ({ type }: AuthFormProps) => {
         });
         setIsLoading(false);
         return;
+      }
+
+      // For registration, validate password complexity
+      if (type === "register") {
+        const passwordValidationError = validatePassword(password);
+        if (passwordValidationError) {
+          toast({
+            title: "Password Requirements",
+            description: passwordValidationError,
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
       }
 
       if (type === "login") {
@@ -184,9 +213,15 @@ const AuthForm = ({ type }: AuthFormProps) => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    if (type === "register") {
+                      handlePasswordChange(e.target.value);
+                    } else {
+                      setPassword(e.target.value);
+                    }
+                  }}
                   required
-                  className="h-9 sm:h-10 text-sm sm:text-base bg-white text-black"
+                  className={`h-9 sm:h-10 text-sm sm:text-base bg-white text-black ${passwordError ? 'border-red-500' : ''}`}
                 />
                 <button
                   type="button"
@@ -196,6 +231,14 @@ const AuthForm = ({ type }: AuthFormProps) => {
                     {showPassword ? <EyeOff size={16} className="text-gray-500" /> : <Eye size={16} className="text-gray-500" />}
                 </button>
               </div>
+              {type === "register" && passwordError && (
+                <p className="text-xs text-red-500 mt-1">{passwordError}</p>
+              )}
+              {type === "register" && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Must be 8+ characters with uppercase, lowercase, and number
+                </p>
+              )}
             </div>
 
             {type === "register" && (

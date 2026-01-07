@@ -16,18 +16,33 @@ export const useSubscription = () => {
 
       const { data, error } = await supabase
         .from("subscriptions")
-        .select("*, pricing_plans(*)")
+        .select(`
+          *,
+          pricing_plans (
+            id,
+            name,
+            description,
+            monthly_price,
+            yearly_price,
+            features,
+            created_at,
+            updated_at
+          )
+        `)
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle(); // Changed from .single() to .maybeSingle()
 
       if (error) {
-        if (error.code === "PGRST116") return null; // No subscription found
+        console.error("Subscription fetch error:", error);
         throw error;
       }
 
-      return data as Subscription & { pricing_plans: any };
+      // Returns null if no subscription found, otherwise returns the subscription
+      return data as (Subscription & { pricing_plans: any }) | null;
     },
     enabled: !!user?.id,
+    retry: 1, // Only retry once on failure
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
   });
 
   const { mutateAsync: createSubscription } = useMutation({
@@ -130,4 +145,4 @@ export const useSubscription = () => {
     updateSubscription,
     cancelSubscription
   ]);
-}; 
+};

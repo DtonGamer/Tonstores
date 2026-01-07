@@ -201,9 +201,9 @@ export function PaymentDashboard() {
           <CardContent>
             <div className="flex items-center">
               <Calendar className="h-5 w-5 text-blue-600 mr-2" />
-              <span className="text-2xl font-bold">Every 48h</span>
+              <span className="text-2xl font-bold">T+1</span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Minimum waiting period</p>
+            <p className="text-xs text-gray-500 mt-1">Next working day settlement</p>
           </CardContent>
         </Card>
       </div>

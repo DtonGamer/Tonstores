@@ -53,24 +53,46 @@ serve(async (req) => {
       return jsonResponse(404, { error: "Profile not found" });
     }
 
-    // Check if 48 hours have passed since last payout
+    // Check if next working day has passed since last payout (T+1 schedule)
     const lastPayoutAt = profile.last_payout_at ? new Date(profile.last_payout_at) : null;
     const now = new Date();
-    const hoursSinceLastPayout = lastPayoutAt 
-      ? (now.getTime() - lastPayoutAt.getTime()) / (1000 * 60 * 60)
-      : 999; // Large number if never paid out
 
-    console.log("⏰ Hours since last payout:", hoursSinceLastPayout);
+    // For T+1 (next working day) schedule, we need to check if at least one full day has passed
+    // and if the last payout wasn't made today (to allow daily payouts on working days)
+    let isEligibleForPayout = true;
+    if (lastPayoutAt) {
+      // Calculate difference in days
+      const timeDiff = now.getTime() - lastPayoutAt.getTime();
+      const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
 
-    if (hoursSinceLastPayout < 48) {
-      const hoursRemaining = Math.ceil(48 - hoursSinceLastPayout);
-      const nextAvailable = new Date(lastPayoutAt!.getTime() + (48 * 60 * 60 * 1000));
-      
+      // Check if last payout was made today (same calendar day)
+      const lastPayoutDate = lastPayoutAt.getDate();
+      const lastPayoutMonth = lastPayoutAt.getMonth();
+      const lastPayoutYear = lastPayoutAt.getFullYear();
+
+      const currentDate = now.getDate();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+
+      // If last payout was made today, user needs to wait until tomorrow
+      if (lastPayoutDate === currentDate &&
+          lastPayoutMonth === currentMonth &&
+          lastPayoutYear === currentYear) {
+        isEligibleForPayout = false;
+      }
+    }
+
+    console.log("⏰ Days since last payout:", lastPayoutAt ? (now.getTime() - lastPayoutAt.getTime()) / (1000 * 60 * 60 * 24) : 'Never');
+
+    if (!isEligibleForPayout) {
+      const nextAvailable = new Date(now);
+      nextAvailable.setDate(now.getDate() + 1); // Next day
+      nextAvailable.setHours(0, 0, 0, 0); // Start of the day
+
       console.log("⚠️ Payout requested too soon");
       return jsonResponse(400, {
         error: "Payout not available yet",
-        message: `You must wait 48 hours between payouts. Next payout available in ${hoursRemaining} hours.`,
-        hoursRemaining,
+        message: "Next payout available tomorrow. Paystack follows T+1 (next working day) schedule.",
         nextAvailableAt: nextAvailable.toISOString()
       });
     }
@@ -168,8 +190,11 @@ serve(async (req) => {
     console.log("✅ Payout initiated successfully");
 
     // Update last_payout_at and next_payout_available_at
-    const nextPayoutAvailable = new Date(now.getTime() + (48 * 60 * 60 * 1000));
-    
+    // For T+1 schedule, next payout is available tomorrow (next working day)
+    const nextPayoutAvailable = new Date(now);
+    nextPayoutAvailable.setDate(now.getDate() + 1); // Next day
+    nextPayoutAvailable.setHours(0, 0, 0, 0); // Start of the day
+
     await supabase
       .from('profiles')
       .update({
@@ -182,7 +207,7 @@ serve(async (req) => {
 
     return jsonResponse(200, {
       status: true,
-      message: "Payout requested successfully",
+      message: "Payout requested successfully. Funds will be transferred according to Paystack's T+1 (next working day) schedule.",
       data: {
         amount: availableBalance,
         reference: reference,

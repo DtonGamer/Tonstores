@@ -271,8 +271,8 @@ export default function ConnectedAccountInfo({ profile }: ConnectedAccountInfoPr
               <div>
                 <h4 className="font-semibold text-blue-900 dark:text-blue-100">Payout Schedule</h4>
                 <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                  You can request a payout every 48 hours. Funds are held in escrow for security 
-                  and will be transferred to your bank account within minutes.
+                  Paystack's standard payout schedule is typically T+1 (next working day) for Nigeria,
+                  with funds automatically settled to your bank account.
                 </p>
               </div>
             </div>
