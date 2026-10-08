@@ -1,5 +1,7 @@
 # Tonstores Catalog Hub
 
+# Built with Qwen Code + Cursor
+
 A modern e-commerce catalog management system built with React, Vite, and Supabase. Create and share beautiful product catalogs, manage orders, and process payments seamlessly.
 
 ## Features
