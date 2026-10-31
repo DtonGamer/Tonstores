@@ -55,3 +55,9 @@ coverage/
 *.pem
 .vercel
 .netlify
+
+# TypeScript incremental build artifact
+tsconfig.tsbuildinfo
+
+# TypeScript incremental build artifact
+tsconfig.tsbuildinfo
