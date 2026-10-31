@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 const values = [
   { title: "Built for sellers like you", text: "Made for people running real shops on WhatsApp, Instagram and TikTok, not adapted from Western tools." },
   { title: "You own your data", text: "Your customers, products and orders are yours. Export them anytime." },
-  { title: "No cut of your sales", text: "You pay a flat monthly fee, or use the free plan. You keep 100% of what you earn." },
+  { title: "Secure payments", text: "Customers pay through Paystack checkout, and payment is held until they confirm delivery." },
   { title: "Real support", text: "You talk to the person building the product, not a script." },
 ];
 

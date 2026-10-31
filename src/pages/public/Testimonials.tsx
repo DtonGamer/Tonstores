@@ -42,7 +42,7 @@ const testimonials = [
 const stats = [
   { value: "500+", label: "Active users" }, // TODO: verify before publishing
   { value: "₦50M+", label: "Sales processed" }, // TODO: verify before publishing
-  { value: "0%", label: "Commission on sales" },
+  { value: "Paystack", label: "Secure checkout" },
   { value: "<24h", label: "Support response" },
 ];
 

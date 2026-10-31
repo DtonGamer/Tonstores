@@ -205,7 +205,7 @@ const OrderManagement = () => {
       case "processing":
         return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
       case "shipped":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
+        return "bg-Tonstores-green/10 text-Tonstores-green dark:bg-Tonstores-green/20 dark:text-Tonstores-green";
       case "delivered":
         return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
       case "cancelled":
@@ -239,7 +239,7 @@ const OrderManagement = () => {
     
     switch(source.toLowerCase()) {
       case 'instagram':
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
+        return "bg-Tonstores-green/10 text-Tonstores-green dark:bg-Tonstores-green/20 dark:text-Tonstores-green";
       case 'facebook':
         return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
       case 'twitter':

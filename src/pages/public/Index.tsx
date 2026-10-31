@@ -6,7 +6,7 @@ import useAuth from "@/contexts/AuthContext";
 const steps = [
   { n: "1", title: "Add your products", text: "Upload photos, set prices and descriptions once." },
   { n: "2", title: "Share your link", text: "Put it in your WhatsApp status, Instagram bio or TikTok live chat." },
-  { n: "3", title: "Get orders", text: "See every order in one dashboard. Customers pay you directly by bank transfer." },
+  { n: "3", title: "Get orders", text: "See every order in one dashboard. Customers pay through secure checkout." },
 ];
 
 const quotes = [
@@ -22,8 +22,8 @@ const plans = [
 ];
 
 const faqs = [
-  { q: "How do I get paid?", a: "Customers pay by bank transfer straight to your account. We don't hold your money and we don't take a cut of your sales." },
-  { q: "Do I need a business bank account?", a: "No. You can use your regular account." },
+  { q: "How do I get paid?", a: "Customers pay at checkout through Paystack. Payment is held securely until the buyer confirms delivery, then released to you." },
+  { q: "Do I need a business bank account?", a: "No. You don't need a bank merchant account to get started." },
   { q: "Can I leave and take my data?", a: "Yes. Export your customers, products and orders anytime." },
 ];
 
@@ -41,7 +41,7 @@ const Index = () => {
                 Your whole shop in <span className="bg-Tonstores-amber/25 px-2 rounded-md">one link.</span>
               </h1>
               <p className="text-xl text-gray-600 max-w-xl mb-8">
-                Add your products once. Share the link on WhatsApp, Instagram or TikTok. Customers order, you get paid by transfer, and you stop retyping prices.
+                Add your products once. Share the link on WhatsApp, Instagram or TikTok. Customers order and pay at checkout, and you stop retyping prices.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 {user ? (
@@ -66,7 +66,7 @@ const Index = () => {
                 )}
               </div>
               <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600">
-                {["Free for 10 products", "No commission on sales", "No card needed"].map((t) => (
+                {["Free for 10 products", "Secure checkout", "No card needed"].map((t) => (
                   <li key={t} className="flex items-center"><Check size={16} className="text-Tonstores-green mr-1" />{t}</li>
                 ))}
               </ul>
@@ -154,7 +154,7 @@ const Index = () => {
         <section className="pb-16 md:pb-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl md:text-4xl font-extrabold text-Tonstores-darkblue">Pricing that stays simple</h2>
-            <p className="text-gray-600 mt-2 mb-8">A flat monthly fee. We never take a cut of your sales.</p>
+            <p className="text-gray-600 mt-2 mb-8">Start free and upgrade when your shop grows.</p>
             <div className="grid md:grid-cols-3 gap-4">
               {plans.map((p) => (
                 <div key={p.name} className={`bg-white rounded-2xl p-7 ${p.popular ? "border-2 border-Tonstores-green" : "border border-gray-200"}`}>

@@ -182,14 +182,14 @@ export function QuickAccountCreation({
     <Card className="w-full">
       <CardHeader className="space-y-1">
         <div className="flex items-center gap-2">
-          <div className="p-2 bg-green-100 rounded-lg">
-            <ShieldCheck className="h-5 w-5 text-green-600" />
+          <div className="p-2 bg-Tonstores-green/10 rounded-lg">
+            <ShieldCheck className="h-5 w-5 text-Tonstores-green" />
           </div>
           <CardTitle className="text-xl">Secure Your Order</CardTitle>
         </div>
         <CardDescription>
           Create a buyer account to track your order and enjoy faster checkout next time.
-          <span className="font-medium text-green-600"> Email verification required for security.</span>
+          <span className="font-medium text-Tonstores-green"> Email verification required for security.</span>
         </CardDescription>
       </CardHeader>
 
@@ -261,9 +261,9 @@ export function QuickAccountCreation({
         </div>
 
         {/* Benefits */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-2">
-          <p className="text-sm font-medium text-blue-900">As a buyer, with your account you can:</p>
-          <ul className="text-xs text-blue-700 space-y-1 ml-4 list-disc">
+        <div className="bg-Tonstores-green/5 border border-Tonstores-green/20 rounded-lg p-3 space-y-2">
+          <p className="text-sm font-medium text-Tonstores-darkblue">As a buyer, with your account you can:</p>
+          <ul className="text-xs text-gray-600 space-y-1 ml-4 list-disc">
             <li>Track your order status in real-time</li>
             <li>View order history anytime</li>
             <li>Faster checkout on your next purchase</li>

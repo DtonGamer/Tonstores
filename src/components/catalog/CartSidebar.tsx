@@ -103,7 +103,7 @@ const CartSidebar = ({ isOpen, onClose, cart, onProceedToCheckout }: CartSidebar
                 Proceed to checkout
                 <ArrowRight className="ml-2" size={18} />
               </Button>
-              <p className="text-xs text-muted-foreground text-center mt-2">You pay the seller by bank transfer.</p>
+              <p className="text-xs text-muted-foreground text-center mt-2">Secure checkout. Payment is released to the seller after you confirm delivery.</p>
             </div>
           </>
         )}

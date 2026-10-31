@@ -4,7 +4,7 @@ import { Database, Shield, Lock, Zap, BarChart4, Users, TrendingUp, Target, Arro
 
 const features = [
   { title: "Update once, change everywhere", text: "Edit a price or photo in one place and every shared link is current.", icon: Zap },
-  { title: "Looks trustworthy", text: "A clean catalog makes new customers comfortable paying by transfer.", icon: Lock },
+  { title: "Looks trustworthy", text: "A clean catalog makes new customers comfortable paying.", icon: Lock },
   { title: "Works on every platform", text: "One link for WhatsApp, Instagram, TikTok, SMS and email. If one app changes, you lose nothing.", icon: Shield },
   { title: "You own your data", text: "Export customers, products and orders anytime. No lock-in.", icon: Database },
   { title: "See what sells", text: "Pro and Business show which products and platforms bring in orders.", icon: BarChart4 },
@@ -17,7 +17,7 @@ const steps = [
   { title: "Add your products", text: "Photos, descriptions and prices, organised in one catalog." },
   { title: "Share your link", text: "Post it anywhere your customers already are." },
   { title: "Receive orders", text: "Every order and customer detail lands in your dashboard." },
-  { title: "Get paid directly", text: "Customers pay your bank account. We never touch your money." },
+  { title: "Get paid securely", text: "Customers pay at checkout. Funds are released to you once the buyer confirms delivery." },
 ];
 
 const Features = () => (

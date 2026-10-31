@@ -95,7 +95,7 @@ const TermsOfService = () => {
               <h2 className={`text-2xl font-semibold mb-4 ${textClasses.subheading}`}>5. Payment Terms</h2>
               <p className={`mb-4 ${textClasses.text}`}>
                 Users agree to pay all applicable fees and charges for using our services.
-                Subscription fees are non-refundable unless we state otherwise in writing. Tonstores does not take a commission on your sales and does not hold customer payments.
+                Subscription fees are non-refundable unless we state otherwise in writing. Customer payments are processed through Paystack and may be held until the buyer confirms delivery, as shown in the checkout and order-tracking flow.
               </p>
             </section>
 

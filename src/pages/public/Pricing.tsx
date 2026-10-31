@@ -78,7 +78,7 @@ const Pricing = () => {
               Plans That Grow <span className="text-Tonstores-amber">With Your Business</span>
             </h1>
             <p className="mt-6 text-xl text-white/80 max-w-3xl mx-auto">
-              Pick the plan that fits your shop. A flat monthly fee, and we never take a cut of your sales.
+              Pick the plan that fits your shop. Start free and upgrade when you grow.
             </p>
             
             <div className="mt-10">
@@ -204,7 +204,7 @@ const Pricing = () => {
                   WHY A FLAT FEE
                 </span>
                 <h2 className="text-3xl md:text-4xl font-bold text-Tonstores-darkblue mb-6">
-                  No commissions, no surprises
+                  Simple pricing
                 </h2>
                 </div>
               
@@ -243,7 +243,7 @@ const Pricing = () => {
                     <ul className="space-y-3 text-gray-700 text-sm">
                       <li className="flex items-start">
                         <span className="text-Tonstores-green mr-2 mt-1">•</span>
-                        <span>One flat monthly fee, nothing else</span>
+                        <span>One monthly plan</span>
                       </li>
                       <li className="flex items-start">
                         <span className="text-Tonstores-green mr-2 mt-1">•</span>
@@ -255,14 +255,14 @@ const Pricing = () => {
                       </li>
                       <li className="flex items-start">
                         <span className="text-Tonstores-green mr-2 mt-1">•</span>
-                        <span>100% of your sales go to you</span>
+                        <span>Upgrade only when you need more</span>
                       </li>
                     </ul>
                   </div>
                 </div>
                 
                 <div className="mt-10 p-6 bg-Tonstores-green text-white rounded-xl">
-                  <p className="text-center leading-relaxed">Pro is ₦15,000 a month. You keep every naira you earn from sales.</p>
+                  <p className="text-center leading-relaxed">Pro is ₦15,000 a month.</p>
                 </div>
               </div>
             </div>

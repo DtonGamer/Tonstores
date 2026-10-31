@@ -234,17 +234,17 @@ const OrderSuccess = () => {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-background py-12">
         <div className="max-w-3xl mx-auto p-4">
           <Button variant="ghost" className="flex items-center mb-6" onClick={handleRedirect}>
             <ArrowLeft className="mr-2" size={18} />
             Continue Shopping
           </Button>
 
-          <Card className="border-green-100 shadow-md">
+          <Card className="border-green-100 ">
             <CardContent className="p-8">
               <div className="flex justify-center mb-6">
-                <CheckCircle size={64} className="text-green-500" />
+                <CheckCircle size={64} className="text-Tonstores-green" />
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-center text-Tonstores-darkblue mb-2">
                 Thank You For Your Order!
@@ -254,7 +254,7 @@ const OrderSuccess = () => {
               </p>
               <Separator className="mb-6" />
               <div className="flex justify-center">
-                <Button className="bg-Tonstores-green hover:bg-Tonstores-darkblue" onClick={handleRedirect}>
+                <Button className="bg-Tonstores-green hover:bg-Tonstores-greendark" onClick={handleRedirect}>
                   Continue Shopping
                 </Button>
               </div>
@@ -266,17 +266,17 @@ const OrderSuccess = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-background py-12">
       <div className="max-w-3xl mx-auto p-4">
         <Button variant="ghost" className="flex items-center mb-6" onClick={handleRedirect}>
           <ArrowLeft className="mr-2" size={18} />
           Continue Shopping
         </Button>
 
-        <Card className="border-green-100 shadow-md">
+        <Card className="border-green-100 ">
           <CardContent className="p-8">
             <div className="flex justify-center mb-6">
-              <CheckCircle size={64} className="text-green-500" />
+              <CheckCircle size={64} className="text-Tonstores-green" />
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-center text-Tonstores-darkblue mb-2">
               Thank You For Your Order!
@@ -309,8 +309,12 @@ const OrderSuccess = () => {
                   <p className="font-medium text-green-600">{order.payment_status || 'Paid'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Escrow Status</p>
-                  <p className="font-medium text-orange-600">{order.escrow_status || 'Held'}</p>
+                  <p className="text-sm text-gray-500">Payment protection</p>
+                  <p className="font-medium text-amber-700">
+                    {(order.escrow_status || 'held') === 'held'
+                      ? 'Held until you confirm delivery'
+                      : String(order.escrow_status).charAt(0).toUpperCase() + String(order.escrow_status).slice(1)}
+                  </p>
                 </div>
               </div>
               {paymentReference && (
@@ -321,14 +325,14 @@ const OrderSuccess = () => {
               )}
             </div>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button className="bg-Tonstores-green hover:bg-Tonstores-darkblue" onClick={() => navigate(`/order-tracking/${order.id}`)}>
+              <Button className="bg-Tonstores-green hover:bg-Tonstores-greendark" onClick={() => navigate(`/order-tracking/${order.id}`)}>
                 <Eye className="mr-2" size={18} />
                 Track Your Order
               </Button>
               
               {sellerContact && (
                 <Button 
-                  className="bg-green-500 hover:bg-green-600 text-white" 
+                  className="bg-Tonstores-green hover:bg-Tonstores-greendark text-white" 
                   onClick={openWhatsAppChat}
                 >
                   <WhatsAppIcon className="mr-2" />

@@ -158,7 +158,7 @@ const CheckoutForm = ({ onSubmit, isLoading }: CheckoutFormProps) => {
         />
 
         <div className="pt-4">
-          <Button type="submit" disabled={isLoading} className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue">
+          <Button type="submit" disabled={isLoading} className="w-full bg-Tonstores-green hover:bg-Tonstores-greendark">
             {isLoading ? "Processing..." : "Continue to Payment"}
           </Button>
         </div>

@@ -15,13 +15,13 @@ const OrderStatus = ({ status, type = "order" }: { status: string, type?: "order
   const getStatusColor = () => {
     switch (status.toLowerCase()) {
       case 'pending':
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-Tonstores-amber/20 text-amber-900 border-Tonstores-amber/40";
       case 'paid':
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-Tonstores-green/10 text-Tonstores-green border-Tonstores-green/20";
       case 'processing':
-        return "bg-purple-100 text-purple-800 border-purple-200";
+        return "bg-Tonstores-green/10 text-Tonstores-green border-Tonstores-green/20";
       case 'shipped':
-        return "bg-indigo-100 text-indigo-800 border-indigo-200";
+        return "bg-Tonstores-green/10 text-Tonstores-green border-Tonstores-green/20";
       case 'delivered':
         return "bg-green-100 text-green-800 border-green-200";
       case 'cancelled':
@@ -31,7 +31,7 @@ const OrderStatus = ({ status, type = "order" }: { status: string, type?: "order
       case 'held':
         return "bg-orange-100 text-orange-800 border-orange-200";
       case 'released':
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-Tonstores-green/10 text-Tonstores-green border-Tonstores-green/20";
       case 'refunded':
         return "bg-red-100 text-red-800 border-red-200";
       default:
@@ -235,7 +235,7 @@ const OrderTracking = () => {
   }
   
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 sm:py-12">
+    <div className="min-h-screen bg-background py-8 sm:py-12">
       <div className="max-w-2xl mx-auto p-4 sm:p-6">
         <button
           onClick={() => {
@@ -277,7 +277,7 @@ const OrderTracking = () => {
               <div className="mt-4 sm:mt-6">
                 <Button
                   onClick={handleConfirmDelivery}
-                  className="bg-green-600 hover:bg-green-700 w-full text-sm sm:text-base py-5 sm:py-auto"
+                  className="bg-Tonstores-green hover:bg-Tonstores-greendark w-full text-sm sm:text-base py-5 sm:py-auto"
                 >
                   Confirm Delivery & Release Payment
                 </Button>

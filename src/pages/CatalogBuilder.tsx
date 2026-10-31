@@ -487,7 +487,7 @@ const CatalogBuilder = () => {
               
               <TabsContent value="details">
                 <div className="grid grid-cols-1 gap-6">
-                  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm dark:shadow-gray-900 border dark:border-gray-700">
+                  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border dark:border-gray-700">
                     <h2 className="text-xl font-semibold mb-4 dark:text-white">Catalog Information</h2>
                     
                     <div className="space-y-4">

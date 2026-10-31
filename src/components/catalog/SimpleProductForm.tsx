@@ -77,7 +77,7 @@ const SimpleProductForm = ({ catalog, onSubmit, onCancel, isLoading }: SimplePro
   };
 
   return (
-    <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900 border dark:border-gray-700">
+    <div className="p-6 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700">
       <h2 className="text-xl font-semibold mb-4 dark:text-white">Add Your First Product</h2>
       <p className="text-gray-600 dark:text-gray-300 mb-6">
         Get started quickly with your first product. You can add more details later!
@@ -99,7 +99,7 @@ const SimpleProductForm = ({ catalog, onSubmit, onCancel, isLoading }: SimplePro
             </div>
 
             <label className="cursor-pointer">
-              <div className="flex items-center gap-2 bg-Tonstores-blue bg-opacity-10 hover:bg-opacity-20 text-Tonstores-blue px-4 py-2 rounded-md text-sm">
+              <div className="flex items-center gap-2 bg-Tonstores-green/10 hover:bg-Tonstores-green/20 text-Tonstores-green px-4 py-2 rounded-md text-sm">
                 <Upload size={16} />
                 <span>{previewUrl ? "Change Image" : "Upload Product Image"}</span>
               </div>

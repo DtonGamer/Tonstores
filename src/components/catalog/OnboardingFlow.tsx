@@ -233,7 +233,7 @@ const OnboardingFlow = () => {
   };
 
   return (
-    <div className="min-h-screen bg-Tonstores-lightgray flex items-center justify-center p-4">
+    <div className="min-h-screen bg-Tonstores-cream flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         <Card>
           <CardHeader className="text-center">

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ChevronDown, ChevronUp, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -50,8 +51,8 @@ const faqs = [
         answer: "Absolutely. Export everything—customer contacts, product catalog, order history—anytime. We don't hold your business hostage. You're free to leave whenever. We earn your business by serving you, not trapping you."
       },
       {
-        question: "Do you take a cut of my sales like marketplaces do?",
-        answer: "No. You pay a flat monthly fee (or use Free tier), and we don't touch your sales. You keep 100% of what you earn. We don't profit from your dependency—we profit from serving you well enough that you choose to stay."
+        question: "Is my customers' payment safe?",
+        answer: "Yes. Customers pay through secure Paystack checkout, and payment is held until they confirm delivery."
       }
     ]
   },
@@ -64,7 +65,7 @@ const faqs = [
       },
       {
         question: "What if customers don't trust buying through a link?",
-        answer: "That's what professional presentation solves. Your Tonstores catalog looks organized and trustworthy—not like scattered Instagram posts or WhatsApp status updates. Customers feel safe completing bank transfers when things look professional."
+        answer: "That's what professional presentation solves. Your Tonstores catalog looks organized and trustworthy—not like scattered Instagram posts or WhatsApp status updates. Customers feel safe paying when things look professional."
       },
       {
         question: "How do I scale from 10 products to 100 without chaos?",
@@ -77,15 +78,15 @@ const faqs = [
     questions: [
       {
         question: "How do I get paid?",
-        answer: "Customers complete orders through your catalog, then pay via bank transfer to your account (you provide account details). We integrated Paystack for smooth payment processing, but YOU receive the money directly—not us, not a platform."
+        answer: "Customers pay at checkout through Paystack. Payment is held securely until the buyer confirms delivery, then released to you."
       },
       {
         question: "Do I need a merchant account from a bank?",
-        answer: "No. That's the point—banks excluded most Builders from merchant accounts. We built this so you can operate professionally WITHOUT needing bank approval. Accept payments directly to your regular account."
+        answer: "No. You don't need a bank merchant account to get started."
       },
       {
         question: "What are the actual costs?",
-        answer: "Free tier: ₦0 forever (10 products). Pro: ₦15,000/month (100 products). Business: ₦33,000/month (unlimited). No hidden fees, no transaction cuts, no surprise charges. What you see is what you pay."
+        answer: "Free tier: ₦0 forever (10 products). Pro: ₦15,000/month (100 products). Business: ₦33,000/month (unlimited). Plans are billed monthly. What you see is what you pay."
       }
     ]
   }
@@ -110,7 +111,7 @@ const categories = [
   {
     title: "Orders & Payments",
     icon: "💰",
-    description: "Get paid directly by bank transfer"
+    description: "Get paid securely through checkout"
   },
   {
     title: "Sharing & Growth",

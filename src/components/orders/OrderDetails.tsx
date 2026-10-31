@@ -48,7 +48,7 @@ const getSocialMediaColor = (source: string | null | undefined): string => {
   
   switch(source.toLowerCase()) {
     case 'instagram':
-      return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
+      return "bg-Tonstores-green/10 text-Tonstores-green dark:bg-Tonstores-green/20 dark:text-Tonstores-green";
     case 'facebook':
       return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
     case 'twitter':
@@ -182,14 +182,14 @@ const OrderDetails = ({ order, onClose, onStatusUpdate }: OrderDetailsProps) => 
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'pending': return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case 'paid': return "bg-blue-100 text-blue-800 border-blue-200";
-      case 'processing': return "bg-purple-100 text-purple-800 border-purple-200";
-      case 'shipped': return "bg-indigo-100 text-indigo-800 border-indigo-200";
+      case 'pending': return "bg-Tonstores-amber/20 text-amber-900 border-Tonstores-amber/40";
+      case 'paid': return "bg-Tonstores-green/10 text-Tonstores-green border-Tonstores-green/20";
+      case 'processing': return "bg-Tonstores-green/10 text-Tonstores-green border-Tonstores-green/20";
+      case 'shipped': return "bg-Tonstores-green/10 text-Tonstores-green border-Tonstores-green/20";
       case 'delivered': return "bg-green-100 text-green-800 border-green-200";
       case 'cancelled': return "bg-red-100 text-red-800 border-red-200";
       case 'held': return "bg-orange-100 text-orange-800 border-orange-200";
-      case 'released': return "bg-blue-100 text-blue-800 border-blue-200";
+      case 'released': return "bg-Tonstores-green/10 text-Tonstores-green border-Tonstores-green/20";
       case 'refunded': return "bg-red-100 text-red-800 border-red-200";
       default: return "bg-gray-100 text-gray-800 border-gray-200";
     }
