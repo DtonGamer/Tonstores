@@ -1,98 +1,71 @@
-import { Mail, MessageCircle, Copy, CheckCircle } from "lucide-react";
+import { Copy, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-interface EmailTemplate {
+export interface MessageTemplate {
   id: string;
   title: string;
-  subject: string;
+  label?: string;   // small tag, e.g. "WhatsApp", "Status", "Email"
+  subject?: string; // only shown for emails
   body: string;
-  category: 'cold-outreach' | 'warm-intro' | 'success-story' | 'value-proposition';
 }
 
-interface EmailTemplateCardProps {
-  templates: EmailTemplate[];
+interface MessageTemplateCardProps {
+  heading?: string;
+  description?: string;
+  templates: MessageTemplate[];
 }
 
-const EmailTemplateCard = ({ templates }: EmailTemplateCardProps) => {
+const EmailTemplateCard = ({
+  heading = "Ready-made messages",
+  description = "Copy, add a name, and send.",
+  templates,
+}: MessageTemplateCardProps) => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const handleCopy = (templateBody: string, id: string) => {
-    navigator.clipboard.writeText(templateBody);
+  const handleCopy = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const getCategoryLabel = (category: string) => {
-    switch(category) {
-      case 'cold-outreach':
-        return 'Cold Outreach';
-      case 'warm-intro':
-        return 'Warm Introduction';
-      case 'success-story':
-        return 'Success Story';
-      case 'value-proposition':
-        return 'Value Proposition';
-      default:
-        return 'Template';
-    }
-  };
-
   return (
-    <div className="border dark:border-gray-700 rounded-lg overflow-hidden shadow-sm bg-white dark:bg-gray-800">
-      <div className="p-6">
-        <div className="flex items-center mb-4">
-          <Mail className="h-5 w-5 text-Tonstores-green mr-2" />
-          <h3 className="text-lg font-semibold dark:text-white">Email Templates</h3>
-        </div>
-        <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">
-          Ready-to-use templates for reaching out to fellow builders
-        </p>
+    <div className="border border-border rounded-2xl overflow-hidden bg-card">
+      <div className="p-5 sm:p-6">
+        <h3 className="text-lg font-extrabold mb-1">{heading}</h3>
+        <p className="text-muted-foreground text-sm mb-5">{description}</p>
 
-        <div className="space-y-6">
-          {templates.map((template) => (
-            <div
-              key={template.id}
-              className="p-4 rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50"
-            >
-              <div className="flex justify-between items-start mb-2">
+        <div className="space-y-4">
+          {templates.map((t) => (
+            <div key={t.id} className="p-4 rounded-xl border border-border bg-muted">
+              <div className="flex justify-between items-start gap-3 mb-3">
                 <div>
-                  <h4 className="font-medium dark:text-white">{template.title}</h4>
-                  <span className="inline-block mt-1 px-2 py-1 text-xs rounded-full bg-Tonstores-green/10 text-Tonstores-green">
-                    {getCategoryLabel(template.category)}
-                  </span>
+                  <h4 className="font-semibold">{t.title}</h4>
+                  {t.label && (
+                    <span className="inline-block mt-1 px-2 py-0.5 text-xs rounded-full bg-Tonstores-green/10 text-Tonstores-green font-semibold">
+                      {t.label}
+                    </span>
+                  )}
                 </div>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
-                  className="h-8 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-                  onClick={() => handleCopy(template.body, template.id)}
+                  className="h-9 flex-none"
+                  onClick={() => handleCopy(t.subject ? `Subject: ${t.subject}\n\n${t.body}` : t.body, t.id)}
                 >
-                  {copiedId === template.id ? (
-                    <>
-                      <CheckCircle className="h-4 w-4 mr-1" /> Copied
-                    </>
+                  {copiedId === t.id ? (
+                    <><CheckCircle className="h-4 w-4 mr-1" /> Copied</>
                   ) : (
-                    <>
-                      <Copy className="h-4 w-4 mr-1" /> Copy
-                    </>
+                    <><Copy className="h-4 w-4 mr-1" /> Copy</>
                   )}
                 </Button>
               </div>
-              
-              <div className="mt-3">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject:</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 p-2 rounded border">
-                  {template.subject}
+              {t.subject && (
+                <p className="text-sm bg-background p-2.5 rounded-lg border border-border mb-2">
+                  <span className="font-semibold">Subject: </span>{t.subject}
                 </p>
-              </div>
-              
-              <div className="mt-3">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Body:</p>
-                <div className="text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 p-2 rounded border whitespace-pre-line">
-                  {template.body}
-                </div>
-              </div>
+              )}
+              <div className="text-sm bg-background p-3 rounded-lg border border-border whitespace-pre-line">{t.body}</div>
             </div>
           ))}
         </div>

@@ -7,38 +7,33 @@ const AffiliateTermsPage = () => {
   const recognitionBadges = [
     {
       id: "founder-partner",
-      title: "Founding Infrastructure Partner",
-      description: "Awarded to early affiliates who contribute to building the ecosystem",
-      icon: <Star className="h-5 w-5 text-yellow-500" />,
-      status: "active" as const
+      title: "Founding Partner",
+      description: "For early affiliates who help us get started",
+      icon: <Star className="h-5 w-5 text-Tonstores-green" />
     },
     {
       id: "community-builder",
       title: "Community Builder",
       description: "Earned by affiliates with 10+ active referrals",
-      icon: <Users className="h-5 w-5 text-blue-500" />,
-      status: "active" as const
+      icon: <Users className="h-5 w-5 text-Tonstores-green" />,
     },
     {
       id: "rising-star",
       title: "Rising Star",
       description: "First 5 referrals that become active customers",
-      icon: <TrendingUp className="h-5 w-5 text-green-500" />,
-      status: "pending" as const
+      icon: <TrendingUp className="h-5 w-5 text-Tonstores-green" />,
     },
     {
       id: "top-earner",
       title: "Top Earner",
       description: "Awarded to affiliates with highest monthly earnings",
-      icon: <Trophy className="h-5 w-5 text-purple-500" />,
-      status: "inactive" as const
+      icon: <Trophy className="h-5 w-5 text-Tonstores-green" />,
     },
     {
       id: "ambassador",
-      title: "Infrastructure Ambassador",
-      description: "Recognized for exceptional contribution to builder community",
-      icon: <BadgeCheck className="h-5 w-5 text-red-500" />,
-      status: "inactive" as const
+      title: "Ambassador",
+      description: "For affiliates who consistently help sellers get started",
+      icon: <BadgeCheck className="h-5 w-5 text-Tonstores-green" />,
     }
   ];
 
@@ -47,7 +42,7 @@ const AffiliateTermsPage = () => {
       <div className="mb-8">
         <h1 className="text-2xl font-bold dark:text-white">Affiliate Program Terms</h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Understanding your role as a builder promoting infrastructure to other builders
+          How the program works, how you earn and what we ask of you
         </p>
       </div>
 
@@ -59,13 +54,12 @@ const AffiliateTermsPage = () => {
             </CardHeader>
             <CardContent>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
-                The Tonstores Affiliate Program is designed for builders who understand the importance 
-                of infrastructure independence. As an affiliate, you're not just earning commissions 
-                – you're building the ecosystem alongside us.
+                The Tonstores affiliate program is for sellers who want to recommend Tonstores to other 
+                sellers they know. When someone you refer subscribes to a paid plan, you earn a commission.
               </p>
               <p className="text-gray-700 dark:text-gray-300">
-                Your role is to advocate for infrastructure solutions that prioritize builder autonomy, 
-                data ownership, and independence from exploitative platforms.
+                We ask you to be honest and helpful. Recommend Tonstores to people it can actually help, 
+                and describe it as it really works.
               </p>
             </CardContent>
           </Card>
@@ -134,7 +128,7 @@ const AffiliateTermsPage = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl dark:text-white">Affiliate Principles</CardTitle>
+              <CardTitle className="text-xl dark:text-white">How to promote well</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -143,12 +137,10 @@ const AffiliateTermsPage = () => {
                     <Target className="h-5 w-5 text-Tonstores-green" />
                   </div>
                   <div>
-                    <h3 className="font-medium dark:text-white">Shared Success</h3>
+                    <h3 className="font-semibold">Recommend, don't push</h3>
                     <p className="text-gray-700 dark:text-gray-300">
-                      Frame your promotion around shared success: "When you help another Builder 
-                      professionalize, we all benefit – you through commission, them through better 
-                      infrastructure, all of us through a stronger community of professional Builders 
-                      who aren't dependent on exploitative platforms."
+                      Suggest Tonstores to sellers who would really benefit, such as those who retype prices 
+                      or answer the same questions all day. Everyone wins when it's a good fit.
                     </p>
                   </div>
                 </div>
@@ -158,11 +150,10 @@ const AffiliateTermsPage = () => {
                     <Users className="h-5 w-5 text-Tonstores-green" />
                   </div>
                   <div>
-                    <h3 className="font-medium dark:text-white">Builder-to-Builder Approach</h3>
+                    <h3 className="font-medium dark:text-white">Share like a friend</h3>
                     <p className="text-gray-700 dark:text-gray-300">
-                      Position yourself as a fellow builder sharing a solution, not as a marketer 
-                      selling a product. The psychological difference is crucial for authentic 
-                      recommendations to people you actually want to help.
+                      Talk to sellers the way you would to a friend. Tell them what changed for you instead of 
+                      reading out a sales pitch.
                     </p>
                   </div>
                 </div>
@@ -172,11 +163,10 @@ const AffiliateTermsPage = () => {
                     <Award className="h-5 w-5 text-Tonstores-green" />
                   </div>
                   <div>
-                    <h3 className="font-medium dark:text-white">Value-Align Promotion</h3>
+                    <h3 className="font-medium dark:text-white">Be honest about what it does</h3>
                     <p className="text-gray-700 dark:text-gray-300">
-                      Don't do hard sells – do value-aligned recommendations. Focus on the problems 
-                      that Tonstores solves for builders, particularly the independence from exploitative 
-                      platforms and ownership of customer data.
+                      Focus on what Tonstores really does: one shareable catalog link, orders in one place, and 
+                      your customer data stays yours. Please don't promise sales or results.
                     </p>
                   </div>
                 </div>
@@ -188,13 +178,12 @@ const AffiliateTermsPage = () => {
         <div className="space-y-8">
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl dark:text-white">Recognition System</CardTitle>
+              <CardTitle className="text-xl dark:text-white">Recognition</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">
-                Our recognition system highlights infrastructure advocates in the community. 
-                These badges represent more than just activity – they reflect your contribution 
-                to building the ecosystem.
+                We plan to recognise affiliates who help many sellers get started. These are the 
+                levels we're working towards.
               </p>
               
               <div className="space-y-4">
@@ -204,7 +193,6 @@ const AffiliateTermsPage = () => {
                     title={badge.title}
                     description={badge.description}
                     icon={badge.icon}
-                    status={badge.status}
                   />
                 ))}
               </div>
@@ -213,7 +201,7 @@ const AffiliateTermsPage = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl dark:text-white">Affiliate Best Practices</CardTitle>
+              <CardTitle className="text-xl dark:text-white">Tips</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
@@ -221,31 +209,31 @@ const AffiliateTermsPage = () => {
                   <div className="bg-Tonstores-green/10 rounded-full p-1 mr-3 mt-0.5">
                     <Award className="h-4 w-4 text-Tonstores-green" />
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">Focus on builders facing platform dependency issues</span>
+                  <span className="text-gray-700 dark:text-gray-300">Start with sellers who retype prices or reply to the same questions often</span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-Tonstores-green/10 rounded-full p-1 mr-3 mt-0.5">
                     <Award className="h-4 w-4 text-Tonstores-green" />
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">Share your own story of gaining independence</span>
+                  <span className="text-gray-700 dark:text-gray-300">Tell them what changed for you first</span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-Tonstores-green/10 rounded-full p-1 mr-3 mt-0.5">
                     <Award className="h-4 w-4 text-Tonstores-green" />
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">Emphasize the infrastructure, not just the tool</span>
+                  <span className="text-gray-700 dark:text-gray-300">Message one person at a time. Please don't spam groups</span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-Tonstores-green/10 rounded-full p-1 mr-3 mt-0.5">
                     <Award className="h-4 w-4 text-Tonstores-green" />
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">Provide value before asking for referral</span>
+                  <span className="text-gray-700 dark:text-gray-300">Be helpful before you ask anyone to sign up</span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-Tonstores-green/10 rounded-full p-1 mr-3 mt-0.5">
                     <Award className="h-4 w-4 text-Tonstores-green" />
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">Stay engaged with your referred builders</span>
+                  <span className="text-gray-700 dark:text-gray-300">Check in after a few days to see if they need help</span>
                 </li>
               </ul>
             </CardContent>

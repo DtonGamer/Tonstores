@@ -170,11 +170,11 @@ const AffiliateDashboard = () => {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold dark:text-white">Affiliate Program</h1>
+        <h1 className="text-2xl font-bold dark:text-white">Earn by sharing Tonstores</h1>
         <p className="text-gray-600 dark:text-gray-400">
           {isAffiliate 
-            ? "Manage your affiliate activities and track your earnings" 
-            : "Join the affiliate program and start earning by referring other builders"}
+            ? "Share your link, see who joined and track what you earn"
+            : "Earn by recommending Tonstores to sellers you know"}
         </p>
       </div>
 
@@ -183,55 +183,38 @@ const AffiliateDashboard = () => {
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <AffiliateStatsCard
-              title="Total Referrals"
+              title="Sellers referred"
               value={affiliateStats.totalReferrals}
-              change="+5 this month"
               icon={<Users className="h-6 w-6 text-white" />}
               color="bg-Tonstores-green p-2 rounded-lg"
             />
             <AffiliateStatsCard
-              title="Total Earnings"
+              title="Total earnings"
               value={`₦${affiliateStats.totalEarnings.toLocaleString()}`}
-              change="+15% from last month"
               icon={<DollarSign className="h-6 w-6 text-white" />}
               color="bg-Tonstores-green p-2 rounded-lg"
             />
             <AffiliateStatsCard
-              title="Active Referrals"
+              title="Active sellers"
               value={affiliateStats.activeReferrals}
-              change="+3 this month"
               icon={<TrendingUp className="h-6 w-6 text-white" />}
               color="bg-Tonstores-green p-2 rounded-lg"
             />
             <AffiliateStatsCard
-              title="Commission Rate"
+              title="Commission"
               value={`${affiliateStats.commissionRate}%`}
-              change="Recurring commission"
+              change="Every month they stay subscribed"
               icon={<BarChart3 className="h-6 w-6 text-white" />}
               color="bg-Tonstores-green p-2 rounded-lg"
             />
           </div>
 
-          {/* Infrastructure Advocate Message */}
-          <div className="mb-8">
-            <Card className="bg-gradient-to-r from-Tonstores-green/10 to-blue-500/10 border-0 shadow-lg dark:from-gray-800 dark:to-gray-800 dark:border-gray-700">
-              <CardContent className="p-6">
-                <div className="flex items-start">
-                  <div className="bg-Tonstores-green/20 p-3 rounded-full mr-4">
-                    <Building className="h-6 w-6 text-Tonstores-green" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold dark:text-white">You're Building Infrastructure</h3>
-                    <p className="text-gray-600 dark:text-gray-400 mt-2">
-                      As an infrastructure advocate, you're not just earning commissions—you're building parallel
-                      infrastructure alongside Tonstores. When you help another builder professionalize, we all benefit:
-                      you through commission, them through better infrastructure, all of us through a stronger community
-                      of professional builders who aren't dependent on exploitative platforms.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* How you earn */}
+          <div className="mb-8 rounded-2xl border border-border bg-card p-5 sm:p-6">
+            <h3 className="text-lg font-extrabold mb-1">How you earn</h3>
+            <p className="text-muted-foreground">
+              Share your link with sellers you know. When they subscribe, you earn 20% of what they pay, every month they stay.
+            </p>
           </div>
 
           {/* Affiliate Invite Card */}
@@ -247,19 +230,19 @@ const AffiliateDashboard = () => {
           {/* Referrals Section */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold dark:text-white">Your Referrals</h2>
+              <h2 className="text-xl font-extrabold">Sellers you referred</h2>
               <Link to="/affiliate/tools">
                 <Button variant="outline" className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
-                  View Tools
+                  Messages and tips
                 </Button>
               </Link>
             </div>
 
             {referrals.length === 0 ? (
               <Card className="p-12 text-center dark:bg-gray-800 dark:border-gray-700">
-                <h3 className="text-lg font-medium mb-2 dark:text-white">No referrals yet</h3>
+                <h3 className="text-lg font-medium mb-2 dark:text-white">No one has joined with your link yet</h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
-                  Continue sharing your affiliate link to start building the ecosystem
+                  Send your link to a seller you know on WhatsApp. Check "Messages and tips" for something to copy.
                 </p>
               </Card>
             ) : (
@@ -283,14 +266,13 @@ const AffiliateDashboard = () => {
         </>
       ) : (
         <div className="max-w-4xl mx-auto">
-          <Card className="mb-8">
+          <Card className="mb-8 rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-xl dark:text-white">Join the Infrastructure Advocate Program</CardTitle>
+              <CardTitle className="text-xl dark:text-white">Earn by sharing Tonstores</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                As a builder promoting infrastructure to other builders, you'll be part of something larger.
-                You're not just earning commissions—you're building the ecosystem.
+                Know a seller who still retypes prices on WhatsApp? Send them your link. When they subscribe, you earn.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -298,9 +280,9 @@ const AffiliateDashboard = () => {
                   <div className="bg-Tonstores-green/10 p-2 rounded-full w-10 h-10 flex items-center justify-center mb-3">
                     <Users className="h-5 w-5 text-Tonstores-green" />
                   </div>
-                  <h4 className="font-medium dark:text-white mb-1">Shared Success</h4>
+                  <h4 className="font-semibold mb-1">Earn every month</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    When you help another builder professionalize, we all benefit.
+                    You earn 20% of what each seller you refer pays, for as long as they stay subscribed.
                   </p>
                 </div>
 
@@ -308,9 +290,9 @@ const AffiliateDashboard = () => {
                   <div className="bg-Tonstores-green/10 p-2 rounded-full w-10 h-10 flex items-center justify-center mb-3">
                     <Award className="h-5 w-5 text-Tonstores-green" />
                   </div>
-                  <h4 className="font-medium dark:text-white mb-1">Recognition</h4>
+                  <h4 className="font-semibold mb-1">Ready-made messages</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Top affiliates get recognized as infrastructure advocates in the community.
+                    Copy and send WhatsApp messages instead of writing from scratch.
                   </p>
                 </div>
 
@@ -318,54 +300,54 @@ const AffiliateDashboard = () => {
                   <div className="bg-Tonstores-green/10 p-2 rounded-full w-10 h-10 flex items-center justify-center mb-3">
                     <BarChart3 className="h-5 w-5 text-Tonstores-green" />
                   </div>
-                  <h4 className="font-medium dark:text-white mb-1">Builder Tools</h4>
+                  <h4 className="font-semibold mb-1">Track your referrals</h4>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Get templates, case studies, and comparison documents to help other builders.
+                    See who joined with your link and what you have earned.
                   </p>
                 </div>
               </div>
 
               <Button
-                className="bg-Tonstores-green hover:bg-Tonstores-darkblue text-white"
+                className="bg-Tonstores-green hover:bg-Tonstores-greendark text-white"
                 onClick={handleApplyForAffiliate}
               >
-                Apply to Build Infrastructure
+                Join the program
               </Button>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl dark:text-white">Why Become an Infrastructure Advocate?</CardTitle>
+              <CardTitle className="text-xl dark:text-white">Why share Tonstores?</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                You're not just promoting software—you're promoting independence and infrastructure ownership:
+                A simple way to earn from people you already know:
               </p>
               <ul className="space-y-2">
                 <li className="flex items-start">
                   <div className="bg-Tonstores-green/10 rounded-full p-1 mr-2 mt-0.5">
                     <TrendingUp className="h-4 w-4 text-Tonstores-green" />
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">Earn 20% recurring commission from builders you refer</span>
+                  <span className="text-gray-700 dark:text-gray-300">Earn 20% every month from sellers you refer</span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-Tonstores-green/10 rounded-full p-1 mr-2 mt-0.5">
                     <Building className="h-4 w-4 text-Tonstores-green" />
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">Build the parallel infrastructure ecosystem</span>
+                  <span className="text-gray-700 dark:text-gray-300">Help sellers you know save time</span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-Tonstores-green/10 rounded-full p-1 mr-2 mt-0.5">
                     <Users className="h-4 w-4 text-Tonstores-green" />
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">Join a community of builders helping builders</span>
+                  <span className="text-gray-700 dark:text-gray-300">Get messages you can copy and send</span>
                 </li>
                 <li className="flex items-start">
                   <div className="bg-Tonstores-green/10 rounded-full p-1 mr-2 mt-0.5">
                     <Shield className="h-4 w-4 text-Tonstores-green" />
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300">Help others avoid platform dependency</span>
+                  <span className="text-gray-700 dark:text-gray-300">Your link works on WhatsApp, Instagram and TikTok</span>
                 </li>
               </ul>
             </CardContent>
