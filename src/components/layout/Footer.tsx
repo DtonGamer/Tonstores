@@ -112,7 +112,7 @@ export function Footer() {
           <div className="col-span-1 md:col-span-1">
             <h3 className="text-2xl font-bold">Tonstores</h3>
             <p className="mt-4 text-gray-300 max-w-md">
-              The easiest way to sell on social media for Nigerian businesses
+              Your whole shop in one link. Built for Nigerian sellers.
             </p>
             <div className="mt-4 flex space-x-4">
               <a href="https://wa.me/2349038650178" className="text-gray-300 hover:text-white transition-colors" aria-label="WhatsApp">
@@ -167,13 +167,13 @@ export function Footer() {
             <h4 className="font-semibold text-lg mb-4">Contact</h4>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
-                <Mail size={16} className="text-Tonstores-green" />
+                <Mail size={16} className="text-Tonstores-amber" />
                 <a href="mailto:tonshopdev@proton.me" className="text-gray-300 hover:text-white transition-colors">
                   tonshopdev@proton.me
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <WhatsAppIcon size={16} className="text-Tonstores-green" />
+                <WhatsAppIcon size={16} className="text-Tonstores-amber" />
                 <a href="https://wa.me/2349038650178" className="text-gray-300 hover:text-white transition-colors">
                   +234 903 865 0178
                 </a>

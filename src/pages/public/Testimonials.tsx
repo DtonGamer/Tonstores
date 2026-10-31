@@ -39,92 +39,54 @@ const testimonials = [
   }
 ];
 
-const Testimonials = () => {
-  return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-white py-20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex-grow">
-        <div className="max-w-4xl mx-auto text-center mb-16">
-          <span className="bg-Tonstores-green/10 text-Tonstores-green text-sm font-medium px-4 py-2 rounded-full mb-4 inline-block">
-            BUILDERS LIKE YOU
-          </span>
-          <h1 className="text-3xl md:text-4xl font-bold text-Tonstores-darkblue mb-6">
-            From Chaos to Control
-          </h1>
-          <div className="w-24 h-1 bg-Tonstores-green mx-auto my-6 rounded-full"></div>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            See how Nigerian entrepreneurs are building independent businesses
-          </p>
-        </div>
+const stats = [
+  { value: "500+", label: "Active users" }, // TODO: verify before publishing
+  { value: "₦50M+", label: "Sales processed" }, // TODO: verify before publishing
+  { value: "0%", label: "Commission on sales" },
+  { value: "<24h", label: "Support response" },
+];
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {testimonials.map((testimonial, index) => (
-            <div
-              key={index}
-              className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 transform transition-all hover:-translate-y-2"
-            >
-              <div className="flex mb-4 items-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-Tonstores-green/20 to-Tonstores-darkblue/10 flex items-center justify-center mr-4">
-                  <span className="text-Tonstores-green text-2xl font-bold">{testimonial.initials}</span>
-                </div>
-                <div>
-                  <h3 className="font-bold text-Tonstores-darkblue text-xl">{testimonial.name}</h3>
-                  <p className="text-sm text-gray-600">{testimonial.role}</p>
-                </div>
+const Testimonials = () => (
+  <main className="flex-grow bg-Tonstores-cream py-16 md:py-24">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto mb-12">
+        <p className="text-Tonstores-green font-semibold mb-3">Seller stories</p>
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-Tonstores-darkblue mb-4">From scattered posts to one simple link</h1>
+        <p className="text-xl text-gray-600">How Nigerian sellers use Tonstores to save time and sell more.</p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4 max-w-5xl mx-auto">
+        {testimonials.map((t) => (
+          <figure key={t.name} className="bg-white border border-gray-200 border-l-4 border-l-Tonstores-green rounded-2xl p-8">
+            <blockquote className="text-lg text-gray-700 mb-6">“{t.content}”</blockquote>
+            <figcaption className="flex items-center">
+              <div className="w-12 h-12 rounded-full bg-Tonstores-green/10 text-Tonstores-green font-bold flex items-center justify-center mr-4">{t.initials}</div>
+              <div>
+                <div className="font-bold text-Tonstores-darkblue">{t.name}</div>
+                <div className="text-sm text-gray-600">{t.role}</div>
+                <div className="text-xs text-gray-500 mt-1">{t.duration} · {t.sales}</div>
               </div>
-              <p className="text-lg text-gray-700 mt-6 relative pl-6 before:content-[''] before:absolute before:left-0 before:top-0 before:h-full before:w-1 before:bg-Tonstores-green before:rounded-full">
-                "{testimonial.content}"
-              </p>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
 
-              <div className="flex mt-6 text-Tonstores-green text-xl">
-                ★★★★★
-              </div>
-              <div className="mt-4 text-sm text-gray-500">
-                {testimonial.location} • {testimonial.duration} • {testimonial.sales}
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto mt-12">
+        {stats.map((s) => (
+          <div key={s.label} className="bg-white border border-gray-200 rounded-2xl p-6 text-center">
+            <div className="text-3xl font-extrabold text-Tonstores-green">{s.value}</div>
+            <div className="text-gray-600 mt-1 text-sm">{s.label}</div>
+          </div>
+        ))}
+      </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mt-16">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
-            <div className="text-3xl font-bold text-Tonstores-darkblue">500+</div>
-            <div className="text-gray-600 mt-2">Active Users</div>
-          </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
-            <div className="text-3xl font-bold text-Tonstores-darkblue">₦50M+</div>
-            <div className="text-gray-600 mt-2">Sales Processed</div>
-          </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
-            <div className="text-3xl font-bold text-Tonstores-darkblue">100%</div>
-            <div className="text-gray-600 mt-2">Data Ownership</div>
-          </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
-            <div className="text-3xl font-bold text-Tonstores-darkblue">24/7</div>
-            <div className="text-gray-600 mt-2">Nigeria Support</div>
-          </div>
-        </div>
-
-        {/* CTA Section */}
-        <div className="max-w-4xl mx-auto mt-20 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-Tonstores-darkblue mb-6">
-            Ready to <span className="text-Tonstores-green">Own Your Infrastructure</span>?
-          </h2>
-          <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
-            Join Nigerian Builders who stopped asking permission and started building anyway
-          </p>
-
-          <Link
-            to="/register"
-            className="inline-block bg-Tonstores-green hover:bg-Tonstores-darkblue text-white px-8 py-4 rounded-xl font-medium transition-colors"
-          >
-            Start Building Free
-          </Link>
-        </div>
+      <div className="max-w-5xl mx-auto mt-16 bg-Tonstores-green text-white rounded-3xl py-14 px-6 text-center">
+        <h2 className="text-3xl font-extrabold mb-3">Set up your shop tonight</h2>
+        <p className="text-white/80 mb-8">Share your link tomorrow. It's free to start.</p>
+        <Link to="/register" className="inline-block bg-white text-Tonstores-green px-8 py-4 rounded-lg font-bold">Create your free catalog</Link>
       </div>
     </div>
-  );
-};
+  </main>
+);
 
-
-export default Testimonials; 
+export default Testimonials;

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ChevronDown, ChevronUp, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -9,8 +8,8 @@ const faqs = [
     category: "Getting Started",
     questions: [
       {
-        question: "How do I start building my infrastructure?",
-        answer: "Sign up free (no credit card needed), click 'New Catalog' in your dashboard, add your business details, and start adding products. Your infrastructure is live in 5 minutes. You own everything from day one."
+        question: "How do I set up my catalog?",
+        answer: "Sign up free (no credit card needed), click 'New Catalog' in your dashboard, add your business details, and start adding products. Most sellers are live in about 10 minutes, and you own your data from day one."
       },
       {
         question: "What does 'own your data' actually mean?",
@@ -96,12 +95,12 @@ const categories = [
   {
     title: "Getting Started",
     icon: "🚀",
-    description: "Build your first infrastructure in 5 minutes"
+    description: "Set up your first catalog in minutes"
   },
   {
-    title: "Ownership & Control",
+    title: "Your Data",
     icon: "🔐",
-    description: "Understanding what you own and control"
+    description: "What you own and how to export it"
   },
   {
     title: "Managing Products",
@@ -111,17 +110,17 @@ const categories = [
   {
     title: "Orders & Payments",
     icon: "💰",
-    description: "Get paid without platform intermediaries"
+    description: "Get paid directly by bank transfer"
   },
   {
     title: "Sharing & Growth",
     icon: "📱",
-    description: "Scale across platforms without dependency"
+    description: "Share on every platform"
   },
   {
-    title: "Independence",
+    title: "Growing",
     icon: "💪",
-    description: "Maintain control as you grow"
+    description: "Move from 10 products to unlimited"
   }
 ];
 
@@ -145,15 +144,15 @@ const HelpCenter = () => {
     : allQuestions;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-Tonstores-cream">
       {/* Hero */}
-      <section className="relative py-16 overflow-hidden bg-gradient-to-br from-Tonstores-darkblue via-purple-900 to-Tonstores-green">
+      <section className="relative py-16 overflow-hidden bg-Tonstores-green">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            How Can We Help You <span className="text-Tonstores-green">Build</span>?
+            How can we <span className="text-Tonstores-amber">help</span>?
           </h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            Everything you need to own your infrastructure and grow without permission
+          <p className="text-xl text-white/80 max-w-2xl mx-auto">
+            Answers about setting up, sharing and getting paid
           </p>
         </div>
       </section>
@@ -162,7 +161,7 @@ const HelpCenter = () => {
         <div className="max-w-4xl mx-auto">
           {/* Search */}
           <div className="relative max-w-xl mx-auto mb-12 -mt-8">
-            <div className="bg-white rounded-xl shadow-lg p-2">
+            <div className="bg-white rounded-xl p-2">
               <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <Input
                 type="text"
@@ -179,7 +178,7 @@ const HelpCenter = () => {
             {categories.map((category, index) => (
               <div
                 key={index}
-                className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-all border border-gray-100 group"
+                className="bg-white rounded-xl p-6 transition-all border border-gray-100 group"
               >
                 <div className="text-4xl mb-3">{category.icon}</div>
                 <h3 className="text-lg font-bold text-Tonstores-darkblue mb-2 group-hover:text-Tonstores-green transition-colors">
@@ -191,7 +190,7 @@ const HelpCenter = () => {
           </div>
 
           {/* FAQs */}
-          <div className="bg-white rounded-xl shadow-sm p-8">
+          <div className="bg-white rounded-xl p-8">
             <h2 className="text-2xl font-bold text-Tonstores-darkblue mb-6">
               {searchQuery ? "Search Results" : "Common Questions"}
             </h2>
@@ -202,7 +201,7 @@ const HelpCenter = () => {
                   className="border border-gray-200 rounded-xl overflow-hidden hover:border-Tonstores-green transition-colors"
                 >
                   <button
-                    className="w-full text-left px-6 py-4 flex justify-between items-center bg-white hover:bg-gray-50 transition-colors"
+                    className="w-full text-left px-6 py-4 flex justify-between items-center bg-white hover:bg-Tonstores-cream transition-colors"
                     onClick={() => setExpandedFaq(expandedFaq === faq.id ? null : faq.id)}
                   >
                     <div>
@@ -218,7 +217,7 @@ const HelpCenter = () => {
                     )}
                   </button>
                   {expandedFaq === faq.id && (
-                    <div className="px-6 py-4 border-t bg-gray-50">
+                    <div className="px-6 py-4 border-t bg-Tonstores-cream">
                       <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
                     </div>
                   )}
@@ -228,10 +227,10 @@ const HelpCenter = () => {
           </div>
 
           {/* Still Need Help */}
-          <div className="mt-12 bg-gradient-to-br from-Tonstores-darkblue via-purple-900 to-Tonstores-green rounded-xl p-8 text-center text-white">
+          <div className="mt-12 bg-Tonstores-green rounded-xl p-8 text-center text-white">
             <h2 className="text-2xl font-bold mb-4">Still Need Help?</h2>
-            <p className="text-blue-100 mb-6 text-lg">
-              We're Builders helping Builders. Real support, not corporate scripts.
+            <p className="text-white/80 mb-6 text-lg">
+              Real people, not scripts. Message us anytime.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
@@ -248,7 +247,7 @@ const HelpCenter = () => {
                 WhatsApp Support
               </Button>
             </div>
-            <p className="text-sm text-blue-100 mt-4">
+            <p className="text-sm text-white/80 mt-4">
               Response time: Within 24 hours • Priority support for Pro & Business tiers
             </p>
           </div>

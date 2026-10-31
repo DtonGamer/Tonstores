@@ -135,7 +135,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
           <span>Back to Home</span>
         </Link>
       </div>
-      <Card className="w-full shadow-md bg-white">
+      <Card className="w-full bg-white">
         {showVerificationMessage ? (
           // Show verification message UI
           <div className="p-8 text-center">
@@ -154,7 +154,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
             <div className="mt-6">
               <Button
                 onClick={() => setShowVerificationMessage(false)}
-                className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue transition-colors"
+                className="w-full bg-Tonstores-green hover:bg-Tonstores-greendark transition-colors"
               >
                 Back to Login
               </Button>
@@ -170,7 +170,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
               <CardDescription className="text-center text-sm sm:text-base mt-1 sm:mt-2 text-gray-600">
               {type === "login"
                 ? "Enter your credentials to access your dashboard"
-                : "Sign up to start creating your product catalog"}
+                : "Create your free catalog and share it in minutes"}
             </CardDescription>
           </CardHeader>
           <CardContent className="px-5 sm:px-6">
@@ -259,7 +259,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
               <div className="pt-2 sm:pt-3">
             <Button
               type="submit"
-              className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue transition-colors h-9 sm:h-10 text-sm sm:text-base"
+              className="w-full bg-Tonstores-green hover:bg-Tonstores-greendark transition-colors h-9 sm:h-10 text-sm sm:text-base"
               disabled={isLoading}
             >
               {isLoading ? "Processing..." : type === "login" ? "Login" : "Create Account"}
@@ -269,7 +269,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
               {type === "login" && (
                 <>
                   <div className="pt-3 text-center">
-                    <Link to="/auth/recovery" className="text-sm text-Tonstores-blue hover:underline">
+                    <Link to="/auth/recovery" className="text-sm text-Tonstores-green hover:underline">
                       Forgot your password?
                     </Link>
                   </div>
@@ -288,11 +288,11 @@ const AuthForm = ({ type }: AuthFormProps) => {
             <p className="text-xs sm:text-sm text-gray-500">
             {type === "login" ? (
               <>
-                  Don't have an account? <Link to="/register" className="text-Tonstores-blue hover:underline font-medium">Sign up</Link>
+                  Don't have an account? <Link to="/register" className="text-Tonstores-green hover:underline font-medium">Sign up</Link>
               </>
             ) : (
               <>
-                  Already have an account? <Link to="/login" className="text-Tonstores-blue hover:underline font-medium">Login</Link>
+                  Already have an account? <Link to="/login" className="text-Tonstores-green hover:underline font-medium">Login</Link>
               </>
             )}
           </p>

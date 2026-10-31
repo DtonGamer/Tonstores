@@ -1,4 +1,4 @@
-import { ShoppingCart, X, ArrowRight } from "lucide-react";
+import { ShoppingCart, X, ArrowRight, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getStorageUrl } from "@/utils/imageHelpers";
 
@@ -26,128 +26,88 @@ interface CartSidebarProps {
   onProceedToCheckout: () => void;
 }
 
-const CartSidebar = ({ 
-  isOpen, 
-  onClose, 
-  cart, 
-  onProceedToCheckout 
-}: CartSidebarProps) => {
+const naira = (kobo: number) => `₦${(kobo / 100).toLocaleString("en-NG", { maximumFractionDigits: 2 })}`;
+
+const CartSidebar = ({ isOpen, onClose, cart, onProceedToCheckout }: CartSidebarProps) => {
   if (!isOpen) return null;
 
   return (
     <>
-      <div
-        className="fixed inset-0 bg-black bg-opacity-40 z-40 transition-opacity"
-        onClick={onClose}
-      ></div>
-      <div
-        className="fixed inset-y-0 right-0 max-w-sm w-full bg-white shadow-xl transform z-50 transition-transform duration-300 ease-in-out"
-      >
-        <div className="h-full flex flex-col p-5">
-          <div className="flex justify-between items-center mb-4 pb-2 border-b">
-            <h2 className="text-lg font-bold">Your Cart ({cart.items.length})</h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="rounded-full hover:bg-gray-100"
-            >
-              <X size={20} />
+      <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose}></div>
+      <aside className="fixed inset-y-0 right-0 h-dvh w-full max-w-sm bg-background border-l border-border z-50 flex flex-col">
+        <div className="flex justify-between items-center px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-3 border-b border-border">
+          <h2 className="text-lg font-extrabold">Your cart ({cart.items.length})</h2>
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full" aria-label="Close cart">
+            <X size={20} />
+          </Button>
+        </div>
+
+        {cart.isEmpty ? (
+          <div className="flex-grow flex flex-col items-center justify-center text-center px-6">
+            <div className="bg-accent p-4 rounded-full mb-4">
+              <ShoppingCart size={36} className="text-Tonstores-green" />
+            </div>
+            <h3 className="text-lg font-bold mb-1">Your cart is empty</h3>
+            <p className="text-muted-foreground mb-6">Add something you like and it will show up here.</p>
+            <Button variant="outline" className="border-2 border-Tonstores-green text-Tonstores-green font-bold" onClick={onClose}>
+              Continue shopping
             </Button>
           </div>
-
-          {cart.isEmpty ? (
-            <div className="flex-grow flex flex-col items-center justify-center text-center py-8">
-              <div className="bg-Tonstores-lightgreen p-4 rounded-full mb-4">
-                <ShoppingCart size={40} className="text-Tonstores-green mx-auto" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">Your cart is empty</h3>
-              <p className="text-gray-600 mb-6">
-                Start adding some products to your cart
-              </p>
-              <Button
-                variant="outline"
-                className="border-Tonstores-green text-Tonstores-green hover:bg-Tonstores-lightgreen"
-                onClick={onClose}
-              >
-                Continue Shopping
-              </Button>
-            </div>
-          ) : (
-            <>
-              <div className="flex-grow overflow-y-auto space-y-4 py-2">
-                {cart.items.map(item => (
-                  <div key={item.id} className="flex items-center py-3 border-b border-gray-100 dark:border-gray-700">
-                    <img
-                      src={item.image_urls?.[0] ? getStorageUrl(item.image_urls[0]) : (item.image_url ? getStorageUrl(item.image_url) : "/placeholder.svg")}
-                      alt={item.name}
-                      className="w-16 h-16 object-cover rounded-lg mr-3"
-                    />
-                    <div className="flex-grow min-w-0">
-                      <h4 className="font-medium text-sm truncate">{item.name}</h4>
-                      <div className="flex items-center justify-between mt-1">
-                        <div className="flex items-center border rounded">
-                          <button
-                            className="p-1 text-gray-600 hover:bg-gray-100"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              cart.updateQuantity(item.id, item.quantity - 1);
-                            }}
-                            type="button"
-                            disabled={item.quantity <= 1}
-                          >
-                            -
-                          </button>
-                          <span className="px-2 py-1 min-w-[40px] text-center">{item.quantity}</span>
-                          <button
-                            className="p-1 text-gray-600 hover:bg-gray-100"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              cart.updateQuantity(item.id, item.quantity + 1);
-                            }}
-                            type="button"
-                          >
-                            +
-                          </button>
-                        </div>
-                        <span className="font-medium text-sm">
-                          ₦{((item.price * item.quantity) / 100).toLocaleString()}
-                        </span>
-                      </div>
+        ) : (
+          <>
+            <div className="flex-grow overflow-y-auto px-5 py-2">
+              {cart.items.map((item) => (
+                <div key={item.id} className="flex items-center gap-3 py-4 border-b border-border">
+                  <img
+                    src={item.image_urls?.[0] ? getStorageUrl(item.image_urls[0]) : (item.image_url ? getStorageUrl(item.image_url) : "/placeholder.svg")}
+                    alt={item.name}
+                    className="w-16 h-16 object-cover rounded-xl bg-muted flex-none"
+                  />
+                  <div className="flex-grow min-w-0">
+                    <h4 className="font-semibold text-sm truncate">{item.name}</h4>
+                    <p className="text-sm font-bold text-Tonstores-green">{naira(item.price * item.quantity)}</p>
+                    <div className="inline-flex items-center border border-border rounded-lg mt-1">
+                      <button
+                        type="button"
+                        className="w-9 h-9 flex items-center justify-center disabled:opacity-40"
+                        onClick={() => cart.updateQuantity(item.id, item.quantity - 1)}
+                        disabled={item.quantity <= 1}
+                        aria-label="Decrease quantity"
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <span className="min-w-[32px] text-center text-sm font-semibold">{item.quantity}</span>
+                      <button
+                        type="button"
+                        className="w-9 h-9 flex items-center justify-center"
+                        onClick={() => cart.updateQuantity(item.id, item.quantity + 1)}
+                        aria-label="Increase quantity"
+                      >
+                        <Plus size={16} />
+                      </button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="ml-1 p-0 w-8 h-8 rounded-full hover:bg-gray-100"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        cart.removeItem(item.id);
-                      }}
-                    >
-                      <X size={16} />
-                    </Button>
                   </div>
-                ))}
-              </div>
-
-              <div className="border-t border-gray-200 pt-4 mt-auto">
-                <div className="flex justify-between text-base font-semibold mb-2">
-                  <span>Total:</span>
-                  <span>₦{(cart.total / 100).toLocaleString()}</span>
+                  <Button variant="ghost" size="icon" className="rounded-full flex-none" onClick={() => cart.removeItem(item.id)} aria-label={`Remove ${item.name}`}>
+                    <X size={16} />
+                  </Button>
                 </div>
+              ))}
+            </div>
 
-                <Button
-                  className="w-full bg-Tonstores-green hover:bg-Tonstores-darkgreen py-2.5 flex items-center justify-center"
-                  onClick={onProceedToCheckout}
-                >
-                  Proceed to Checkout
-                  <ArrowRight className="ml-2" size={18} />
-                </Button>
+            <div className="border-t border-border px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+              <div className="flex justify-between text-base font-extrabold mb-3">
+                <span>Total</span>
+                <span>{naira(cart.total)}</span>
               </div>
-            </>
-          )}
-        </div>
-      </div>
+              <Button className="w-full h-12 text-base font-bold bg-Tonstores-green hover:bg-Tonstores-greendark text-white" onClick={onProceedToCheckout}>
+                Proceed to checkout
+                <ArrowRight className="ml-2" size={18} />
+              </Button>
+              <p className="text-xs text-muted-foreground text-center mt-2">You pay the seller by bank transfer.</p>
+            </div>
+          </>
+        )}
+      </aside>
     </>
   );
 };

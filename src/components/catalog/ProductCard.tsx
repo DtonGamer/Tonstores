@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AlertTriangle, Eye, ShoppingCart, ChevronLeft, ChevronRight, X, ImageIcon } from "lucide-react";
+import { AlertTriangle, ShoppingCart, ChevronLeft, ChevronRight, X, ImageIcon } from "lucide-react";
 
 // Helper function to get storage URL or handle relative URLs
 const getStorageUrl = (url: string | null) => {
@@ -97,81 +97,67 @@ const ProductCard = ({
   
   return (
     <>
-      <Card className={`overflow-hidden ${!inStock ? 'opacity-70' : ''}`}>
-        <div className="aspect-square overflow-hidden relative">
-          <img 
-            src={imageError || images.length === 0 ? imageDefaults.placeholderImage : getStorageUrl(images[0]) || imageDefaults.placeholderImage} 
-            alt={name} 
+      <Card className={`overflow-hidden rounded-2xl border border-border bg-card flex flex-col ${!inStock ? 'opacity-80' : ''}`}>
+        <div
+          className={`aspect-square overflow-hidden relative bg-muted ${!isEditable ? 'cursor-pointer' : ''}`}
+          onClick={!isEditable ? openProductDetail : undefined}
+        >
+          <img
+            src={imageError || images.length === 0 ? imageDefaults.placeholderImage : getStorageUrl(images[0]) || imageDefaults.placeholderImage}
+            alt={name}
             className="object-cover w-full h-full"
             onError={() => setImageError(true)}
           />
           {!inStock && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <span className="text-white font-semibold text-lg">Out of Stock</span>
-            </div>
+            <span className="absolute top-2 left-2 rounded-full bg-background border border-border px-2.5 py-0.5 text-[11px] font-bold text-muted-foreground">
+              Sold out
+            </span>
           )}
           {isLowStock && inStock && (
-            <div className="absolute top-0 left-0 bg-amber-500 text-white px-2 py-1 text-xs font-medium flex items-center">
-              <AlertTriangle size={12} className="mr-1" />
-              Low Stock
-            </div>
-          )}
-          {!isEditable && (
-            <Button 
-              variant="secondary" 
-              size="sm"
-              className="absolute top-2 right-2 bg-white dark:bg-gray-800 bg-opacity-80 hover:bg-opacity-100 dark:text-gray-200"
-              onClick={openProductDetail}
-            >
-              <Eye size={16} className="mr-1" /> View
-            </Button>
+            <span className="absolute top-2 left-2 rounded-full bg-Tonstores-amber/25 px-2.5 py-0.5 text-[11px] font-bold text-amber-900 dark:text-amber-300">
+              Only {stockQuantity} left
+            </span>
           )}
           {images.length > 1 && (
-            <Badge 
-              className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white"
-              variant="secondary"
-            >
+            <span className="absolute bottom-2 right-2 rounded-full bg-black/60 text-white px-2 py-0.5 text-[11px] flex items-center">
               <ImageIcon size={12} className="mr-1" /> {images.length}
-            </Badge>
+            </span>
           )}
         </div>
-        <CardContent className="p-4">
-          <h3 className="font-semibold text-lg dark:text-white">{name}</h3>
-          <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 h-10">{description}</p>
-          <p className="text-lg font-bold text-Tonstores-darkblue dark:text-Tonstores-blue mt-2">
-            ₦{(price / 100).toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            })}
+        <CardContent className="p-3 flex-1">
+          <h3
+            className={`font-semibold text-[15px] leading-snug line-clamp-2 ${!isEditable ? 'cursor-pointer' : ''}`}
+            onClick={!isEditable ? openProductDetail : undefined}
+          >
+            {name}
+          </h3>
+          {description && (
+            <p className="hidden sm:block text-muted-foreground text-sm line-clamp-2 mt-1">{description}</p>
+          )}
+          <p className="text-lg font-extrabold text-Tonstores-green mt-1">
+            ₦{(price / 100).toLocaleString("en-NG", { maximumFractionDigits: 2 })}
           </p>
-          {stockQuantity !== undefined && stockQuantity !== null && inStock && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          {isEditable && stockQuantity !== undefined && stockQuantity !== null && inStock && (
+            <p className="text-sm text-muted-foreground mt-1">
               {stockQuantity} {stockQuantity === 1 ? 'item' : 'items'} left
             </p>
           )}
         </CardContent>
-        <CardFooter className="p-4 pt-0">
+        <CardFooter className="p-3 pt-0">
           {isEditable ? (
-            <Button 
-              className="w-full bg-Tonstores-blue hover:bg-blue-600" 
-              onClick={handleEdit}
-            >
+            <Button className="w-full h-10 bg-Tonstores-darkblue hover:bg-Tonstores-darkblue/90 text-white" onClick={handleEdit}>
               Edit Product
             </Button>
           ) : inStock ? (
-            <Button 
-              className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue" 
+            <Button
+              variant="outline"
+              className="w-full h-10 border-2 border-Tonstores-green text-Tonstores-green bg-transparent hover:bg-Tonstores-green hover:text-white font-bold"
               onClick={handleAddToCart}
             >
-              Add to Cart
+              Add to cart
             </Button>
           ) : (
-            <Button 
-              className="w-full" 
-              disabled
-            >
-              Out of Stock
-            </Button>
+            <Button className="w-full h-10" disabled>Sold out</Button>
           )}
         </CardFooter>
       </Card>
@@ -226,7 +212,7 @@ const ProductCard = ({
                         <Button
                           variant="secondary"
                           size="icon"
-                          className="absolute left-2 top-1/2 transform -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full opacity-90 hover:opacity-100 shadow-md"
+                          className="absolute left-2 top-1/2 transform -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full opacity-90 hover:opacity-100 "
                           onClick={prevImage}
                         >
                           <ChevronLeft size={16} className="sm:w-[18px] sm:h-[18px]" />
@@ -234,7 +220,7 @@ const ProductCard = ({
                         <Button
                           variant="secondary"
                           size="icon"
-                          className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full opacity-90 hover:opacity-100 shadow-md"
+                          className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full opacity-90 hover:opacity-100 "
                           onClick={nextImage}
                         >
                           <ChevronRight size={16} className="sm:w-[18px] sm:h-[18px]" />
@@ -256,7 +242,7 @@ const ProductCard = ({
                         <div
                           key={index}
                           className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-md overflow-hidden border-2 cursor-pointer transition-all ${
-                            index === currentImageIndex ? 'border-Tonstores-blue scale-105 shadow-md' : 'border-gray-200 hover:border-gray-300'
+                            index === currentImageIndex ? 'border-Tonstores-green ' : 'border-gray-200 hover:border-gray-300'
                           }`}
                           onClick={() => setCurrentImageIndex(index)}
                         >
@@ -280,7 +266,7 @@ const ProductCard = ({
                 <div className="flex flex-col gap-3 sm:gap-6">
                   {/* Price */}
                   <div>
-                    <p className="text-2xl sm:text-3xl font-bold text-Tonstores-darkblue dark:text-Tonstores-blue">
+                    <p className="text-2xl sm:text-3xl font-bold text-Tonstores-green">
                       ₦{(price / 100).toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
@@ -326,10 +312,10 @@ const ProductCard = ({
           </div>
 
           {/* Fixed Footer with Add to Cart Button */}
-          <div className="flex-shrink-0 p-3 sm:p-4 border-t dark:border-gray-800 bg-white dark:bg-gray-950 shadow-lg">
+          <div className="flex-shrink-0 p-3 sm:p-4 border-t dark:border-gray-800 bg-white dark:bg-gray-950 ">
             {inStock ? (
               <Button
-                className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue text-white py-4 sm:py-6 text-base sm:text-lg font-semibold"
+                className="w-full bg-Tonstores-green hover:bg-Tonstores-greendark text-white py-4 sm:py-6 text-base sm:text-lg font-semibold"
                 onClick={() => {
                   handleAddToCart();
                   setIsDetailOpen(false);

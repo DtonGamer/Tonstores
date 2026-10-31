@@ -95,7 +95,7 @@ const TermsOfService = () => {
               <h2 className={`text-2xl font-semibold mb-4 ${textClasses.subheading}`}>5. Payment Terms</h2>
               <p className={`mb-4 ${textClasses.text}`}>
                 Users agree to pay all applicable fees and charges for using our services.
-                All payments are non-refundable unless otherwise specified in our refund policy.
+                Subscription fees are non-refundable unless we state otherwise in writing. Tonstores does not take a commission on your sales and does not hold customer payments.
               </p>
             </section>
 
@@ -116,7 +116,14 @@ const TermsOfService = () => {
             </section>
 
             <section className="mb-8">
-              <h2 className={`text-2xl font-semibold mb-4 ${textClasses.subheading}`}>8. Changes to Terms</h2>
+              <h2 className={`text-2xl font-semibold mb-4 ${textClasses.subheading}`}>8. Your Data and Export</h2>
+              <p className={`mb-4 ${textClasses.text}`}>
+                Your customer contacts, catalog and order history belong to you. You can export them at any time, including after you stop using Tonstores.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className={`text-2xl font-semibold mb-4 ${textClasses.subheading}`}>9. Changes to Terms</h2>
               <p className={`mb-4 ${textClasses.text}`}>
                 We reserve the right to modify these terms at any time. We will notify users
                 of any changes by posting the new terms on this page.
@@ -124,7 +131,7 @@ const TermsOfService = () => {
             </section>
 
             <section className="mb-8">
-              <h2 className={`text-2xl font-semibold mb-4 ${textClasses.subheading}`}>9. Contact Information</h2>
+              <h2 className={`text-2xl font-semibold mb-4 ${textClasses.subheading}`}>10. Contact Information</h2>
               <p className={`mb-4 ${textClasses.text}`}>
                 For any questions about these Terms, please contact us at:
               </p>
@@ -135,7 +142,7 @@ const TermsOfService = () => {
             </section>
 
             <div className={`text-sm mt-8 ${textClasses.text}`}>
-              Last Updated: {new Date().toLocaleDateString()}
+              Last Updated: 30 October 2026
             </div>
           </div>
         </div>

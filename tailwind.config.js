@@ -63,12 +63,18 @@ module.exports = {
 				},
 				// Tonstores custom colors
 				Tonstores: {
-					green: '#25D366',
-					darkblue: '#075E54',
+					green: '#0B5D3B',     // brand, buttons (was #25D366)
+					greendark: '#094A30', // button hover
+					darkblue: '#1C1B18',  // warm near-black text (was #075E54)
+					amber: '#F2A516',     // accents only
+					cream: '#FAF8F4',     // page background
 					blue: '#34B7F1',
 					lightgray: '#F1F1F1',
 					darkgray: '#3C4043',
 				},
+			},
+			fontFamily: {
+				sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', '-apple-system', '"Segoe UI"', 'Roboto', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

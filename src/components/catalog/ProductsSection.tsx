@@ -22,7 +22,7 @@ const ProductsSection = ({
 }: ProductsSectionProps) => {
   if (isNewCatalog) {
     return (
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700 text-center">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border dark:border-gray-700 text-center">
         <h2 className="text-xl font-semibold mb-2 dark:text-white">Save your catalog first</h2>
         <p className="text-gray-600 dark:text-gray-400 mb-4">You need to save your catalog before adding products.</p>
       </div>
@@ -31,14 +31,14 @@ const ProductsSection = ({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold dark:text-white">Products</h2>
           <p className="text-gray-600 dark:text-gray-400">Manage products in your catalog</p>
         </div>
         <Button
           onClick={onAddProduct}
-          className="bg-Tonstores-green hover:bg-Tonstores-darkblue flex items-center gap-2"
+          className="bg-Tonstores-green hover:bg-Tonstores-greendark flex items-center gap-2"
         >
           <PlusCircle size={16} />
           Add New Product
@@ -50,19 +50,19 @@ const ProductsSection = ({
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-Tonstores-green"></div>
         </div>
       ) : products.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 p-12 rounded-lg shadow-sm border dark:border-gray-700 text-center">
+        <div className="bg-white dark:bg-gray-800 p-12 rounded-lg border dark:border-gray-700 text-center">
           <h3 className="text-lg font-semibold mb-2 dark:text-white">No products yet</h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6">Add your first product to get started</p>
           <Button
             onClick={onAddProduct}
-            className="bg-Tonstores-green hover:bg-Tonstores-darkblue flex items-center gap-2"
+            className="bg-Tonstores-green hover:bg-Tonstores-greendark flex items-center gap-2"
           >
             <PlusCircle size={16} />
             Add New Product
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
           {products.map(product => (
             <div key={product.id} className="relative">
               <Button

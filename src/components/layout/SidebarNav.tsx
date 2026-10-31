@@ -5,7 +5,6 @@ import { useProfile } from "@/hooks/useProfile";
 import { useSubscription } from "@/hooks/useSubscription";
 import {
   LayoutDashboard,
-  ShoppingBag,
   ClipboardList,
   Settings,
   LogOut,
@@ -88,6 +87,13 @@ export default function SidebarNav() {
                         subscription.pricing_plans.name !== 'Free' &&
                         subscription.status === 'active';
 
+  // Active when on the exact page, or any child page of it
+  const isActive = (href: string) => {
+    const p = location.pathname;
+    if (href === "/dashboard") return p === "/dashboard" || p.startsWith("/catalog") || p === "/onboarding";
+    return p === href || p.startsWith(href + "/");
+  };
+
   // Define navigation items based on user type
   const navItems: NavItem[] = isBuyer ? [
     {
@@ -100,11 +106,6 @@ export default function SidebarNav() {
       name: "Dashboard",
       href: "/dashboard",
       icon: <LayoutDashboard className="h-5 w-5" />,
-    },
-    {
-      name: "Catalogs",
-      href: "/dashboard",
-      icon: <ShoppingBag className="h-5 w-5" />,
     },
     {
       name: "Orders",
@@ -169,10 +170,10 @@ export default function SidebarNav() {
   return (
     <>
       {/* Mobile Menu Button */}
-      <div className="lg:hidden fixed top-4 right-4 z-50">
+      <div className="lg:hidden fixed top-[max(1rem,env(safe-area-inset-top))] right-4 z-50">
         <button
           onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
-          className="mobile-menu-button flex items-center justify-center p-2.5 rounded-lg bg-Tonstores-green text-white hover:bg-Tonstores-darkblue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-Tonstores-green shadow-lg"
+          className="mobile-menu-button flex items-center justify-center p-2.5 rounded-lg bg-Tonstores-green text-white hover:bg-Tonstores-greendark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-Tonstores-green "
           aria-label="Toggle menu"
         >
           {isMobileNavOpen ? <X size={20} /> : <Menu size={20} />}
@@ -189,7 +190,7 @@ export default function SidebarNav() {
                   <div className="w-8 h-8 rounded-lg bg-Tonstores-green flex items-center justify-center">
                     <span className="text-white font-bold text-lg">T</span>
                   </div>
-                  <span className="text-xl font-bold bg-gradient-to-r from-Tonstores-green to-Tonstores-darkblue bg-clip-text text-transparent">
+                  <span className="text-xl font-bold text-Tonstores-darkblue">
                 Tonstores
                   </span>
                 </div>
@@ -218,9 +219,9 @@ export default function SidebarNav() {
                   key={item.name}
                   to={item.href}
                   onClick={() => handleNavClick(item.href)}
-                  className={`group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-Tonstores-lightgray ${
-                    location.pathname === item.href
-                      ? "bg-Tonstores-lightgray text-Tonstores-darkblue"
+                  className={`group flex items-center px-3 py-3 text-sm font-medium rounded-md hover:bg-Tonstores-green/5 ${
+                    isActive(item.href)
+                      ? "bg-Tonstores-green/10 text-Tonstores-green font-semibold"
                       : "text-Tonstores-darkgray"
                   }`}
                 >
@@ -237,7 +238,7 @@ export default function SidebarNav() {
             {!isSidebarCollapsed && !isBuyer && (
               <Button
                 onClick={handleUpgradeClick}
-                className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center justify-center gap-2 py-5"
+                className="w-full bg-Tonstores-green hover:bg-Tonstores-greendark text-white flex items-center justify-center gap-2 py-5"
                 disabled={!nextTierPlan}
               >
                 <ArrowUpCircle size={18} />
@@ -276,7 +277,7 @@ export default function SidebarNav() {
                 {!isBuyer && (
                   <Button
                     onClick={handleUpgradeClick}
-                    className="w-10 h-10 p-0 rounded-full bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center justify-center"
+                    className="w-10 h-10 p-0 rounded-full bg-Tonstores-green hover:bg-Tonstores-greendark text-white flex items-center justify-center"
                     disabled={!nextTierPlan}
                     title="Upgrade Subscription"
                   >
@@ -306,17 +307,17 @@ export default function SidebarNav() {
     
 
       {/* Mobile Sidebar */}
-      <div className={`lg:hidden fixed inset-0 z-40 transition-opacity duration-300 ${isMobileNavOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <div className="absolute inset-0 bg-gray-600 bg-opacity-75" onClick={() => setIsMobileNavOpen(false)}></div>
+      <div className={`lg:hidden fixed inset-0 h-dvh z-40 transition-opacity duration-300 ${isMobileNavOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className="absolute inset-0 bg-black/50" onClick={() => setIsMobileNavOpen(false)}></div>
 
-        <div className={`sidebar-content relative transform transition-transform duration-300 ease-in-out ${isMobileNavOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col w-72 max-w-[80%] h-full bg-white shadow-xl overflow-y-auto overflow-x-hidden scrollbar-hide`}>
+        <div className={`sidebar-content relative transform transition-transform duration-300 ease-in-out ${isMobileNavOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col w-72 max-w-[85%] h-dvh bg-white overflow-y-auto overflow-x-hidden scrollbar-hide`}>
           <div className="flex items-center justify-between h-16 flex-shrink-0 px-4 border-b border-gray-200">
             <Link to="/" className="flex items-center">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 rounded-lg bg-Tonstores-green flex items-center justify-center">
                   <span className="text-white font-bold text-lg">T</span>
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-Tonstores-green to-Tonstores-darkblue bg-clip-text text-transparent">
+                <span className="text-xl font-bold text-Tonstores-darkblue">
                   Tonstores
                 </span>
               </div>
@@ -329,9 +330,9 @@ export default function SidebarNav() {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`group flex items-center px-3 py-3 text-base font-medium rounded-md hover:bg-Tonstores-lightgray dark:hover:bg-gray-800 ${
-                    location.pathname === item.href
-                      ? "bg-Tonstores-lightgray dark:bg-gray-800 text-Tonstores-darkblue dark:text-white"
+                  className={`group flex items-center px-3 py-3 text-base font-medium rounded-md hover:bg-Tonstores-green/5 dark:hover:bg-gray-800 ${
+                    isActive(item.href)
+                      ? "bg-Tonstores-green/10 text-Tonstores-green font-semibold dark:bg-gray-800 dark:text-white"
                       : "text-Tonstores-darkgray dark:text-gray-300"
                   }`}
                   onClick={() => handleNavClick(item.href)}
@@ -344,12 +345,12 @@ export default function SidebarNav() {
           </div>
 
           {/* Upgrade button and user profile section */}
-          <div className="flex-shrink-0 flex flex-col border-t border-gray-200 dark:border-gray-700 p-4 space-y-4">
+          <div className="flex-shrink-0 flex flex-col border-t border-gray-200 dark:border-gray-700 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-4">
             {/* Upgrade subscription button - Mobile */}
             {!isBuyer && (
               <Button
                 onClick={handleUpgradeClick}
-                className="w-full bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center justify-center gap-2 py-5"
+                className="w-full bg-Tonstores-green hover:bg-Tonstores-greendark text-white flex items-center justify-center gap-2 py-5"
                 disabled={!nextTierPlan}
               >
                 <ArrowUpCircle size={18} />

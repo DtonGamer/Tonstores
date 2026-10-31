@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import ProductCard from "@/components/catalog/ProductCard";
 import { X, ShoppingCart, Share2, Phone, Twitter, Instagram, Facebook, Search, Link2 } from "lucide-react";
@@ -25,8 +24,8 @@ import CartSidebar from "@/components/catalog/CartSidebar";
 import TikTokIcon from "@/components/catalog/tiktokIcon";
 
 const DEFAULT_CONTACTS = {
-  email_support: "Creatorrichie@gmail",
-  whatsapp_support: "+239038650178",
+  email_support: "tonshopdev@proton.me",
+  whatsapp_support: "+2349038650178",
   twitter_handle: "RichieDbuilder",
   instagram_handle: "Tonstores",
   facebook_handle: "Tonstore",
@@ -452,26 +451,30 @@ const CatalogView = () => {
   }
   
   const contactMethods = getContactMethods();
+  const cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Helmet>
         <title>{catalog?.name || "Product Catalog"} - Shop Online | Tonstores Hub</title>
         <meta name="description" content={catalog?.description || `Shop ${catalog?.name || "quality products"} online with secure payment and fast delivery.`} />
         <link rel="canonical" href={window.location.href} />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content={`${catalog?.name || "Shop Online"} - Tonstores Hub`} />
+        <meta property="og:title" content={`${catalog?.name || "Shop Online"}`} />
         <meta property="og:url" content={window.location.href} />
       </Helmet>
       
-      <header className="bg-white dark:bg-gray-900 shadow-lg sticky top-0 z-40 border-b dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-Tonstores-green to-Tonstores-darkblue bg-clip-text text-transparent truncate max-w-xs sm:max-w-md">
-              {catalog.name}
-            </h1>
-            <div className="flex items-center gap-3">
-              <DropdownMenu>
+      <header className="bg-background border-b border-border sticky top-0 z-40 pt-[env(safe-area-inset-top)]">
+        <div className="max-w-6xl mx-auto px-4 flex items-center gap-3 h-[60px]">
+          {sellerProfile?.avatar_url ? (
+            <img src={getStorageUrl(sellerProfile.avatar_url)} alt="" className="w-9 h-9 rounded-full object-cover flex-none" />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-Tonstores-green text-white font-extrabold flex items-center justify-center flex-none">
+              {catalog.name?.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <span className="font-extrabold truncate flex-1">{catalog.name}</span>
+          <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="flex items-center space-x-1 sm:space-x-2 h-9">
                     <Share2 size={18} />
@@ -505,70 +508,73 @@ const CatalogView = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-
-              <Button variant="outline" size="sm" className="flex items-center space-x-1 sm:space-x-2 relative h-9" onClick={toggleCart}>
-                <ShoppingCart size={18} />
-                <span className="hidden sm:inline">Cart</span>
-                {cart.items.length > 0 && (
-                  <Badge className="absolute -top-2 -right-2 bg-Tonstores-green text-xs w-5 h-5 flex items-center justify-center">
-                    {cart.items.reduce((sum, item) => sum + item.quantity, 0)}
-                  </Badge>
-                )}
-              </Button>
-            </div>
-          </div>
+          <Button variant="outline" size="sm" className="relative h-9" onClick={toggleCart} aria-label="Open cart">
+            <ShoppingCart size={18} />
+            <span className="hidden sm:inline ml-2">Cart</span>
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-Tonstores-green text-white text-[11px] font-bold min-w-[20px] h-5 px-1 rounded-full flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </Button>
         </div>
       </header>
-      
-      <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-Tonstores-green to-Tonstores-darkblue bg-clip-text text-transparent mb-2">
-            {catalog.name}
-          </h2>
-          {catalog.description && (
-            <p className="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">{catalog.description}</p>
-          )}
-        </div>
 
-        <div className="mb-10">
-          <div className="relative max-w-lg mx-auto">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Search className="text-gray-400" size={20} />
-            </div>
+      <main className={`flex-grow max-w-6xl w-full mx-auto px-4 ${cartCount > 0 ? "pb-28" : "pb-8"}`}>
+        <section className="pt-6 pb-2">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight mb-2">{catalog.name}</h1>
+          {catalog.description && (
+            <p className="text-muted-foreground max-w-xl mb-4">{catalog.description}</p>
+          )}
+          <div className="flex flex-wrap gap-2 mb-4">
+            <span className="bg-accent text-Tonstores-green text-[13px] font-semibold px-3 py-1 rounded-full">Pay by bank transfer</span>
+            <span className="bg-accent text-Tonstores-green text-[13px] font-semibold px-3 py-1 rounded-full">Track your order</span>
+          </div>
+          {sellerProfile?.whatsapp_support && (
+            <a
+              href={getWhatsAppLink(sellerProfile.whatsapp_support)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-Tonstores-green hover:bg-Tonstores-greendark text-white font-bold px-5 py-3 rounded-lg"
+            >
+              <Phone size={18} /> Chat with seller on WhatsApp
+            </a>
+          )}
+        </section>
+
+        <div className="sticky top-[calc(60px+env(safe-area-inset-top))] z-30 bg-background py-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
             <Input
-              type="text"
-              placeholder="Search products..."
-              className="pl-10 pr-10 py-3"
+              type="search"
+              placeholder="Search products"
+              aria-label="Search products"
+              className="pl-10 pr-10 h-11 rounded-lg"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             {searchTerm && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8"
-                onClick={() => setSearchTerm('')}
-              >
+              <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" onClick={() => setSearchTerm('')} aria-label="Clear search">
                 <X size={18} />
               </Button>
             )}
           </div>
           {searchTerm && (
-            <p className="text-sm text-gray-600 text-center mt-3">
-              Found {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+            <p className="text-sm text-muted-foreground mt-2">
+              {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'} found
             </p>
           )}
         </div>
-        
+
         {filteredProducts.length === 0 ? (
-          <div className="text-center p-12">
-            <h3 className="text-xl font-semibold mb-2">No Products Found</h3>
-            <p className="text-gray-600">
-              {products.length === 0 ? "This catalog currently has no products." : "No products match your search."}
+          <div className="text-center py-16">
+            <h3 className="text-xl font-bold mb-2">No products found</h3>
+            <p className="text-muted-foreground">
+              {products.length === 0 ? "This catalog has no products yet." : "Nothing matches your search."}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 mt-1">
             {filteredProducts.map(product => (
               <ProductCard
                 key={product.id}
@@ -589,13 +595,31 @@ const CatalogView = () => {
 
         <ContactMethods
           contactMethods={contactMethods}
+          hasSellerContacts={!!(sellerProfile?.whatsapp_support || sellerProfile?.email_support)}
           getWhatsAppLink={getWhatsAppLink}
           getTwitterLink={getTwitterLink}
           getInstagramLink={getInstagramLink}
           getFacebookLink={getFacebookLink}
           getTikTokLink={getTikTokLink}
         />
+
+        <p className="text-center text-sm text-muted-foreground py-6">
+          Made with <b className="text-Tonstores-green">Tonstores</b> ·{" "}
+          <a href="/register" className="text-Tonstores-green font-bold">Create your free catalog</a>
+        </p>
       </main>
+
+      {cartCount > 0 && !isCartOpen && (
+        <div className="fixed inset-x-0 bottom-0 z-40 bg-background border-t border-border px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <button
+            onClick={toggleCart}
+            className="w-full max-w-6xl mx-auto flex items-center justify-between bg-Tonstores-green hover:bg-Tonstores-greendark text-white font-bold rounded-xl px-5 py-3.5"
+          >
+            <span>{cartCount} {cartCount === 1 ? "item" : "items"}</span>
+            <span>View cart · ₦{(cart.total / 100).toLocaleString("en-NG")}</span>
+          </button>
+        </div>
+      )}
       
       <CartSidebar
         isOpen={isCartOpen}

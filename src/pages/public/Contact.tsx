@@ -151,32 +151,16 @@ const Contact = () => {
       details: contactMethods.email,
       icon: Mail,
       link: `mailto:${contactMethods.email}`,
-      bgColor: "bg-blue-100",
-      iconColor: "text-blue-600"
+      bgColor: "bg-Tonstores-green/10",
+      iconColor: "text-Tonstores-green"
     },
     {
-      title: "Call Us",
+      title: "WhatsApp Us",
       details: contactMethods.whatsapp,
       icon: WhatsAppIcon,
       link: getWhatsAppLink(contactMethods.whatsapp),
-      bgColor: "bg-green-100",
-      iconColor: "text-green-600"
-    },
-    {
-      title: "Visit Us",
-      details: "123 Idejo Street, Victoria Island, Lagos, Nigeria",
-      icon: MapPin,
-      link: "https://maps.google.com",
-      bgColor: "bg-red-100",
-      iconColor: "text-red-600"
-    },
-    {
-      title: "Live Chat",
-      details: "Available 9am-5pm WAT, Mon-Fri",
-      icon: MessageSquare,
-      link: "#chat",
-      bgColor: "bg-purple-100",
-      iconColor: "text-purple-600"
+      bgColor: "bg-Tonstores-green/10",
+      iconColor: "text-Tonstores-green"
     }
   ];
 
@@ -231,20 +215,14 @@ const Contact = () => {
 
       {/* Hero Section */}
       <section className="relative py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-Tonstores-darkblue via-purple-900 to-Tonstores-green z-0"></div>
-        <div className="absolute inset-0 z-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: '40px 40px'
-          }}></div>
-        </div>
-        
+        <div className="absolute inset-0 bg-Tonstores-green z-0"></div>
+                
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 inline-block mb-6">
+          <div className="bg-white/10 rounded-xl p-8 inline-block mb-6">
             <h1 className="text-4xl md:text-5xl font-bold text-white">Get in Touch</h1>
           </div>
           <p className="mt-6 text-xl text-white max-w-3xl mx-auto">
-            We'd love to hear from you. Reach out to our team with any questions, feedback, or inquiries.
+            Questions about your catalog or plan? Message us on WhatsApp or email. We reply within 24 hours.
           </p>
         </div>
       </section>
@@ -260,7 +238,7 @@ const Contact = () => {
               <div className="space-y-6">
                 {contactInfo.map((item, index) => (
                   <a href={item.link} key={index} className="flex items-start group">
-                    <div className={`${item.bgColor} p-3 rounded-xl mr-4 group-hover:scale-110 transition-transform`}>
+                    <div className={`${item.bgColor} p-3 rounded-xl mr-4 `}>
                       {typeof item.icon === 'function' && (
                         item.icon === WhatsAppIcon ? 
                           <WhatsAppIcon size={24} className={item.iconColor} /> : 
@@ -283,7 +261,7 @@ const Contact = () => {
                     href={platform.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${platform.bgColor} ${platform.hoverBgColor} p-3 rounded-full text-white transition-transform hover:scale-110`}
+                    className={`${platform.bgColor} ${platform.hoverBgColor} p-3 rounded-full text-white `}
                   >
                     {platform.icon === TikTokIcon ? 
                       <TikTokIcon size={20} /> : 
@@ -296,7 +274,7 @@ const Contact = () => {
             
             {/* Contact Form Column */}
             <div className="md:col-span-2">
-              <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+              <div className="bg-white rounded-2xl p-8 border border-gray-100">
                 <h2 className="text-2xl md:text-3xl font-bold text-Tonstores-darkblue mb-2">Send a Message</h2>
                 <p className="text-gray-600 mb-6">We'll get back to you within 24 hours</p>
                 
@@ -362,7 +340,7 @@ const Contact = () => {
                     <Button 
                       type="submit"
                       disabled={isSubmitting}
-                      className="px-8 py-6 bg-Tonstores-green hover:bg-Tonstores-darkblue text-white text-lg rounded-xl shadow-lg transform transition-all hover:scale-105 font-medium w-full sm:w-auto"
+                      className="px-8 py-6 bg-Tonstores-green hover:bg-Tonstores-darkblue text-white text-lg rounded-xl font-medium w-full sm:w-auto"
                     >
                       {isSubmitting ? (
                         <span className="flex items-center">
@@ -388,14 +366,14 @@ const Contact = () => {
       </section>
       
       {/* Map Section */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-Tonstores-cream">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-Tonstores-darkblue">Find Us</h2>
             <p className="text-gray-600 mt-2">Visit our office in Lagos, Nigeria</p>
           </div>
           
-          <div className="rounded-xl overflow-hidden shadow-lg max-w-5xl mx-auto">
+          <div className="rounded-xl overflow-hidden max-w-5xl mx-auto">
             <iframe 
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3964.7292455432513!2d3.4210515757396595!3d6.426185024636028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103bf53aec4dd92d%3A0x5e34fe6a84cdcd77!2sVictoria%20Island%2C%20Lagos!5e0!3m2!1sen!2sng!4v1698789436302!5m2!1sen!2sng" 
               width="100%" 
@@ -410,14 +388,14 @@ const Contact = () => {
       </section>
       
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-br from-Tonstores-darkblue via-purple-900 to-Tonstores-green">
+      <section className="py-16 bg-Tonstores-green">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Start Selling?</h2>
-          <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+          <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
             Create your free account today and transform your social media presence into a powerful sales machine.
           </p>
           <Link to="/register">
-            <Button className="px-8 py-6 bg-white text-Tonstores-darkblue hover:bg-Tonstores-green hover:text-white text-lg rounded-xl shadow-lg transform transition-all hover:scale-105 font-medium">
+            <Button className="px-8 py-6 bg-white text-Tonstores-darkblue hover:bg-Tonstores-green hover:text-white text-lg rounded-xl font-medium">
               Create Free Account
               <ArrowRight className="ml-2" size={20} />
             </Button>

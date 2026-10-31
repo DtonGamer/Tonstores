@@ -63,7 +63,7 @@ const PrivacyPolicy = () => {
               <ul className={`list-disc pl-6 ${textClasses.text} space-y-2`}>
                 <li>Personal identification information (Name, email address, phone number)</li>
                 <li>Business information</li>
-                <li>Payment information</li>
+                <li>Subscription billing information, processed by Paystack (we do not store full card details)</li>
                 <li>Usage data and analytics</li>
               </ul>
             </section>
@@ -97,6 +97,13 @@ const PrivacyPolicy = () => {
             </section>
 
             <section className="mb-8">
+              <h2 className={`text-2xl font-semibold mb-4 ${textClasses.subheading}`}>Your Rights</h2>
+              <p className={`mb-4 ${textClasses.text}`}>
+                Under the Nigeria Data Protection Act, you may ask to access, correct, export or delete your personal data. Email us and we will respond within a reasonable time.
+              </p>
+            </section>
+
+            <section className="mb-8">
               <h2 className={`text-2xl font-semibold mb-4 ${textClasses.subheading}`}>Changes to This Policy</h2>
               <p className={`mb-4 ${textClasses.text}`}>
                 We may update our Privacy Policy from time to time. We will notify you of any
@@ -117,7 +124,7 @@ const PrivacyPolicy = () => {
             </section>
 
             <div className={`text-sm mt-8 ${textClasses.text}`}>
-              Last Updated: {new Date().toLocaleDateString()}
+              Last Updated: 30 October 2026
             </div>
           </div>
         </div>
@@ -126,4 +133,4 @@ const PrivacyPolicy = () => {
   );
 };
 
-export default PrivacyPolicy; 
+export default PrivacyPolicy;

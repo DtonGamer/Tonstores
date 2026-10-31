@@ -290,7 +290,7 @@ const Dashboard = () => {
       )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-  <Card className="flex flex-col sm:flex-row items-center p-4 sm:p-6 bg-gradient-to-br from-Tonstores-lightgreen to-Tonstores-green shadow-sm dark:from-Tonstores-green/80 dark:to-Tonstores-darkgreen">
+  <Card className="flex flex-col sm:flex-row items-center p-4 sm:p-6 bg-Tonstores-green/10 border-Tonstores-green/30 dark:bg-Tonstores-green/20">
     <div className="text-black dark:text-white flex-1 text-center sm:text-left mb-3 sm:mb-0">
       <h2 className="text-base sm:text-lg font-semibold mb-1">New Catalog</h2>
       <p className="text-black dark:text-white/80 text-xs sm:text-sm opacity-90">Create a product catalog</p>
@@ -298,7 +298,7 @@ const Dashboard = () => {
     <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 w-full sm:w-auto">
       <Link to="/onboarding" className="w-full sm:w-auto">
         <Button
-          className="bg-white text-Tonstores-darkgreen hover:bg-gray-100 dark:bg-gray-800 dark:text-Tonstores-green dark:hover:bg-gray-700 flex items-center justify-center h-10 px-3 w-full"
+          className="bg-white text-Tonstores-green hover:bg-gray-100 dark:bg-gray-800 dark:text-Tonstores-green dark:hover:bg-gray-700 flex items-center justify-center h-10 px-3 w-full"
           disabled={subscriptionLimits && !subscriptionLimits.canCreateCatalog}
         >
           <Plus size={14} className="mr-1" />
@@ -308,7 +308,7 @@ const Dashboard = () => {
       <Link to="/catalog/new" className="w-full sm:w-auto">
         <Button
           variant="outline"
-          className="text-Tonstores-darkgreen hover:bg-Tonstores-lightgreen dark:text-Tonstores-green dark:hover:bg-gray-700 border dark:border-gray-600 h-10 px-3 w-full"
+          className="text-Tonstores-green hover:bg-Tonstores-green/10 dark:text-Tonstores-green dark:hover:bg-gray-700 border dark:border-gray-600 h-10 px-3 w-full"
           disabled={subscriptionLimits && !subscriptionLimits.canCreateCatalog}
         >
           <span className="text-xs sm:text-sm whitespace-nowrap">Advanced</span>
@@ -317,7 +317,7 @@ const Dashboard = () => {
     </div>
   </Card>
 
-  <Card className="flex flex-col sm:flex-row items-center p-4 sm:p-6 bg-gradient-to-br from-Tonstores-lightblue to-Tonstores-blue shadow-sm dark:from-Tonstores-blue/80 dark:to-Tonstores-darkblue">
+  <Card className="flex flex-col sm:flex-row items-center p-4 sm:p-6 bg-Tonstores-amber/15 border-Tonstores-amber/40 dark:bg-Tonstores-amber/10">
     <div className="text-black dark:text-white flex-1 text-center sm:text-left mb-3 sm:mb-0">
       <h2 className="text-base sm:text-lg font-semibold mb-1">Orders</h2>
       <p className="text-black dark:text-white/80 text-xs sm:text-sm opacity-90 text-center sm:text-left">
@@ -346,7 +346,7 @@ const Dashboard = () => {
           <p className="text-gray-600 dark:text-gray-400 text-sm sm:mb-6 mb-4">Create your first catalog to get started</p>
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <Link to="/onboarding" className="w-full sm:w-auto">
-              <Button className="bg-Tonstores-green hover:bg-Tonstores-darkblue flex items-center gap-2 w-full sm:w-auto">
+              <Button className="bg-Tonstores-green hover:bg-Tonstores-greendark flex items-center gap-2 w-full sm:w-auto">
                 <Plus size={16} className="sm:size-5" />
                 <span className="text-xs sm:text-sm">Quick Setup</span>
               </Button>
@@ -363,7 +363,7 @@ const Dashboard = () => {
           {catalogs.map((catalog) => (
             <div 
               key={catalog.id} 
-              className="border dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-gray-800"
+              className="border dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800"
             >
               <div className="p-4">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
@@ -398,7 +398,7 @@ const Dashboard = () => {
                       {catalog.is_active ? 'Deactivate' : 'Activate'}
                     </Button>
                     <Link to={`/catalog/${catalog.id}/edit`}>
-                      <Button size="sm" className="whitespace-nowrap bg-Tonstores-green hover:bg-Tonstores-darkblue text-white">Edit</Button>
+                      <Button size="sm" className="whitespace-nowrap bg-Tonstores-green hover:bg-Tonstores-greendark text-white">Edit</Button>
                     </Link>
                   </div>
                 </div>

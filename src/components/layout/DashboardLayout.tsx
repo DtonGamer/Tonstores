@@ -123,7 +123,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   debugLog("Rendering dashboard content");
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-screen bg-background flex flex-col">
         {shouldShowSidebar && <SidebarNav />}
         {shouldShowBuyerSidebar && <SidebarNav />}
 

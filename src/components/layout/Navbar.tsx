@@ -32,13 +32,13 @@ const Navbar = () => {
   const toggleMenu = () => setIsMenuOpen((open) => !open);
 
   return (
-    <nav className="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+    <nav className="bg-Tonstores-cream border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20">
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-bold bg-gradient-to-r from-Tonstores-darkblue to-Tonstores-green bg-clip-text text-transparent">Tonstores</span>
+              <span className="text-2xl font-bold text-Tonstores-darkblue">Tonstores</span>
             </Link>
           </div>
 
@@ -68,8 +68,8 @@ const Navbar = () => {
                     </Button>
                   </Link>
                   <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="bg-Tonstores-green hover:bg-Tonstores-darkblue text-white">
-                      Sign Up
+                    <Button className="bg-Tonstores-green hover:bg-Tonstores-greendark text-white">
+                      Start free
                       <ArrowRight className="ml-2" size={16} />
                     </Button>
                   </Link>
@@ -80,7 +80,7 @@ const Navbar = () => {
             {/* If authenticated on home page, show only Dashboard */}
             {isAuthenticated && onHomeRoute && (
               <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                <Button className="bg-Tonstores-green hover:bg-Tonstores-darkblue text-white flex items-center space-x-2">
+                <Button className="bg-Tonstores-green hover:bg-Tonstores-greendark text-white flex items-center space-x-2">
                   <User size={18} />
                   <span>Dashboard</span>
                 </Button>
@@ -116,7 +116,7 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white py-4 px-4 shadow-lg rounded-b-lg animate-fade-in">
+        <div className="md:hidden bg-Tonstores-cream py-4 px-4 border-b border-gray-200 animate-fade-in">
           <div className="flex flex-col space-y-3 pb-3 border-b border-gray-200">
             {!isAuthenticated && (
               <>
@@ -159,8 +159,8 @@ const Navbar = () => {
                 </Button>
               </Link>
               <Link to="/register" className="w-full" onClick={() => setIsMenuOpen(false)}>
-                <Button className="w-full justify-center bg-Tonstores-green hover:bg-Tonstores-darkblue text-white">
-                  Sign Up
+                <Button className="w-full justify-center bg-Tonstores-green hover:bg-Tonstores-greendark text-white">
+                  Start free
                 </Button>
               </Link>
             </div>
