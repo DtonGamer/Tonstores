@@ -18,8 +18,6 @@ interface ContactMethodsProps {
   getTikTokLink: (handle: string) => string;
 }
 
-const pill = "inline-flex items-center gap-2 border border-border bg-card rounded-lg px-3.5 py-2 text-sm font-semibold hover:border-Tonstores-green transition-colors";
-
 const ContactMethods = ({
   contactMethods,
   hasSellerContacts = false,
@@ -29,6 +27,13 @@ const ContactMethods = ({
   getFacebookLink,
   getTikTokLink,
 }: ContactMethodsProps) => {
+  const socials = [
+    { label: "Instagram", href: getInstagramLink(contactMethods.instagram), icon: <Instagram size={20} /> },
+    { label: "TikTok", href: getTikTokLink(contactMethods.tiktok), icon: <TikTokIcon className="w-5 h-5" /> },
+    { label: "Facebook", href: getFacebookLink(contactMethods.facebook), icon: <Facebook size={20} /> },
+    { label: "Twitter", href: getTwitterLink(contactMethods.twitter), icon: <Twitter size={20} /> },
+  ];
+
   return (
     <section className="mt-10 bg-card border border-border rounded-2xl p-5 sm:p-6">
       <h2 className="text-lg font-extrabold mb-1">
@@ -38,30 +43,40 @@ const ContactMethods = ({
         {hasSellerContacts ? "Message the seller directly." : "Our support team is happy to help."}
       </p>
 
-      <div className="flex flex-wrap gap-2">
+      {/* Primary contact: two equal buttons */}
+      <div className="grid grid-cols-2 gap-3">
         <a
           href={getWhatsAppLink(contactMethods.whatsapp)}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-Tonstores-green hover:bg-Tonstores-greendark text-white rounded-lg px-4 py-2 text-sm font-bold"
+          className="flex items-center justify-center gap-2 h-12 rounded-lg bg-Tonstores-green hover:bg-Tonstores-greendark text-white text-sm font-bold"
         >
-          <Phone size={16} /> WhatsApp
+          <Phone size={18} /> WhatsApp
         </a>
-        <a href={`mailto:${contactMethods.email}`} className={pill}>
-          <Mail size={16} /> Email
+        <a
+          href={`mailto:${contactMethods.email}`}
+          className="flex items-center justify-center gap-2 h-12 rounded-lg border border-border bg-background text-sm font-bold hover:border-Tonstores-green transition-colors"
+        >
+          <Mail size={18} /> Email
         </a>
-        <a href={getInstagramLink(contactMethods.instagram)} target="_blank" rel="noopener noreferrer" className={pill}>
-          <Instagram size={16} /> Instagram
-        </a>
-        <a href={getTikTokLink(contactMethods.tiktok)} target="_blank" rel="noopener noreferrer" className={pill}>
-          <TikTokIcon className="w-4 h-4" /> TikTok
-        </a>
-        <a href={getFacebookLink(contactMethods.facebook)} target="_blank" rel="noopener noreferrer" className={pill}>
-          <Facebook size={16} /> Facebook
-        </a>
-        <a href={getTwitterLink(contactMethods.twitter)} target="_blank" rel="noopener noreferrer" className={pill}>
-          <Twitter size={16} /> Twitter
-        </a>
+      </div>
+
+      {/* Social: four equal tiles */}
+      <p className="text-xs font-semibold text-muted-foreground mt-5 mb-2">Follow</p>
+      <div className="grid grid-cols-4 gap-3">
+        {socials.map((s) => (
+          <a
+            key={s.label}
+            href={s.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={s.label}
+            className="flex flex-col items-center justify-center gap-1.5 h-[72px] rounded-lg border border-border bg-background text-foreground hover:border-Tonstores-green hover:text-Tonstores-green transition-colors"
+          >
+            {s.icon}
+            <span className="text-[11px] font-semibold">{s.label}</span>
+          </a>
+        ))}
       </div>
     </section>
   );

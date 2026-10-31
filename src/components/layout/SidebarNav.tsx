@@ -167,6 +167,17 @@ export default function SidebarNav() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMobileNavOpen]);
 
+  // Lock background scroll while the drawer is open. This stops the mobile browser's
+  // toolbars from collapsing/expanding mid-scroll, which briefly leaves a gap under the drawer.
+  useEffect(() => {
+    if (!isMobileNavOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isMobileNavOpen]);
+
   return (
     <>
       {/* Mobile Menu Button */}
@@ -307,10 +318,10 @@ export default function SidebarNav() {
     
 
       {/* Mobile Sidebar */}
-      <div className={`lg:hidden fixed inset-0 h-dvh z-40 transition-opacity duration-300 ${isMobileNavOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      <div className={`lg:hidden fixed inset-x-0 top-0 -bottom-24 z-40 transition-opacity duration-300 ${isMobileNavOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <div className="absolute inset-0 bg-black/50" onClick={() => setIsMobileNavOpen(false)}></div>
 
-        <div className={`sidebar-content relative transform transition-transform duration-300 ease-in-out ${isMobileNavOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col w-72 max-w-[85%] h-dvh bg-white overflow-y-auto overflow-x-hidden scrollbar-hide`}>
+        <div className={`sidebar-content relative transform transition-transform duration-300 ease-in-out ${isMobileNavOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col w-72 max-w-[85%] h-full pb-24 bg-white overflow-y-auto overflow-x-hidden scrollbar-hide`}>
           <div className="flex items-center justify-between h-16 flex-shrink-0 px-4 border-b border-gray-200">
             <Link to="/" className="flex items-center">
               <div className="flex items-center space-x-2">

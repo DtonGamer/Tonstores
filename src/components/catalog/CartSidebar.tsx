@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { ShoppingCart, X, ArrowRight, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getStorageUrl } from "@/utils/imageHelpers";
@@ -29,12 +30,22 @@ interface CartSidebarProps {
 const naira = (kobo: number) => `₦${(kobo / 100).toLocaleString("en-NG", { maximumFractionDigits: 2 })}`;
 
 const CartSidebar = ({ isOpen, onClose, cart, onProceedToCheckout }: CartSidebarProps) => {
+  // Lock background scroll while open (prevents the browser toolbar resize gap)
+  useEffect(() => {
+    if (!isOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose}></div>
-      <aside className="fixed inset-y-0 right-0 h-dvh w-full max-w-sm bg-background border-l border-border z-50 flex flex-col">
+      <div className="fixed inset-x-0 top-0 -bottom-24 bg-black/50 z-40" onClick={onClose}></div>
+      <aside className="fixed top-0 right-0 -bottom-24 pb-24 w-full max-w-sm bg-background border-l border-border z-50 flex flex-col">
         <div className="flex justify-between items-center px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-3 border-b border-border">
           <h2 className="text-lg font-extrabold">Your cart ({cart.items.length})</h2>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full" aria-label="Close cart">
