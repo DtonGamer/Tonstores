@@ -520,7 +520,7 @@ const CatalogView = () => {
         </div>
       </header>
 
-      <main className={`flex-grow max-w-6xl w-full mx-auto px-4 ${cartCount > 0 ? "pb-28" : "pb-8"}`}>
+      <main className="flex-grow max-w-6xl w-full mx-auto px-4 pb-4">
         <section className="pt-6 pb-2 text-center">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight mb-2">{catalog.name}</h1>
           {catalog.description && (
@@ -603,11 +603,14 @@ const CatalogView = () => {
           getTikTokLink={getTikTokLink}
         />
 
+      </main>
+
+      <footer className={`w-full mt-auto ${cartCount > 0 ? "pb-28" : "pb-4"}`}>
         <p className="text-center text-sm text-muted-foreground py-6">
           Made with <b className="text-Tonstores-green">Tonstores</b> ·{" "}
           <a href="/register" className="text-Tonstores-green font-bold">Create your free catalog</a>
         </p>
-      </main>
+      </footer>
 
       {cartCount > 0 && !isCartOpen && (
         <div className="fixed inset-x-0 bottom-0 z-40 bg-background border-t border-border px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
