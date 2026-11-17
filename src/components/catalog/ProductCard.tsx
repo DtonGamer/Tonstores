@@ -126,17 +126,24 @@ const ProductCard = ({
         </div>
         <CardContent className="p-3 flex-1 min-w-0">
           <h3
-            className={`font-semibold text-[15px] leading-snug line-clamp-2 break-words ${!isEditable ? 'cursor-pointer' : ''}`}
+            className={`font-semibold text-[15px] leading-snug break-words overflow-hidden ${!isEditable ? 'cursor-pointer' : ''}`}
+            style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}
             onClick={!isEditable ? openProductDetail : undefined}
           >
             {name}
           </h3>
-          {description && (
-            <p className="hidden sm:block text-muted-foreground text-sm line-clamp-2 break-words mt-1">{description}</p>
-          )}
-          <p className="text-lg font-extrabold text-Tonstores-green mt-1">
+          <p className="text-lg font-extrabold text-Tonstores-green mt-1.5">
             ₦{(price / 100).toLocaleString("en-NG", { maximumFractionDigits: 2 })}
           </p>
+          {!isEditable && (
+            <button
+              type="button"
+              onClick={openProductDetail}
+              className="mt-1 text-xs font-medium text-muted-foreground hover:text-foreground underline underline-offset-2"
+            >
+              View details
+            </button>
+          )}
           {isEditable && stockQuantity !== undefined && stockQuantity !== null && inStock && (
             <p className="text-sm text-muted-foreground mt-1">
               {stockQuantity} {stockQuantity === 1 ? 'item' : 'items'} left

@@ -521,12 +521,12 @@ const CatalogView = () => {
       </header>
 
       <main className={`flex-grow max-w-6xl w-full mx-auto px-4 ${cartCount > 0 ? "pb-28" : "pb-8"}`}>
-        <section className="pt-6 pb-2">
+        <section className="pt-6 pb-2 text-center">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight mb-2">{catalog.name}</h1>
           {catalog.description && (
-            <p className="text-muted-foreground max-w-xl mb-4">{catalog.description}</p>
+            <p className="text-muted-foreground max-w-xl mx-auto mb-4">{catalog.description}</p>
           )}
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap justify-center gap-2 mb-4">
             <span className="bg-accent text-Tonstores-green text-[13px] font-semibold px-3 py-1 rounded-full">Secure checkout</span>
             <span className="bg-accent text-Tonstores-green text-[13px] font-semibold px-3 py-1 rounded-full">Track your order</span>
           </div>
