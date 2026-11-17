@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useEventTracker } from '@/hooks/useEventTracker';
+import { validatePassword, PASSWORD_HINT } from '@/utils/passwordValidation';
 
 const UpdatePassword = () => {
   const [password, setPassword] = useState('');
@@ -85,11 +86,9 @@ const UpdatePassword = () => {
     }
 
     // Validate password strength
-    if (password.length < 6) {
-      setMessage({
-        type: 'error',
-        text: 'Password must be at least 6 characters long.'
-      });
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setMessage({ type: 'error', text: passwordError });
       setIsLoading(false);
       return;
     }
@@ -173,8 +172,9 @@ const UpdatePassword = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={isLoading}
-                  placeholder="At least 6 characters"
+                  placeholder="At least 8 characters"
                 />
+                <p className="text-xs text-gray-500">{PASSWORD_HINT}</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm New Password</Label>

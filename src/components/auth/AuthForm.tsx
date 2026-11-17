@@ -9,6 +9,7 @@ import useAuth from "@/contexts/AuthContext";
 import { toast } from "@/components/ui/use-toast";
 import { AffiliateService } from "@/services/AffiliateService";
 import { handleChange } from "@/utils/formUtils";
+import { validatePassword } from "@/utils/passwordValidation";
 
 type AuthFormProps = {
   type: "login" | "register";
@@ -26,14 +27,6 @@ const AuthForm = ({ type }: AuthFormProps) => {
   const navigate = useNavigate();
   const { signIn, signUp } = useAuth();
   const location = useLocation();
-
-  const validatePassword = (pwd: string): string | null => {
-    if (pwd.length < 8) return 'Password must be at least 8 characters';
-    if (!/[A-Z]/.test(pwd)) return 'Password must contain an uppercase letter';
-    if (!/[a-z]/.test(pwd)) return 'Password must contain a lowercase letter';
-    if (!/[0-9]/.test(pwd)) return 'Password must contain a number';
-    return null;
-  };
 
   const handlePasswordChange = (value: string) => {
     setPassword(value);
@@ -153,7 +146,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
             </p>
             <div className="mt-6">
               <Button
-                onClick={() => setShowVerificationMessage(false)}
+                onClick={() => navigate("/login")}
                 className="w-full bg-Tonstores-green hover:bg-Tonstores-greendark transition-colors"
               >
                 Back to Login

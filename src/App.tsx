@@ -150,6 +150,134 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// Created once at module level so it is not rebuilt on every App render
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <PublicLayout><Index /></PublicLayout>
+  },
+  {
+    path: "/features",
+    element: <PublicLayout><Features /></PublicLayout>
+  },
+  {
+    path: "/pricing",
+    element: <PublicLayout><Pricing /></PublicLayout>
+  },
+  {
+    path: "/about",
+    element: <PublicLayout><About /></PublicLayout>
+  },
+  {
+    path: "/contact",
+    element: <PublicLayout><Contact /></PublicLayout>
+  },
+  {
+    path: "/privacy",
+    element: <PublicLayout><PrivacyPolicy /></PublicLayout>
+  },
+  {
+    path: "/terms",
+    element: <PublicLayout><TermsOfService /></PublicLayout>
+  },
+  {
+    path: "/help",
+    element: <PublicLayout><HelpCenter /></PublicLayout>
+  },
+  {
+    path: "/testimonials",
+    element: <PublicLayout><Testimonials /></PublicLayout>
+  },
+  {
+    path: "/dashboard",
+    element: <SellerRoute><Dashboard /></SellerRoute>
+  },
+  {
+    path: "/onboarding",
+    element: <SellerRoute><OnboardingFlow /></SellerRoute>
+  },
+  {
+    path: "/catalog/new",
+    element: <SellerRoute><CatalogBuilder /></SellerRoute>
+  },
+  {
+    path: "/catalog/:id/edit",
+    element: <SellerRoute><CatalogBuilder /></SellerRoute>
+  },
+  {
+    path: "/orders",
+    element: <SellerRoute><OrderManagement /></SellerRoute>
+  },
+  {
+    path: "/settings",
+    element: <SellerRoute><Settings /></SellerRoute>
+  },
+  {
+    path: "/analytics",
+    element: <SellerRoute><Analytics /></SellerRoute>
+  },
+  {
+    path: "/c/:slug",
+    element: <CatalogViewLayout><CatalogView /></CatalogViewLayout>
+  },
+  {
+    path: "/checkout/:slug",
+    element: <PublicLayout><Checkout /></PublicLayout>
+  },
+  {
+    path: "/order-success/:id",
+    element: <OrderSuccessLayout><OrderSuccess /></OrderSuccessLayout>
+  },
+  {
+    path: "/order-tracking/:id",
+    element: <OrderTrackingLayout><OrderTracking /></OrderTrackingLayout>
+  },
+  {
+    path: "/buyer-profile",
+    element: <BuyerRoute><BuyerProfile /></BuyerRoute>
+  },
+  {
+    path: "/login",
+    element: <AuthLayout><div className="min-h-screen bg-Tonstores-lightgray flex items-center justify-center p-4"><AuthForm type="login" /></div></AuthLayout>
+  },
+  {
+    path: "/register",
+    element: <AuthLayout><div className="min-h-screen bg-Tonstores-lightgray flex items-center justify-center p-4"><AuthForm type="register" /></div></AuthLayout>
+  },
+  {
+    path: "/auth/verify",
+    element: <AuthLayout><VerifyEmail /></AuthLayout>
+  },
+  {
+    path: "/auth/recovery",
+    element: <AuthLayout><PasswordRecovery /></AuthLayout>
+  },
+  {
+    path: "/auth/update-password",
+    element: <AuthLayout><UpdatePassword /></AuthLayout>
+  },
+  {
+    path: "/finances",
+    element: <SellerRoute><PremiumRoute><Finances /></PremiumRoute></SellerRoute>
+  },
+  {
+    path: "/affiliate",
+    element: <SellerRoute><AffiliateDashboard /></SellerRoute>
+  },
+  {
+    path: "/affiliate/tools",
+    element: <SellerRoute><AffiliateToolsPage /></SellerRoute>
+  },
+  {
+    path: "/affiliate/terms",
+    element: <SellerRoute><AffiliateTermsPage /></SellerRoute>
+  },
+  {
+    path: "*",
+    element: <NotFound />
+  }
+]);
+
 const App = () => {
   // Check for redirect after login
   useEffect(() => {
@@ -159,134 +287,6 @@ const App = () => {
       // We don't need to navigate here because ProtectedRoute will handle it
     }
   }, []);
-
-  // Create router with createBrowserRouter
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <PublicLayout><Index /></PublicLayout>
-    },
-    {
-      path: "/features",
-      element: <PublicLayout><Features /></PublicLayout>
-    },
-    {
-      path: "/pricing",
-      element: <PublicLayout><Pricing /></PublicLayout>
-    },
-    {
-      path: "/about",
-      element: <PublicLayout><About /></PublicLayout>
-    },
-    {
-      path: "/contact",
-      element: <PublicLayout><Contact /></PublicLayout>
-    },
-    {
-      path: "/privacy",
-      element: <PublicLayout><PrivacyPolicy /></PublicLayout>
-    },
-    {
-      path: "/terms",
-      element: <PublicLayout><TermsOfService /></PublicLayout>
-    },
-    {
-      path: "/help",
-      element: <PublicLayout><HelpCenter /></PublicLayout>
-    },
-    {
-      path: "/testimonials",
-      element: <PublicLayout><Testimonials /></PublicLayout>
-    },
-    {
-      path: "/dashboard",
-      element: <SellerRoute><Dashboard /></SellerRoute>
-    },
-    {
-      path: "/onboarding",
-      element: <SellerRoute><OnboardingFlow /></SellerRoute>
-    },
-    {
-      path: "/catalog/new",
-      element: <SellerRoute><CatalogBuilder /></SellerRoute>
-    },
-    {
-      path: "/catalog/:id/edit",
-      element: <SellerRoute><CatalogBuilder /></SellerRoute>
-    },
-    {
-      path: "/orders",
-      element: <SellerRoute><OrderManagement /></SellerRoute>
-    },
-    {
-      path: "/settings",
-      element: <SellerRoute><Settings /></SellerRoute>
-    },
-    {
-      path: "/analytics",
-      element: <SellerRoute><Analytics /></SellerRoute>
-    },
-    {
-      path: "/c/:slug",
-      element: <CatalogViewLayout><CatalogView /></CatalogViewLayout>
-    },
-    {
-      path: "/checkout/:slug",
-      element: <PublicLayout><Checkout /></PublicLayout>
-    },
-    {
-      path: "/order-success/:id",
-      element: <OrderSuccessLayout><OrderSuccess /></OrderSuccessLayout>
-    },
-    {
-      path: "/order-tracking/:id",
-      element: <OrderTrackingLayout><OrderTracking /></OrderTrackingLayout>
-    },
-    {
-      path: "/buyer-profile",
-      element: <BuyerRoute><BuyerProfile /></BuyerRoute>
-    },
-    {
-      path: "/login",
-      element: <AuthLayout><div className="min-h-screen bg-Tonstores-lightgray flex items-center justify-center p-4"><AuthForm type="login" /></div></AuthLayout>
-    },
-    {
-      path: "/register",
-      element: <AuthLayout><div className="min-h-screen bg-Tonstores-lightgray flex items-center justify-center p-4"><AuthForm type="register" /></div></AuthLayout>
-    },
-    {
-      path: "/auth/verify",
-      element: <AuthLayout><VerifyEmail /></AuthLayout>
-    },
-    {
-      path: "/auth/recovery",
-      element: <AuthLayout><PasswordRecovery /></AuthLayout>
-    },
-    {
-      path: "/auth/update-password",
-      element: <AuthLayout><UpdatePassword /></AuthLayout>
-    },
-    {
-      path: "/finances",
-      element: <SellerRoute><PremiumRoute><Finances /></PremiumRoute></SellerRoute>
-    },
-    {
-      path: "/affiliate",
-      element: <SellerRoute><AffiliateDashboard /></SellerRoute>
-    },
-    {
-      path: "/affiliate/tools",
-      element: <SellerRoute><AffiliateToolsPage /></SellerRoute>
-    },
-    {
-      path: "/affiliate/terms",
-      element: <SellerRoute><AffiliateTermsPage /></SellerRoute>
-    },
-    {
-      path: "*",
-      element: <NotFound />
-    }
-  ]);
 
   return (
     <QueryClientProvider client={queryClient}>

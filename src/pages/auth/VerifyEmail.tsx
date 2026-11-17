@@ -140,7 +140,7 @@ export default function VerifyEmail() {
           {status !== "loading" && (
             <Button 
               variant="outline" 
-              onClick={() => navigate("/auth/login")}
+              onClick={() => navigate("/login")}
             >
               Return to Login
             </Button>
@@ -149,4 +149,4 @@ export default function VerifyEmail() {
       </Card>
     </div>
   );
-} 
+}
