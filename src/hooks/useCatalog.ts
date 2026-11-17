@@ -44,11 +44,16 @@ export const useCatalog = () => {
     }
   };
 
+  /**
+   * Public storefront lookup.
+   * Read path: does NOT toast. It returns null when the catalog isn't found
+   * (PGRST116) and rethrows any other error so the calling view can show
+   * a single error message.
+   */
   const getCatalogBySlug = async (slug: string) => {
     try {
       setIsLoading(true);
       
-     // // console.log("useCatalog: Getting catalog by slug:", slug);
       const { data, error } = await supabase
         .from("catalogs")
         .select("*")
@@ -59,27 +64,17 @@ export const useCatalog = () => {
       // Handle PGRST116 error (not found) specially
       if (error) {
         if (error.code === "PGRST116") {
-          //// console.log("useCatalog: No active catalog found for slug:", slug);
           return null; // Return null instead of throwing for "not found"
         }
-    //    console.error("useCatalog: Error fetching catalog:", error);
         throw error;
       }
       
-      // // console.log("useCatalog: Found catalog:", data);
       return data;
     } catch (error: any) {
-   //   console.error("useCatalog: Error in getCatalogBySlug:", error);
-      
-      // Don't show toast for "not found" errors
-      if (error.code !== "PGRST116") {
-        toast({
-          title: "Error retrieving catalog",
-          description: error.message,
-          variant: "destructive",
-        });
+      if (error?.code !== "PGRST116") {
+        console.error("useCatalog: Error fetching catalog by slug:", error);
       }
-      
+      // No toast here: the view that called us owns the UI.
       throw error;
     } finally {
       setIsLoading(false);
@@ -110,24 +105,18 @@ export const useCatalog = () => {
         throw new Error("Slug must be at least 3 characters long");
       }
       
-     // // console.log("Creating catalog with data:", catalogData);
-      
       // Create the insert payload
       const payload = {
         ...catalogData,
         user_id: user.id,
       };
- //     // console.log("Insert payload:", payload);
       
-      const { data, error, status, statusText } = await supabase
+      const { data, error } = await supabase
         .from("catalogs")
         .insert(payload)
         .select();
       
-     // // console.log("Supabase response:", { data, error, status, statusText });
-      
       if (error) {
-    //    console.error("Database error creating catalog:", error);
         throw error;
       }
       
@@ -136,16 +125,13 @@ export const useCatalog = () => {
       }
       
       const createdCatalog = data[0];
-     // // console.log("Catalog created successfully:", createdCatalog);
       
       toast({
         title: "Catalog created",
-      //  description: "Your catalog has been created successfully",
       });
       
       return createdCatalog;
     } catch (error: any) {
-    //  console.error("Error creating catalog:", error);
       toast({
         title: "Error creating catalog",
         description: error.message,
@@ -235,8 +221,6 @@ export const useCatalog = () => {
   };
 
   const generateUniqueSlug = async (name: string, currentCatalogId?: string) => {
-   // // console.log("Generating slug from name:", name);
-    
     // Convert name to slug format and ensure minimum length
     let baseSlug = name
       .toLowerCase()
@@ -247,7 +231,6 @@ export const useCatalog = () => {
     
     // Ensure minimum length for slug (3+ characters)
     if (baseSlug.length < 3) {
-    //  // console.log("Slug too short, padding to minimum length:", baseSlug);
       baseSlug = baseSlug.padEnd(3, baseSlug[0] || 'a');
     }
     
@@ -258,8 +241,6 @@ export const useCatalog = () => {
     // Check if slug exists and generate a unique one
     while (!isUnique) {
       try {
-     //   // console.log("Checking if slug exists:", slug);
-        
         let query = supabase
           .from("catalogs")
           .select("count")
@@ -272,23 +253,17 @@ export const useCatalog = () => {
         
         const { data, error } = await query;
         
-     //   // console.log("Slug check response:", { data, error });
-        
         if (error) {
-      //    console.error("Error checking slug:", error);
           throw error;
         }
         
         if (!data || data.length === 0 || data[0].count === 0) {
           isUnique = true;
-       //   // console.log("Slug is unique:", slug);
         } else {
           slug = `${baseSlug}-${counter}`;
           counter++;
-         // // console.log("Slug already exists, trying new slug:", slug);
         }
       } catch (e) {
-       // console.error("Error in slug generation:", e);
         // If error occurs, generate a new slug with timestamp to ensure uniqueness
         slug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
         isUnique = true; // Break the loop

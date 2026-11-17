@@ -97,7 +97,7 @@ const ProductCard = ({
   
   return (
     <>
-      <Card className={`overflow-hidden rounded-2xl border border-border bg-card flex flex-col ${!inStock ? 'opacity-80' : ''}`}>
+      <Card className={`overflow-hidden rounded-2xl border border-border bg-card flex flex-col min-w-0 ${!inStock ? 'opacity-80' : ''}`}>
         <div
           className={`aspect-square overflow-hidden relative bg-muted ${!isEditable ? 'cursor-pointer' : ''}`}
           onClick={!isEditable ? openProductDetail : undefined}
@@ -124,15 +124,15 @@ const ProductCard = ({
             </span>
           )}
         </div>
-        <CardContent className="p-3 flex-1">
+        <CardContent className="p-3 flex-1 min-w-0">
           <h3
-            className={`font-semibold text-[15px] leading-snug line-clamp-2 ${!isEditable ? 'cursor-pointer' : ''}`}
+            className={`font-semibold text-[15px] leading-snug line-clamp-2 break-words ${!isEditable ? 'cursor-pointer' : ''}`}
             onClick={!isEditable ? openProductDetail : undefined}
           >
             {name}
           </h3>
           {description && (
-            <p className="hidden sm:block text-muted-foreground text-sm line-clamp-2 mt-1">{description}</p>
+            <p className="hidden sm:block text-muted-foreground text-sm line-clamp-2 break-words mt-1">{description}</p>
           )}
           <p className="text-lg font-extrabold text-Tonstores-green mt-1">
             ₦{(price / 100).toLocaleString("en-NG", { maximumFractionDigits: 2 })}
@@ -167,7 +167,7 @@ const ProductCard = ({
         <DialogContent className="max-w-[100vw] w-full h-[100dvh] max-h-[100dvh] p-0 m-0 rounded-none sm:max-w-[600px] sm:h-auto sm:max-h-[90vh] sm:rounded-lg overflow-hidden flex flex-col">
           {/* Fixed Header */}
           <div className="flex-shrink-0 bg-white dark:bg-gray-950 p-3 sm:p-4 border-b dark:border-gray-800 flex justify-between items-center gap-3">
-            <DialogTitle className="text-base sm:text-xl font-bold line-clamp-2 flex-1">{name}</DialogTitle>
+            <DialogTitle className="text-base sm:text-xl font-bold line-clamp-2 break-words flex-1">{name}</DialogTitle>
             <Button
               variant="ghost"
               size="icon"
@@ -278,7 +278,7 @@ const ProductCard = ({
                   <div className="bg-gray-50 dark:bg-gray-800/50 p-3 sm:p-4 rounded-lg">
                     <h4 className="font-semibold text-base sm:text-lg mb-2 dark:text-white">Description</h4>
                     <div className="max-h-[150px] sm:max-h-[200px] overflow-y-auto pr-2">
-                      <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                      <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words">
                         {description || "No description available."}
                       </p>
                     </div>

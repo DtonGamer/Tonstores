@@ -23,6 +23,12 @@ interface ProductsQueryOptions {
   limit?: number;
   offset?: number;
   countOnly?: boolean;
+  /**
+   * Seller-side only. When true, shows a one-time "Low Stock Alert" toast
+   * for this catalog. Defaults to false so public storefront shoppers
+   * never see internal inventory alerts.
+   */
+  showLowStockAlert?: boolean;
 }
 
 export const useProducts = (catalogId?: string) => {
@@ -50,6 +56,10 @@ export const useProducts = (catalogId?: string) => {
     return Array.isArray(products) ? products.filter(product => hasLowStock(product)) : [];
   };
 
+  /**
+   * Read path: does NOT toast on error. It logs and rethrows so the calling
+   * view can show a single error message.
+   */
   const getProducts = async (catalogId: string, options?: ProductsQueryOptions) => {
     try {
       setIsLoading(true);
@@ -85,8 +95,9 @@ export const useProducts = (catalogId?: string) => {
       
       if (error) throw error;
       
-      // Check for low stock items and show notification
-      if (Array.isArray(data)) {
+      // Low stock notification is opt-in (seller context only).
+      // The public storefront calls getProducts() without this flag.
+      if (options?.showLowStockAlert && Array.isArray(data)) {
         const lowStockItems = data.filter(product => {
           if (product.stock_quantity === null || product.stock_quantity === undefined) {
             return false;
@@ -111,11 +122,7 @@ export const useProducts = (catalogId?: string) => {
       return data || [];
     } catch (error: any) {
       console.error("Error fetching products:", error);
-      toast({
-        title: "Error retrieving products",
-        description: error.message,
-        variant: "destructive",
-      });
+      // No toast here: the view that called us owns the UI.
       throw error;
     } finally {
       setIsLoading(false);
