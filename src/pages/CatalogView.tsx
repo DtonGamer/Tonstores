@@ -23,13 +23,18 @@ import ContactMethods from "@/components/catalog/ContactMethods";
 import CartSidebar from "@/components/catalog/CartSidebar";
 import TikTokIcon from "@/components/catalog/tiktokIcon";
 
+// Support contacts fall back to the platform defaults.
+// Social handles intentionally have NO fallback: a social button only
+// appears when the seller has set their own handle/URL.
 const DEFAULT_CONTACTS = {
   email_support: "tonshopdev@proton.me",
   whatsapp_support: "+2349038650178",
-  twitter_handle: "RichieDbuilder",
-  instagram_handle: "Tonstores",
-  facebook_handle: "Tonstore",
-  tiktok_handle: "tonrichie",
+};
+
+// Returns a trimmed handle/URL, or undefined when the seller hasn't set one
+const cleanHandle = (value?: string | null) => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
 };
 
 const CatalogView = () => {
@@ -87,10 +92,10 @@ const CatalogView = () => {
     return {
       email: sellerProfile?.email_support || adminProfile?.email_support || DEFAULT_CONTACTS.email_support,
       whatsapp: sellerProfile?.whatsapp_support || adminProfile?.whatsapp_support || DEFAULT_CONTACTS.whatsapp_support,
-      twitter: sellerProfile?.twitter_handle || adminProfile?.twitter_handle || DEFAULT_CONTACTS.twitter_handle,
-      instagram: sellerProfile?.instagram_handle || adminProfile?.instagram_handle || DEFAULT_CONTACTS.instagram_handle,
-      facebook: sellerProfile?.facebook_handle || adminProfile?.facebook_handle || DEFAULT_CONTACTS.facebook_handle,
-      tiktok: sellerProfile?.tiktok_handle || adminProfile?.tiktok_handle || DEFAULT_CONTACTS.tiktok_handle,
+      twitter: cleanHandle(sellerProfile?.twitter_handle),
+      instagram: cleanHandle(sellerProfile?.instagram_handle),
+      facebook: cleanHandle(sellerProfile?.facebook_handle),
+      tiktok: cleanHandle(sellerProfile?.tiktok_handle),
     };
   }, [sellerProfile, adminProfile]);
   
