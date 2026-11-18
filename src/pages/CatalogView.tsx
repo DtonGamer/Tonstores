@@ -359,9 +359,10 @@ const CatalogView = () => {
       toast({
         title: "Added to cart",
         description: `${quantity} × ${productToAdd.name} added to cart`,
+        duration: 2000,
       });
-      
-      setIsCartOpen(true);
+      // Cart sidebar is no longer auto-opened; the sticky "View cart" bar
+      // and the header cart button let the shopper open it when ready.
     }
   };
   
