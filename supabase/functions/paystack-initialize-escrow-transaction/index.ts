@@ -255,7 +255,7 @@ serve(async (req) => {
         const { error: updateError } = await supabase
           .from('orders')
           .update({ 
-            escrow_status: 'held',
+            // escrow_status is set to 'held' by the webhook once payment succeeds
             payment_gateway: 'paystack',
             payment_reference: reference,
             transaction_reference: transactionReference,
