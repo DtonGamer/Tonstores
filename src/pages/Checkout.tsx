@@ -373,6 +373,9 @@ const Checkout = () => {
           // Redirect to success page and stay there
           navigate(`/order-success/${order.id}`, { state: navigationState, replace: true });
         },
+        cancelUrl: slug
+          ? `${window.location.origin}/c/${slug}?payment_cancelled=1&order=${order.id}`
+          : undefined,
         onClose: () => {
           console.log("Payment modal closed");
           // Do not clear cart on close to allow user to retry payment

@@ -50,7 +50,12 @@ const CatalogView = () => {
   const [sellerProfile, setSellerProfile] = useState<any>(null);
   const [adminProfile, setAdminProfile] = useState<any>(null);
 
-  const paymentCancelled = location.state?.payment_cancelled;
+  // Buyer returning from Paystack's hosted page via its Cancel link: ?payment_cancelled=1&order=<id>
+  const cancelledOrderId = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get("payment_cancelled") === "1" ? params.get("order") : null;
+  }, [location.search]);
+  const paymentCancelled = location.state?.payment_cancelled || !!cancelledOrderId;
   const sessionStorageKey = `catalog_${slug}`;
   const productsStorageKey = `products_${slug}`;
 
@@ -110,6 +115,18 @@ const CatalogView = () => {
 
     fetchAdminProfileData();
   }, []);
+
+  // Ask the server to confirm with Paystack and mark the order cancelled (once)
+  const reconciledOrderRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!cancelledOrderId || reconciledOrderRef.current === cancelledOrderId) return;
+    reconciledOrderRef.current = cancelledOrderId;
+    supabase.functions
+      .invoke("paystack-reconcile-order", { body: { orderId: cancelledOrderId, cancelled: true } })
+      .then(({ error }) => {
+        if (error) console.error("Failed to reconcile cancelled order:", error);
+      });
+  }, [cancelledOrderId]);
 
   // Show toast for cancelled payment once
   useEffect(() => {

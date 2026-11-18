@@ -5,16 +5,14 @@ import {
   createSupabaseClient,
   handleCommonError,
   isDevelopmentMode,
-  mapSnakeToCamel
 } from '../_shared/utils.ts';
 
-// Define interface for Paystack initialize transaction payload
 interface PaystackInitializeTransactionPayload {
   amount: number;
   email: string;
   currency: string;
   reference: string;
-  callbackUrl: string;
+  callback_url: string;
   metadata?: any;
   channels?: string[];
   subaccount?: string;
@@ -25,36 +23,28 @@ interface PaystackInitializeTransactionPayload {
 
 serve(async (req) => {
   console.log("🚀 === ESCROW TRANSACTION INITIALIZATION START ===");
-  console.log("📥 Request Method:", req.method);
-  console.log("📥 Request URL:", req.url);
   
-  // Handle OPTIONS request for CORS
   if (req.method === "OPTIONS") {
-    console.log("✅ Handling CORS OPTIONS request");
     return handleCorsOptions();
   }
 
-  // Only allow POST
   if (req.method !== "POST") {
-    console.log("❌ Method not allowed:", req.method);
     return jsonResponse(405, { error: "Method Not Allowed" });
   }
 
-  // Parse JSON body
   let data;
   try {
     data = await req.json();
-    console.log("📦 Raw request body:", JSON.stringify(data, null, 2));
+    console.log("📦 Request received");
   } catch (err) {
     console.error("❌ Error parsing JSON body:", err);
     return jsonResponse(400, { error: "Invalid JSON body" });
   }
 
-  // Check for development mode
   const devMode = data.dev_mode === true || Deno.env.get("DEV_MODE") === "true" || isDevelopmentMode();
   console.log("🔧 Development mode:", devMode);
 
-  // Map snake_case field names to camelCase if they exist
+  // Map snake_case to camelCase
   if (data.payment_reference && !data.paymentReference) {
     data.paymentReference = data.payment_reference;
   }
@@ -64,20 +54,10 @@ serve(async (req) => {
   if (data.callback_url && !data.callbackUrl) {
     data.callbackUrl = data.callback_url;
   }
-  if (data.return_url && !data.returnUrl) {
-    data.returnUrl = data.return_url;
-  }
-  if (data.custom_description && !data.customDescription) {
-    data.customDescription = data.custom_description;
-  }
-  if (data.charge_redirect_url && !data.chargeRedirectUrl) {
-    data.chargeRedirectUrl = data.charge_redirect_url;
-  }
   if (data.income_split_config && !data.incomeSplitConfig) {
     data.incomeSplitConfig = data.income_split_config;
   }
 
-  // Destructure required fields
   const {
     amount,
     email,
@@ -94,15 +74,10 @@ serve(async (req) => {
   console.log("📋 Extracted fields:", {
     amount,
     email,
-    currency,
-    reference,
-    callbackUrl: callbackUrl?.substring(0, 50) + "...",
-    userId,
+    userId: userId || 'NOT PROVIDED',
     orderId,
     hasMetadata: !!metadata,
-    hasChannels: !!channels,
-    hasIncomeSplitConfig: !!incomeSplitConfig,
-    splitConfigCount: incomeSplitConfig?.length || 0
+    isAnonymous: metadata?.is_anonymous
   });
 
   // Handle development mode
@@ -115,34 +90,22 @@ serve(async (req) => {
       status: true,
       message: "Escrow transaction initialized (Development Mode)",
       dev_mode: true,
-      transactionReference: mockTransactionReference,
-      authorization_url: mockAuthorizationUrl,
-      escrow_status: "held",
       data: {
-        transactionReference: mockTransactionReference,
         authorization_url: mockAuthorizationUrl,
-        amount: amount,
-        currency: currency,
-        email: email,
-        reference: reference,
-        escrow_account_code: "DEV_PLATFORM_ESCROW_ACCT",
-        original_transaction_split: data.incomeSplitConfig,
-        funds_destination: "platform_escrow_account"
+        authorizationUrl: mockAuthorizationUrl,
+        access_code: mockTransactionReference,
+        accessCode: mockTransactionReference,
+        reference: mockTransactionReference
       }
     });
   }
 
-  // Initialize Supabase client
-  console.log("🔌 Initializing Supabase client...");
   const supabase = createSupabaseClient();
   if (!supabase) {
-    console.error("❌ Supabase configuration is missing");
     return jsonResponse(500, { error: "Supabase configuration is missing" });
   }
-  console.log("✅ Supabase client initialized");
 
   // Fetch the platform escrow account
-  console.log("🔍 Fetching platform escrow account...");
   const { data: platformAccountData, error: platformAccountError } = await supabase
     .from('platform_accounts')
     .select('paystack_subaccount_code')
@@ -153,43 +116,33 @@ serve(async (req) => {
   let platformSubaccount;
   if (platformAccountError || !platformAccountData) {
     console.error("⚠️ Error fetching platform escrow account:", platformAccountError);
-    console.log("⚠️ Proceeding with standard transaction as fallback");
     platformSubaccount = null;
   } else {
     platformSubaccount = platformAccountData.paystack_subaccount_code;
-    console.log("✅ Platform escrow account found:", platformSubaccount);
+    console.log("✅ Platform escrow account found");
   }
 
   // Validate required fields
   if (!amount || !email || !reference || !callbackUrl) {
-    console.error("❌ Missing required fields:", {
-      hasAmount: !!amount,
-      hasEmail: !!email,
-      hasReference: !!reference,
-      hasCallbackUrl: !!callbackUrl
-    });
     return jsonResponse(400, {
       error: "Missing required fields",
       required: ["amount", "email", "reference", "callbackUrl"]
     });
   }
 
+  // Validate userId exists (even for anonymous users, Supabase creates a real user)
   if (!userId) {
-    console.warn("⚠️ User ID is missing in escrow transaction initialization");
+    console.error("❌ User ID is missing - this should not happen with anonymous auth");
+    return jsonResponse(400, {
+      error: "User ID is required. Anonymous users should be signed in automatically."
+    });
   }
 
   // Store original income split configuration
-  if (incomeSplitConfig && orderId) {
+  if (incomeSplitConfig && orderId && userId) {
     console.log("💾 Storing income split configuration...");
-    console.log("Split configs to store:", incomeSplitConfig.length);
     
     for (const splitConfig of incomeSplitConfig) {
-      console.log("  - Storing split:", {
-        subaccount: splitConfig.subAccountCode,
-        feePercentage: splitConfig.feePercentage,
-        splitPercentage: splitConfig.splitPercentage
-      });
-      
       try {
         await supabase.from('income_split_configs').upsert({
           user_id: userId,
@@ -203,75 +156,47 @@ serve(async (req) => {
         }, {
           onConflict: 'order_id,subaccount_code'
         });
-        console.log("  ✅ Split config stored successfully");
+        console.log("  ✅ Split config stored");
       } catch (splitError) {
         console.error("  ❌ Error storing split config:", splitError);
       }
     }
   }
 
-  // Get Paystack credentials
   const PAYSTACK_SECRET_KEY = Deno.env.get("PAYSTACK_SECRET_KEY");
-  console.log("🔑 Paystack secret key exists:", !!PAYSTACK_SECRET_KEY);
-  console.log("🔑 Paystack secret key length:", PAYSTACK_SECRET_KEY?.length || 0);
-
+  
   if (!PAYSTACK_SECRET_KEY) {
-    console.error("❌ Paystack credentials not configured");
     return jsonResponse(500, { error: "Paystack credentials not configured" });
   }
 
   // Prepare payload for Paystack
-  console.log("📝 Preparing Paystack payload...");
   const payload: PaystackInitializeTransactionPayload = {
     amount: Math.round(Number(amount)),
     email,
     currency: currency || 'NGN',
     reference,
-    callbackUrl,
+    // Paystack's field is callback_url; camelCase is silently ignored
+    callback_url: callbackUrl,
     metadata: metadata || {},
     channels: channels || ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer']
   };
 
-  console.log("📝 Base payload:", {
-    amount: payload.amount,
-    email: payload.email,
-    currency: payload.currency,
-    reference: payload.reference,
-    callbackUrl: payload.callbackUrl?.substring(0, 50) + "...",
-    channelCount: payload.channels?.length,
-    hasMetadata: !!payload.metadata
-  });
-
   // Add escrow account routing
   if (platformSubaccount) {
-    console.log("💰 Adding platform escrow routing to payload");
     payload.subaccount = platformSubaccount;
     payload.bearer_type = "subaccount";
     payload.transaction_charge = 0;
-    console.log("  - Subaccount:", platformSubaccount);
-    console.log("  - Bearer type:", payload.bearer_type);
-    console.log("  - Transaction charge:", payload.transaction_charge);
-  } else {
-    if (incomeSplitConfig && incomeSplitConfig.length > 0) {
-      console.log("💰 Using fallback routing with split config");
-      payload.subaccount = incomeSplitConfig[0]?.subAccountCode;
-      payload.bearer_type = "subaccount";
-      payload.transaction_charge = 0;
-      console.log("  - Fallback subaccount:", payload.subaccount);
-    } else {
-      console.log("⚠️ No escrow routing configured - using standard transaction");
-    }
+  } else if (incomeSplitConfig && incomeSplitConfig.length > 0) {
+    payload.subaccount = incomeSplitConfig[0]?.subAccountCode;
+    payload.bearer_type = "subaccount";
+    payload.transaction_charge = 0;
   }
-
-  console.log("📤 Final payload to Paystack:", JSON.stringify(payload, null, 2));
 
   try {
     console.log("🌐 Calling Paystack API...");
-    console.log("🌐 URL: https://api.paystack.co/transaction/initialize");
     
     const controller = new AbortController();
     const timeout = setTimeout(() => {
-      console.error("⏱️ Request timeout after 15 seconds");
       controller.abort();
     }, 15000);
 
@@ -287,22 +212,10 @@ serve(async (req) => {
 
     clearTimeout(timeout);
     
-    console.log("📨 Paystack response status:", resp.status);
-    console.log("📨 Paystack response status text:", resp.statusText);
-    console.log("📨 Paystack response headers:", Object.fromEntries(resp.headers.entries()));
-
     const result = await resp.json();
-    console.log("📨 Paystack response body:", JSON.stringify(result, null, 2));
 
     if (!result.status) {
-      console.error("❌ Paystack API returned error status");
-      console.error("❌ Error details:", {
-        status: resp.status,
-        statusText: resp.statusText,
-        message: result.message,
-        fullResult: result
-      });
-
+      console.error("❌ Paystack API error:", result.message);
       return jsonResponse(resp.status, {
         error: result.message || "Paystack API error",
         details: result
@@ -314,14 +227,8 @@ serve(async (req) => {
     const authorizationUrl = result.data.authorization_url;
     const accessCode = result.data.access_code;
 
-    console.log("✅ Transaction details:", {
-      reference: transactionReference,
-      authorizationUrl: authorizationUrl?.substring(0, 50) + "...",
-      accessCode
-    });
-
     // Store escrow transaction in database
-    if (supabase && userId) {
+    if (supabase && orderId) {
       console.log("💾 Storing escrow transaction in database...");
       try {
         const { error: insertError } = await supabase.from('escrow_transactions').insert({
@@ -341,25 +248,25 @@ serve(async (req) => {
         if (insertError) {
           console.error("❌ Error inserting escrow transaction:", insertError);
         } else {
-          console.log("✅ Escrow transaction stored successfully");
+          console.log("✅ Escrow transaction stored");
         }
 
         // Update order
-        if (orderId) {
-          console.log("💾 Updating order status...");
-          const { error: updateError } = await supabase
-            .from('orders')
-            .update({ 
-              escrow_status: 'held',
-              payment_gateway: 'paystack'
-            })
-            .eq('id', orderId);
+        const { error: updateError } = await supabase
+          .from('orders')
+          .update({ 
+            escrow_status: 'held',
+            payment_gateway: 'paystack',
+            payment_reference: reference,
+            transaction_reference: transactionReference,
+            is_anonymous_order: metadata?.is_anonymous || false
+          })
+          .eq('id', orderId);
 
-          if (updateError) {
-            console.error("❌ Error updating order:", updateError);
-          } else {
-            console.log("✅ Order updated successfully");
-          }
+        if (updateError) {
+          console.error("❌ Error updating order:", updateError);
+        } else {
+          console.log("✅ Order updated");
         }
       } catch (dbError) {
         console.error("❌ Database error:", dbError);
@@ -367,23 +274,24 @@ serve(async (req) => {
     }
 
     console.log("🎉 === ESCROW TRANSACTION INITIALIZATION SUCCESS ===");
+    
+    // Return both snake_case and camelCase for compatibility
     return jsonResponse(200, {
       status: true,
       message: "Escrow transaction initialized",
       data: {
-        ...mapSnakeToCamel(result.data),
-        escrow_status: "held",
-        escrow_account_code: platformSubaccount,
-        original_transaction_split: incomeSplitConfig,
-        funds_destination: platformSubaccount ? "platform_escrow_account" : "standard_account"
+        authorization_url: authorizationUrl,
+        authorizationUrl: authorizationUrl,
+        access_code: accessCode,
+        accessCode: accessCode,
+        reference: transactionReference,
+        escrowStatus: "held",
+        escrow_status: "held"
       }
     });
   } catch (error) {
     console.error("❌ === ESCROW TRANSACTION INITIALIZATION FAILED ===");
-    console.error("❌ Error type:", error?.constructor?.name);
-    console.error("❌ Error message:", error?.message);
-    console.error("❌ Error stack:", error?.stack);
-    console.error("❌ Full error object:", error);
+    console.error("❌ Error:", error);
     
     return handleCommonError(error, "Paystack escrow transaction initialization");
   }

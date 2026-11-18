@@ -18,6 +18,8 @@ interface InitiatePaymentProps {
   customerPhone: string;
   onSuccess: (reference: string) => void;
   onClose: () => void;
+  // Where Paystack's hosted page sends the buyer when they click Cancel
+  cancelUrl?: string;
 }
 
 interface PaymentConfig {
@@ -99,7 +101,8 @@ export const useSimplifiedPaystackPayment = () => {
     customerEmail,
     customerPhone,
     onSuccess,
-    onClose
+    onClose,
+    cancelUrl
   }: InitiatePaymentProps) => {
     // Create a debug log that persists
     const debugLog = (message: string, data?: any) => {
@@ -204,7 +207,8 @@ export const useSimplifiedPaystackPayment = () => {
         email: customerEmail,
         currency: 'NGN',
         reference: reference,
-        callbackUrl: `${window.location.origin}/order-success?orderId=${order.id}&reference=${reference}`,
+        // Route is /order-success/:id (the id is a path param, not a query param)
+        callbackUrl: `${window.location.origin}/order-success/${order.id}?reference=${reference}`,
         channels: ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer'],
         metadata: {
           order_id: order.id,
@@ -212,6 +216,8 @@ export const useSimplifiedPaystackPayment = () => {
           customer_email: customerEmail,
           customer_phone: customerPhone,
           ...(userId && { user_id: userId }),
+          // Paystack redirects here when the buyer clicks Cancel on the hosted page
+          ...(cancelUrl && { cancel_action: cancelUrl }),
           custom_fields: [
             {
               display_name: "Order ID",
