@@ -76,12 +76,26 @@ const Index = () => {
                 🔗 tonstores.com/your-shop
                 <span className="ml-auto bg-Tonstores-green/10 text-Tonstores-green px-3 py-1 rounded-full text-xs">Copy</span>
               </div>
-              <div className="rounded-3xl overflow-hidden border-2 border-Tonstores-darkblue bg-white">
-                <img
-                  src="https://hhxpuadernawdgdrdnok.supabase.co/storage/v1/object/public/profiles/avatars/ChatGPT%20Image%20May%203,%202025,%2012_21_52%20AM.png"
-                  alt="A Tonstores catalog on a phone"
-                  className="w-full h-auto"
-                />
+              {/* Two phone mockups: catalog in front, cart behind */}
+              <div className="relative mx-auto w-full max-w-[22rem] h-[29rem]">
+                <div className="absolute right-0 top-10 w-[52%] rotate-[5deg] rounded-[1.75rem] border-[6px] border-Tonstores-darkblue bg-white overflow-hidden shadow-xl">
+                  <img
+                    src="/hero-cart.webp"
+                    alt="The shopping cart with a secure checkout button"
+                    width={600}
+                    height={1041}
+                    className="block w-full h-auto"
+                  />
+                </div>
+                <div className="absolute left-0 top-0 z-10 w-[58%] -rotate-[3deg] rounded-[1.75rem] border-[6px] border-Tonstores-darkblue bg-white overflow-hidden shadow-xl">
+                  <img
+                    src="/hero-catalog.webp"
+                    alt="A Tonstores catalog with products, prices and add to cart buttons"
+                    width={600}
+                    height={1277}
+                    className="block w-full h-auto"
+                  />
+                </div>
               </div>
             </div>
           </div>
